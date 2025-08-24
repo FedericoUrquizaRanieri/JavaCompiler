@@ -15,9 +15,10 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        Token currentToken = new Token("EOF","EOF",0); //revisit this later
+        Token currentToken = new Token("example","example",0); //revisit this later
         SourceManager sourceManager = new SourceManagerImpl();
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceManager);
+        boolean noMistakes=false;
 
         try {
             sourceManager.open(Arrays.toString(args));
@@ -33,8 +34,16 @@ public class Main {
                 throw new RuntimeException(e);
             } catch (LexicException e) {
                 e.printStackTrace();
+                noMistakes=true;
             }
-        }while(Objects.equals(currentToken.getTokenName(), "EOF"));
-
+        }while(!Objects.equals(currentToken.getTokenName(), "EOF"));
+        if(noMistakes){
+            System.out.println("[SinErrores]");
+        }
+        try {
+            sourceManager.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
