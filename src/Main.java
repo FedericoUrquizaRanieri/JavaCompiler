@@ -1,15 +1,40 @@
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+import Lexical.LexExceptions.LexicException;
+import Lexical.LexicalAnalyzer;
+import Lexical.Token;
+import SourceManager.*;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Objects;
+
+public class Main {
+
+    public static void printCorrect(Token token){
+        System.out.println("("+token.getTokenName()+","+token.getLexeme()+","+token.getLine()+")");
+    }
+
+    public static void main(String[] args) {
+        Token currentToken = new Token("EOF","EOF",0); //revisit this later
+        SourceManager sourceManager = new SourceManagerImpl();
+        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceManager);
+
+        try {
+            sourceManager.open(Arrays.toString(args));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
         }
+
+        do{
+            try {
+                currentToken = lexicalAnalyzer.getNextToken();
+                printCorrect(currentToken);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (LexicException e) {
+                e.printStackTrace();
+            }
+        }while(Objects.equals(currentToken.getTokenName(), "EOF"));
+
     }
 }
