@@ -21,7 +21,7 @@ public class Main {
         boolean noMistakes=false;
 
         try {
-            sourceManager.open(Arrays.toString(args));
+            sourceManager.open(args[0]);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }

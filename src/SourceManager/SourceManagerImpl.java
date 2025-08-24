@@ -6,17 +6,13 @@ import java.nio.charset.StandardCharsets;
 
 public class SourceManagerImpl implements SourceManager{
     private BufferedReader reader;
-    private String currentLine;
     private int lineNumber;
     private int lineIndexNumber;
-    private boolean mustReadNextLine;
 
 
     public SourceManagerImpl() {
-        currentLine = "";
         lineNumber = 0;
         lineIndexNumber = 0;
-        mustReadNextLine = true;
     }
 
     @Override
@@ -34,31 +30,27 @@ public class SourceManagerImpl implements SourceManager{
 
     @Override
     public char getNextChar() throws IOException {
-        char currentChar = ' ';
-
-        if(mustReadNextLine) {
-            currentLine = reader.readLine();
+        int currentInt = reader.read();
+        if (currentInt==-1)
+            return END_OF_FILE;
+        char currentChar = (char) currentInt;
+        if(currentChar=='\n'){
+            lineIndexNumber=0;
             lineNumber++;
-            lineIndexNumber = 0;
-            mustReadNextLine = false;
-        }
-
-        if(lineIndexNumber < currentLine.length()) {
-            currentChar = currentLine.charAt(lineIndexNumber);
-            lineIndexNumber++;
-        } else if (reader.ready()) {
-            currentChar = '\n';
-            mustReadNextLine = true;
         } else {
-            currentChar = END_OF_FILE;
+            lineIndexNumber++;
         }
-
         return currentChar;
     }
 
     @Override
     public int getLineNumber() {
         return lineNumber;
+    }
+
+    @Override
+    public int getColumnNumber() {
+        return lineIndexNumber;
     }
 
 }
