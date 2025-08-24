@@ -5,7 +5,6 @@ import SourceManager.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Objects;
 
 public class Main {
@@ -30,8 +29,6 @@ public class Main {
             try {
                 currentToken = lexicalAnalyzer.getNextToken();
                 printCorrect(currentToken);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
             } catch (LexicException e) {
                 e.printStackTrace();
                 noMistakes=true;
