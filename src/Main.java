@@ -16,14 +16,13 @@ public class Main {
     public static void main(String[] args) {
         Token currentToken = new Token("example","example",0); //revisit this later
         SourceManager sourceManager = new SourceManagerImpl();
-        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceManager);
-        boolean noMistakes=false;
-
         try {
             sourceManager.open(args[0]);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
+        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceManager);
+        boolean noMistakes=true;
 
         do{
             try {
@@ -31,7 +30,7 @@ public class Main {
                 printCorrect(currentToken);
             } catch (LexicException e) {
                 e.printStackTrace();
-                noMistakes=true;
+                noMistakes=false;
             }
         }while(!Objects.equals(currentToken.getTokenName(), "EOF"));
         if(noMistakes){
