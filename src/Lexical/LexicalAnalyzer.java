@@ -22,7 +22,7 @@ public class LexicalAnalyzer{
 
     private void changeLexeme(){
         lexeme = lexeme + currentChar;
-        System.out.println("Lexema:"+lexeme);
+        //System.out.println("Lexema:"+lexeme);
     }
 
     private void nextChar(){
@@ -31,7 +31,7 @@ public class LexicalAnalyzer{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.out.println(currentChar);
+        //System.out.println("Caracter:"+currentChar);
     }
 
     private Token state0() throws LexicException {
@@ -133,7 +133,9 @@ public class LexicalAnalyzer{
             nextChar();
             return state23();
         } else {
-            throw new LexicException("no encontre nada",fileManager.getLineNumber());
+            changeLexeme();
+            nextChar();
+            throw new LexicException(lexeme,fileManager.getLineNumber());
         }
     }
 
