@@ -1,4 +1,4 @@
-import Lexical.LexExceptions.LexicException;
+import Lexical.LexExceptions.LexicalException;
 import Lexical.Analyzer.LexicalAnalyzer;
 import Lexical.Analyzer.Token;
 import Lexical.SpecialWordMap.SpecialWordsMap;
@@ -30,7 +30,7 @@ public class Main {
             try {
                 currentToken = lexicalAnalyzer.getNextToken();
                 printCorrect(currentToken);
-            } catch (LexicException e) {
+            } catch (LexicalException e) {
                 e.printError(lexicalAnalyzer.getLine());
                 noMistakes=false;
             }

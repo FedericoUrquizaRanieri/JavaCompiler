@@ -8,11 +8,13 @@ public class SourceManagerImpl implements SourceManager{
     private BufferedReader reader;
     private int lineNumber;
     private int lineIndexNumber;
+    private String currentLine;
 
 
     public SourceManagerImpl() {
         lineNumber = 0;
         lineIndexNumber = 0;
+        currentLine="";
     }
 
     @Override
@@ -37,8 +39,10 @@ public class SourceManagerImpl implements SourceManager{
         if(currentChar=='\n'){
             lineIndexNumber=0;
             lineNumber++;
+            currentLine = "";
         } else {
             lineIndexNumber++;
+            currentLine = currentLine + currentChar;
         }
         return currentChar;
     }
@@ -54,7 +58,10 @@ public class SourceManagerImpl implements SourceManager{
     }
 
     public String getLine() throws IOException {
-        return reader.readLine();
+        reader.mark(0);
+        String ret = currentLine + reader.readLine();
+        reader.reset();
+        return ret;
     }
 
 }

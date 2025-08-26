@@ -1,10 +1,12 @@
 package Lexical.Analyzer;
 
-import Lexical.LexExceptions.LexicException;
+import Lexical.LexExceptions.LexicalException;
 import Lexical.SpecialWordMap.SpecialWordsMap;
 import SourceManager.SourceManager;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class LexicalAnalyzer{
     private final SourceManager fileManager;
@@ -18,14 +20,29 @@ public class LexicalAnalyzer{
         nextChar();
     }
 
-    public Token getNextToken() throws LexicException {
+    public static String decodeUnicode(String input) {
+        Pattern pattern = Pattern.compile("\\\\u([0-9A-Fa-f]{4})");
+        Matcher matcher = pattern.matcher(input);
+        StringBuffer result = new StringBuffer();
+
+        while (matcher.find()) {
+            // convierte el grupo en número y luego en char
+            char ch = (char) Integer.parseInt(matcher.group(1), 16);
+            matcher.appendReplacement(result, String.valueOf(ch));
+        }
+        matcher.appendTail(result);
+
+        return result.toString();
+    }
+
+    public Token getNextToken() throws LexicalException {
         lexeme = "";
         return state0();
     }
 
     private void changeLexeme(){
         lexeme = lexeme + currentChar;
-        //System.out.println("Lexema:"+lexeme);
+        //System.out.println("Lexema:"+lexeme); //TODO sacar esto ya
     }
 
     private void nextChar(){
@@ -34,7 +51,7 @@ public class LexicalAnalyzer{
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        //System.out.println("Caracter:"+currentChar);
+        //System.out.println("Caracter:"+currentChar); //TODO sacar esto ya
     }
 
     public String getLine(){
@@ -45,7 +62,7 @@ public class LexicalAnalyzer{
         }
     }
 
-    private Token state0() throws LexicException {
+    private Token state0() throws LexicalException {
         if (currentChar==SourceManager.END_OF_FILE){
             return new Token("EOF","EOF",fileManager.getLineNumber());
         } else if (currentChar == ' ' || currentChar == '\t' || currentChar == '\n' || currentChar == '\r'){
@@ -150,11 +167,23 @@ public class LexicalAnalyzer{
         } else {
             changeLexeme();
             nextChar();
-            throw new LexicException(lexeme,fileManager.getLineNumber());
+            throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
         }
     }
 
-    private Token state40() throws LexicException {
+    private Token state41() throws LexicalException {
+        for (int i=0;i<4;i++){
+            if(Character.isDigit(currentChar) || (Character.isLetter(currentChar) && Character.isUpperCase(currentChar))){
+                changeLexeme();
+                nextChar();
+            }else{
+                throw new LexicalException(lexeme,fileManager.getLineNumber(),fileManager.getColumnNumber());
+            }
+        }
+        return state26();
+    }
+
+    private Token state40() throws LexicalException {
         if (currentChar=='/') {
             lexeme = "";
             nextChar();
@@ -165,7 +194,7 @@ public class LexicalAnalyzer{
         }
     }
 
-    private Token state39() throws LexicException {
+    private Token state39() throws LexicalException {
         if (currentChar=='*') {
             nextChar();
             return state40();
@@ -175,7 +204,7 @@ public class LexicalAnalyzer{
         }
     }
 
-    private Token state38() throws LexicException {
+    private Token state38() throws LexicalException {
         if (currentChar=='\n') {
             lexeme = "";
             nextChar();
@@ -219,47 +248,51 @@ public class LexicalAnalyzer{
     }
 
     private Token state29() {
-        return new Token("stringLiteral",lexeme,fileManager.getLineNumber());
+        return new Token("stringLiteral",decodeUnicode(lexeme),fileManager.getLineNumber());
     }
 
-    private Token state28() throws LexicException {
+    private Token state28() throws LexicalException {
         if (Character.isLetterOrDigit(currentChar) || currentChar>=33 && currentChar<=126) {
             changeLexeme();
             nextChar();
             return state4();
         }
-        throw new LexicException(lexeme,fileManager.getLineNumber());
+        throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
     }
 
     private Token state27() {
-        return new Token("charLiteral",lexeme,fileManager.getLineNumber());
+        return new Token("charLiteral",decodeUnicode(lexeme),fileManager.getLineNumber());
     }
 
-    private Token state26() throws LexicException {
+    private Token state26() throws LexicalException {
         if(currentChar=='\''){
             changeLexeme();
             nextChar();
             return state27();
         }
-        throw new LexicException(lexeme,fileManager.getLineNumber());
+        throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
     }
 
-    private Token state25() throws LexicException {
-        if (Character.isLetterOrDigit(currentChar) || currentChar>=33 && currentChar<=126) {
+    private Token state25() throws LexicalException {
+        if (currentChar=='u'){
+            changeLexeme();
+            nextChar();
+            return state41();
+        }else if (Character.isLetterOrDigit(currentChar) || currentChar>=33 && currentChar<=126) {
             changeLexeme();
             nextChar();
             return state26();
         }
-        throw new LexicException(lexeme,fileManager.getLineNumber());
+        throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
     }
 
-    private Token state24() throws LexicException {
+    private Token state24() throws LexicalException {
         if (currentChar=='\'') {
             changeLexeme();
             nextChar();
             return state27();
         }
-        throw new LexicException(lexeme,fileManager.getLineNumber());
+        throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
     }
 
     private Token state23() {
@@ -294,7 +327,7 @@ public class LexicalAnalyzer{
         return new Token("openParenthesis",lexeme, fileManager.getLineNumber());
     }
 
-    private Token state15() throws LexicException {
+    private Token state15() throws LexicalException {
         if (currentChar=='/'){
             nextChar();
             return state38();
@@ -331,22 +364,22 @@ public class LexicalAnalyzer{
         return new Token("plus",lexeme,fileManager.getLineNumber());
     }
 
-    private Token state10() throws LexicException {
+    private Token state10() throws LexicalException {
         if (currentChar=='|') {
             changeLexeme();
             nextChar();
             return state35();
         }
-        throw new LexicException(lexeme, fileManager.getLineNumber());
+        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
     }
 
-    private Token state9() throws LexicException {
+    private Token state9() throws LexicalException {
         if (currentChar=='&') {
             changeLexeme();
             nextChar();
             return state34();
         }
-        throw new LexicException(lexeme, fileManager.getLineNumber());
+        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
     }
 
     private Token state8() {
@@ -385,7 +418,7 @@ public class LexicalAnalyzer{
         return new Token("greater",lexeme,fileManager.getLineNumber());
     }
 
-    private Token state4() throws LexicException {
+    private Token state4() throws LexicalException {
         if (currentChar=='"') {
             changeLexeme();
             nextChar();
@@ -399,10 +432,10 @@ public class LexicalAnalyzer{
             nextChar();
             return state4();
         }
-        throw new LexicException(lexeme,fileManager.getLineNumber());
+        throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
     }
 
-    private Token state3() throws LexicException {
+    private Token state3() throws LexicalException {
         if(currentChar!='\\' && currentChar!='\''){
             changeLexeme();
             nextChar();
@@ -412,10 +445,10 @@ public class LexicalAnalyzer{
             nextChar();
             return state25();
         }
-        throw new LexicException(lexeme,fileManager.getLineNumber());
+        throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
     }
 
-    private Token state2() throws LexicException {
+    private Token state2() throws LexicalException {
         if(Character.isDigit(currentChar)){
             changeLexeme();
             nextChar();
@@ -423,12 +456,12 @@ public class LexicalAnalyzer{
         } else if(lexeme.length()<10){
             return new Token("intLiteral",lexeme,fileManager.getLineNumber());
         }else {
-            throw new LexicException(lexeme,fileManager.getLineNumber());
+            throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
         }
     }
 
     private Token state1_1() {
-        if(Character.isDigit(currentChar) || Character.isLetter(currentChar)){
+        if(Character.isDigit(currentChar) || Character.isLetter(currentChar) || currentChar=='_'){
             changeLexeme();
             nextChar();
             return state1_1();
@@ -438,7 +471,7 @@ public class LexicalAnalyzer{
     }
 
     private Token state1() {
-        if(Character.isDigit(currentChar) || Character.isLetter(currentChar)){
+        if(Character.isDigit(currentChar) || Character.isLetter(currentChar) || currentChar=='_'){
             changeLexeme();
             nextChar();
             return state1();
