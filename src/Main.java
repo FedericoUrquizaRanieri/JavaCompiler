@@ -1,6 +1,7 @@
 import Lexical.LexExceptions.LexicException;
-import Lexical.LexicalAnalyzer;
-import Lexical.Token;
+import Lexical.Analyzer.LexicalAnalyzer;
+import Lexical.Analyzer.Token;
+import Lexical.SpecialWordMap.SpecialWordsMap;
 import SourceManager.*;
 
 import java.io.FileNotFoundException;
@@ -16,12 +17,13 @@ public class Main {
     public static void main(String[] args) {
         Token currentToken = new Token("example","example",0); //revisit this later
         SourceManager sourceManager = new SourceManagerImpl();
+        SpecialWordsMap specialWordsMap = new SpecialWordsMap();
         try {
             sourceManager.open(args[0]);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceManager);
+        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceManager,specialWordsMap);
         boolean noMistakes=true;
 
         do{
@@ -29,7 +31,7 @@ public class Main {
                 currentToken = lexicalAnalyzer.getNextToken();
                 printCorrect(currentToken);
             } catch (LexicException e) {
-                e.printStackTrace();
+                e.printError(lexicalAnalyzer.getLine());
                 noMistakes=false;
             }
         }while(!Objects.equals(currentToken.getTokenName(), "EOF"));

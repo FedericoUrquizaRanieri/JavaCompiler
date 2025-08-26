@@ -1,4 +1,4 @@
-package Lexical;
+package Lexical.Analyzer;
 
 public class Token {
     private final String tokenName;

@@ -15,5 +15,7 @@ public interface SourceManager {
 
     int getColumnNumber();
 
+    String getLine() throws IOException;
+
     public static final char END_OF_FILE = (char) 26;
 }

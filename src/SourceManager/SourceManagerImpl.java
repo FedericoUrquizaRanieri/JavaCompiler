@@ -53,4 +53,8 @@ public class SourceManagerImpl implements SourceManager{
         return lineIndexNumber;
     }
 
+    public String getLine() throws IOException {
+        return reader.readLine();
+    }
+
 }

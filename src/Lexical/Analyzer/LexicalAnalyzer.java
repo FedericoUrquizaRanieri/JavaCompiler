@@ -1,17 +1,20 @@
-package Lexical;
+package Lexical.Analyzer;
 
 import Lexical.LexExceptions.LexicException;
+import Lexical.SpecialWordMap.SpecialWordsMap;
 import SourceManager.SourceManager;
 
 import java.io.IOException;
 
 public class LexicalAnalyzer{
     private final SourceManager fileManager;
+    private final SpecialWordsMap wordsMap;
     private char currentChar;
     private String lexeme;
 
-    public LexicalAnalyzer(SourceManager fileManager){
+    public LexicalAnalyzer(SourceManager fileManager, SpecialWordsMap wordsMap){
         this.fileManager=fileManager;
+        this.wordsMap=wordsMap;
         nextChar();
     }
 
@@ -34,16 +37,28 @@ public class LexicalAnalyzer{
         //System.out.println("Caracter:"+currentChar);
     }
 
+    public String getLine(){
+        try {
+            return fileManager.getLine();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private Token state0() throws LexicException {
         if (currentChar==SourceManager.END_OF_FILE){
             return new Token("EOF","EOF",fileManager.getLineNumber());
         } else if (currentChar == ' ' || currentChar == '\t' || currentChar == '\n' || currentChar == '\r'){
             nextChar();
             return state0();
-        } else if (Character.isLetter(currentChar)){
+        } else if (Character.isLetter(currentChar) && Character.isUpperCase(currentChar)){
             changeLexeme();
             nextChar();
             return state1();
+        } else if (Character.isLetter(currentChar) && Character.isLowerCase(currentChar)){
+            changeLexeme();
+            nextChar();
+            return state1_1();
         } else if (Character.isDigit(currentChar)) {
             changeLexeme();
             nextChar();
@@ -172,39 +187,39 @@ public class LexicalAnalyzer{
     }
 
     private Token state37() {
-        return new Token("idRestaVar",lexeme,fileManager.getLineNumber());
+        return new Token("decrement",lexeme,fileManager.getLineNumber());
     }
 
     private Token state36() {
-        return new Token("idSumaVar",lexeme,fileManager.getLineNumber());
+        return new Token("increment",lexeme,fileManager.getLineNumber());
     }
 
     private Token state35() {
-        return new Token("idOr",lexeme,fileManager.getLineNumber());
+        return new Token("or",lexeme,fileManager.getLineNumber());
     }
 
     private Token state34() {
-        return new Token("idAnd",lexeme,fileManager.getLineNumber());
+        return new Token("and",lexeme,fileManager.getLineNumber());
     }
 
     private Token state33() {
-        return new Token("idDistinto",lexeme, fileManager.getLineNumber());
+        return new Token("inequality",lexeme, fileManager.getLineNumber());
     }
 
     private Token state32() {
-        return new Token("idDobleIguall",lexeme, fileManager.getLineNumber());
+        return new Token("equality",lexeme, fileManager.getLineNumber());
     }
 
     private Token state31() {
-        return new Token("idMenorIgual",lexeme, fileManager.getLineNumber());
+        return new Token("lessOrEqual",lexeme, fileManager.getLineNumber());
     }
 
     private Token state30() {
-        return new Token("idMayorIgual",lexeme, fileManager.getLineNumber());
+        return new Token("greaterOrEqual",lexeme, fileManager.getLineNumber());
     }
 
     private Token state29() {
-        return new Token("idString",lexeme,fileManager.getLineNumber());
+        return new Token("stringLiteral",lexeme,fileManager.getLineNumber());
     }
 
     private Token state28() throws LexicException {
@@ -217,7 +232,7 @@ public class LexicalAnalyzer{
     }
 
     private Token state27() {
-        return new Token("idChar",lexeme,fileManager.getLineNumber());
+        return new Token("charLiteral",lexeme,fileManager.getLineNumber());
     }
 
     private Token state26() throws LexicException {
@@ -248,35 +263,35 @@ public class LexicalAnalyzer{
     }
 
     private Token state23() {
-        return new Token("idPunto",lexeme, fileManager.getLineNumber());
+        return new Token("dot",lexeme, fileManager.getLineNumber());
     }
 
     private Token state22() {
-        return new Token("idDosPuntos",lexeme, fileManager.getLineNumber());
+        return new Token("colon",lexeme, fileManager.getLineNumber());
     }
 
     private Token state21() {
-        return new Token("idComa",lexeme, fileManager.getLineNumber());
+        return new Token("comma",lexeme, fileManager.getLineNumber());
     }
 
     private Token state20() {
-        return new Token("idPuntoYComa",lexeme, fileManager.getLineNumber());
+        return new Token("semicolon",lexeme, fileManager.getLineNumber());
     }
 
     private Token state19() {
-        return new Token("idCorcheteCierra",lexeme, fileManager.getLineNumber());
+        return new Token("closeBrace",lexeme, fileManager.getLineNumber());
     }
 
     private Token state18() {
-        return new Token("idCorcheteAbre",lexeme, fileManager.getLineNumber());
+        return new Token("openBrace",lexeme, fileManager.getLineNumber());
     }
 
     private Token state17() {
-        return new Token("idParentesisCierra",lexeme, fileManager.getLineNumber());
+        return new Token("closeParenthesis",lexeme, fileManager.getLineNumber());
     }
 
     private Token state16() {
-        return new Token("idParentesisAbre",lexeme, fileManager.getLineNumber());
+        return new Token("openParenthesis",lexeme, fileManager.getLineNumber());
     }
 
     private Token state15() throws LexicException {
@@ -287,15 +302,15 @@ public class LexicalAnalyzer{
             nextChar();
             return state39();
         }
-        return new Token("idBarra",lexeme, fileManager.getLineNumber());
+        return new Token("slash",lexeme, fileManager.getLineNumber());
     }
 
     private Token state14() {
-        return new Token("idMultiplicacion",lexeme, fileManager.getLineNumber());
+        return new Token("asterisk",lexeme, fileManager.getLineNumber());
     }
 
     private Token state13() {
-        return new Token("idModulo",lexeme, fileManager.getLineNumber());
+        return new Token("modulo",lexeme, fileManager.getLineNumber());
     }
 
     private Token state12() {
@@ -304,7 +319,7 @@ public class LexicalAnalyzer{
             nextChar();
             return state37();
         }
-        return new Token("idSuma",lexeme,fileManager.getLineNumber());
+        return new Token("minus",lexeme,fileManager.getLineNumber());
     }
 
     private Token state11() {
@@ -313,7 +328,7 @@ public class LexicalAnalyzer{
             nextChar();
             return state36();
         }
-        return new Token("idSuma",lexeme,fileManager.getLineNumber());
+        return new Token("plus",lexeme,fileManager.getLineNumber());
     }
 
     private Token state10() throws LexicException {
@@ -340,7 +355,7 @@ public class LexicalAnalyzer{
             nextChar();
             return state33();
         }
-        return new Token("idNegacion",lexeme,fileManager.getLineNumber());
+        return new Token("not",lexeme,fileManager.getLineNumber());
     }
 
     private Token state7() {
@@ -349,7 +364,7 @@ public class LexicalAnalyzer{
             nextChar();
             return state32();
         }
-        return new Token("idIgual",lexeme,fileManager.getLineNumber());
+        return new Token("equals",lexeme,fileManager.getLineNumber());
     }
 
     private Token state6() {
@@ -358,7 +373,7 @@ public class LexicalAnalyzer{
             nextChar();
             return state31();
         }
-        return new Token("idMenor",lexeme,fileManager.getLineNumber());
+        return new Token("less",lexeme,fileManager.getLineNumber());
     }
 
     private Token state5() {
@@ -367,7 +382,7 @@ public class LexicalAnalyzer{
             nextChar();
             return state30();
         }
-        return new Token("idMayor",lexeme,fileManager.getLineNumber());
+        return new Token("greater",lexeme,fileManager.getLineNumber());
     }
 
     private Token state4() throws LexicException {
@@ -400,13 +415,25 @@ public class LexicalAnalyzer{
         throw new LexicException(lexeme,fileManager.getLineNumber());
     }
 
-    private Token state2() {
+    private Token state2() throws LexicException {
         if(Character.isDigit(currentChar)){
             changeLexeme();
             nextChar();
             return state1();
+        } else if(lexeme.length()<10){
+            return new Token("intLiteral",lexeme,fileManager.getLineNumber());
+        }else {
+            throw new LexicException(lexeme,fileManager.getLineNumber());
+        }
+    }
+
+    private Token state1_1() {
+        if(Character.isDigit(currentChar) || Character.isLetter(currentChar)){
+            changeLexeme();
+            nextChar();
+            return state1_1();
         } else {
-            return new Token("id",lexeme,fileManager.getLineNumber());
+            return new Token(wordsMap.getOrDefault(lexeme,"idMetVar"), lexeme,fileManager.getLineNumber());
         }
     }
 
@@ -416,7 +443,7 @@ public class LexicalAnalyzer{
             nextChar();
             return state1();
         } else {
-            return new Token("id",lexeme,fileManager.getLineNumber());
+            return new Token("idClase",lexeme,fileManager.getLineNumber());
         }
     }
 }

@@ -9,9 +9,12 @@ public class LexicException extends Exception{
         this.line = line;
     }
 
-    @Override
-    public void printStackTrace() {
+    public void printError(String entireLine) {
         System.out.println("Error Léxico en linea"+line+": "+lexeme+" no es un símbolo valido");
+        System.out.println("Detalle: "+entireLine);
+        for(int i=0;i<=9;i++)
+            System.out.print(" ");
+        System.out.println("^");
         System.out.println();
         System.out.println("[Error:"+lexeme+"|"+line+"]");
     }
