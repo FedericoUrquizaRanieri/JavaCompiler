@@ -8,22 +8,22 @@ import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class LexicalAnalyzer{
+public class LexicalAnalyzer {
     private final SourceManager fileManager;
     private final SpecialWordsMap wordsMap;
     private char currentChar;
     private String lexeme;
 
-    public LexicalAnalyzer(SourceManager fileManager, SpecialWordsMap wordsMap){
-        this.fileManager=fileManager;
-        this.wordsMap=wordsMap;
+    public LexicalAnalyzer(SourceManager fileManager, SpecialWordsMap wordsMap) {
+        this.fileManager = fileManager;
+        this.wordsMap = wordsMap;
         nextChar();
     }
 
     public static String decodeUnicode(String input) {
         Pattern pattern = Pattern.compile("\\\\u([0-9A-Fa-f]{4})");
         Matcher matcher = pattern.matcher(input);
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         while (matcher.find()) {
             char ch = (char) Integer.parseInt(matcher.group(1), 16);
@@ -36,15 +36,15 @@ public class LexicalAnalyzer{
 
     public Token getNextToken() throws LexicalException {
         lexeme = "";
-        return state0();
+        return initialState();
     }
 
-    private void changeLexeme(){
+    private void changeLexeme() {
         lexeme = lexeme + currentChar;
         //System.out.println("Lexema:"+lexeme); //TODO sacar esto ya
     }
 
-    private void nextChar(){
+    private void nextChar() {
         try {
             currentChar = fileManager.getNextChar();
         } catch (IOException e) {
@@ -53,7 +53,7 @@ public class LexicalAnalyzer{
         //System.out.println("Caracter:"+currentChar); //TODO sacar esto ya
     }
 
-    public String getLine(){
+    public String getLine() {
         try {
             return fileManager.getLine();
         } catch (IOException e) {
@@ -61,421 +61,421 @@ public class LexicalAnalyzer{
         }
     }
 
-    private Token state0() throws LexicalException {
-        if (currentChar==SourceManager.END_OF_FILE){
-            return new Token("EOF","EOF",fileManager.getLineNumber());
-        } else if (currentChar == ' ' || currentChar == '\t' || currentChar == '\n' || currentChar == '\r'){
+    private Token initialState() throws LexicalException {
+        if (currentChar == SourceManager.END_OF_FILE) {
+            return new Token("EOF", "EOF", fileManager.getLineNumber());
+        } else if (currentChar == ' ' || currentChar == '\t' || currentChar == '\n' || currentChar == '\r') {
             nextChar();
-            return state0();
-        } else if (Character.isLetter(currentChar) && Character.isUpperCase(currentChar)){
+            return initialState();
+        } else if (Character.isLetter(currentChar) && Character.isUpperCase(currentChar)) {
             changeLexeme();
             nextChar();
-            return state1();
-        } else if (Character.isLetter(currentChar) && Character.isLowerCase(currentChar)){
+            return classState();
+        } else if (Character.isLetter(currentChar) && Character.isLowerCase(currentChar)) {
             changeLexeme();
             nextChar();
-            return state1_1();
+            return variableOrKeywordState();
         } else if (Character.isDigit(currentChar)) {
             changeLexeme();
             nextChar();
-            return state2();
+            return integerState();
         } else if (currentChar == '\'') {
             changeLexeme();
             nextChar();
-            return state3();
+            return charState();
         } else if (currentChar == '"') {
             changeLexeme();
             nextChar();
-            return state4();
+            return stringState();
         } else if (currentChar == '>') {
             changeLexeme();
             nextChar();
-            return state5();
+            return greaterState();
         } else if (currentChar == '<') {
             changeLexeme();
             nextChar();
-            return state6();
+            return lessState();
         } else if (currentChar == '=') {
             changeLexeme();
             nextChar();
-            return state7();
+            return equalsState();
         } else if (currentChar == '!') {
             changeLexeme();
             nextChar();
-            return state8();
+            return notState();
         } else if (currentChar == '&') {
             changeLexeme();
             nextChar();
-            return state9();
+            return andState();
         } else if (currentChar == '|') {
             changeLexeme();
             nextChar();
-            return state10();
+            return orState();
         } else if (currentChar == '+') {
             changeLexeme();
             nextChar();
-            return state11();
+            return plusState();
         } else if (currentChar == '-') {
             changeLexeme();
             nextChar();
-            return state12();
+            return minusState();
         } else if (currentChar == '%') {
             changeLexeme();
             nextChar();
-            return state13();
+            return moduloState();
         } else if (currentChar == '*') {
             changeLexeme();
             nextChar();
-            return state14();
+            return asteriskState();
         } else if (currentChar == '/') {
             changeLexeme();
             nextChar();
-            return state15();
+            return slashState();
         } else if (currentChar == '(') {
             changeLexeme();
             nextChar();
-            return state16();
+            return openParenthesisState();
         } else if (currentChar == ')') {
             changeLexeme();
             nextChar();
-            return state17();
+            return closeParenthesisState();
         } else if (currentChar == '{') {
             changeLexeme();
             nextChar();
-            return state18();
+            return openBraceState();
         } else if (currentChar == '}') {
             changeLexeme();
             nextChar();
-            return state19();
+            return closeBraceState();
         } else if (currentChar == ';') {
             changeLexeme();
             nextChar();
-            return state20();
+            return semicolonState();
         } else if (currentChar == ',') {
             changeLexeme();
             nextChar();
-            return state21();
+            return commaState();
         } else if (currentChar == ':') {
             changeLexeme();
             nextChar();
-            return state22();
+            return colonState();
         } else if (currentChar == '.') {
             changeLexeme();
             nextChar();
-            return state23();
+            return dotState();
         } else {
             changeLexeme();
             nextChar();
-            throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
+            throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
         }
     }
 
-    private Token state41() throws LexicalException {
-        for (int i=0;i<4;i++){
-            if(Character.isDigit(currentChar) || (Character.isLetter(currentChar) && Character.isUpperCase(currentChar))){
+    private Token unicodeCharState() throws LexicalException {
+        for (int i = 0; i < 4; i++) {
+            if (Character.isDigit(currentChar) || (Character.isLetter(currentChar) && Character.isUpperCase(currentChar))) {
                 changeLexeme();
                 nextChar();
-            }else{
-                throw new LexicalException(lexeme,fileManager.getLineNumber(),fileManager.getColumnNumber());
+            } else {
+                throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
             }
         }
-        return state26();
+        return closeSpecialCharState();
     }
 
-    private Token state40() throws LexicalException {
-        if (currentChar=='/') {
+    private Token closingMultiLineCommentState() throws LexicalException {
+        if (currentChar == '/') {
             lexeme = "";
             nextChar();
-            return state0();
+            return initialState();
         } else {
             nextChar();
-            return state39();
+            return multiLineCommentState();
         }
     }
 
-    private Token state39() throws LexicalException {
-        if (currentChar=='*') {
+    private Token multiLineCommentState() throws LexicalException {
+        if (currentChar == '*') {
             nextChar();
-            return state40();
+            return closingMultiLineCommentState();
         } else {
             nextChar();
-            return state39();
+            return multiLineCommentState();
         }
     }
 
-    private Token state38() throws LexicalException {
-        if (currentChar=='\n') {
+    private Token singleLineCommentState() throws LexicalException {
+        if (currentChar == '\n') {
             lexeme = "";
             nextChar();
-            return state0();
+            return initialState();
         } else {
             nextChar();
-            return state38();
+            return singleLineCommentState();
         }
     }
 
-    private Token state37() {
-        return new Token("decrement",lexeme,fileManager.getLineNumber());
+    private Token decrementState() {
+        return new Token("decrement", lexeme, fileManager.getLineNumber());
     }
 
-    private Token state36() {
-        return new Token("increment",lexeme,fileManager.getLineNumber());
+    private Token incrementState() {
+        return new Token("increment", lexeme, fileManager.getLineNumber());
     }
 
-    private Token state35() {
-        return new Token("or",lexeme,fileManager.getLineNumber());
+    private Token orOperatorState() {
+        return new Token("or", lexeme, fileManager.getLineNumber());
     }
 
-    private Token state34() {
-        return new Token("and",lexeme,fileManager.getLineNumber());
+    private Token andOperatorState() {
+        return new Token("and", lexeme, fileManager.getLineNumber());
     }
 
-    private Token state33() {
-        return new Token("inequality",lexeme, fileManager.getLineNumber());
+    private Token inequalityState() {
+        return new Token("inequality", lexeme, fileManager.getLineNumber());
     }
 
-    private Token state32() {
-        return new Token("equality",lexeme, fileManager.getLineNumber());
+    private Token equalityState() {
+        return new Token("equality", lexeme, fileManager.getLineNumber());
     }
 
-    private Token state31() {
-        return new Token("lessOrEqual",lexeme, fileManager.getLineNumber());
+    private Token lessOrEqualState() {
+        return new Token("lessOrEqual", lexeme, fileManager.getLineNumber());
     }
 
-    private Token state30() {
-        return new Token("greaterOrEqual",lexeme, fileManager.getLineNumber());
+    private Token greaterOrEqualState() {
+        return new Token("greaterOrEqual", lexeme, fileManager.getLineNumber());
     }
 
-    private Token state29() {
-        return new Token("stringLiteral",decodeUnicode(lexeme),fileManager.getLineNumber());
+    private Token closeStringState() {
+        return new Token("stringLiteral", decodeUnicode(lexeme), fileManager.getLineNumber());
     }
 
-    private Token state28() throws LexicalException {
-        if (Character.isLetterOrDigit(currentChar) || currentChar>=33 && currentChar<=126) {
+    private Token specialCharOnStringState() throws LexicalException {
+        if (Character.isLetterOrDigit(currentChar) || currentChar >= 33 && currentChar <= 126) {
             changeLexeme();
             nextChar();
-            return state4();
-        }
-        throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
-    }
-
-    private Token state27() {
-        return new Token("charLiteral",decodeUnicode(lexeme),fileManager.getLineNumber());
-    }
-
-    private Token state26() throws LexicalException {
-        if(currentChar=='\''){
-            changeLexeme();
-            nextChar();
-            return state27();
-        }
-        throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
-    }
-
-    private Token state25() throws LexicalException {
-        if (currentChar=='u'){
-            changeLexeme();
-            nextChar();
-            return state41();
-        }else if (Character.isLetterOrDigit(currentChar) || currentChar>=33 && currentChar<=126) {
-            changeLexeme();
-            nextChar();
-            return state26();
-        }
-        throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
-    }
-
-    private Token state24() throws LexicalException {
-        if (currentChar=='\'') {
-            changeLexeme();
-            nextChar();
-            return state27();
-        }
-        throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
-    }
-
-    private Token state23() {
-        return new Token("dot",lexeme, fileManager.getLineNumber());
-    }
-
-    private Token state22() {
-        return new Token("colon",lexeme, fileManager.getLineNumber());
-    }
-
-    private Token state21() {
-        return new Token("comma",lexeme, fileManager.getLineNumber());
-    }
-
-    private Token state20() {
-        return new Token("semicolon",lexeme, fileManager.getLineNumber());
-    }
-
-    private Token state19() {
-        return new Token("closeBrace",lexeme, fileManager.getLineNumber());
-    }
-
-    private Token state18() {
-        return new Token("openBrace",lexeme, fileManager.getLineNumber());
-    }
-
-    private Token state17() {
-        return new Token("closeParenthesis",lexeme, fileManager.getLineNumber());
-    }
-
-    private Token state16() {
-        return new Token("openParenthesis",lexeme, fileManager.getLineNumber());
-    }
-
-    private Token state15() throws LexicalException {
-        if (currentChar=='/'){
-            nextChar();
-            return state38();
-        } else if (currentChar=='*') {
-            nextChar();
-            return state39();
-        }
-        return new Token("slash",lexeme, fileManager.getLineNumber());
-    }
-
-    private Token state14() {
-        return new Token("asterisk",lexeme, fileManager.getLineNumber());
-    }
-
-    private Token state13() {
-        return new Token("modulo",lexeme, fileManager.getLineNumber());
-    }
-
-    private Token state12() {
-        if (currentChar=='-') {
-            changeLexeme();
-            nextChar();
-            return state37();
-        }
-        return new Token("minus",lexeme,fileManager.getLineNumber());
-    }
-
-    private Token state11() {
-        if (currentChar=='+') {
-            changeLexeme();
-            nextChar();
-            return state36();
-        }
-        return new Token("plus",lexeme,fileManager.getLineNumber());
-    }
-
-    private Token state10() throws LexicalException {
-        if (currentChar=='|') {
-            changeLexeme();
-            nextChar();
-            return state35();
+            return stringState();
         }
         throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
     }
 
-    private Token state9() throws LexicalException {
-        if (currentChar=='&') {
+    private Token CharReturnState() {
+        return new Token("charLiteral", decodeUnicode(lexeme), fileManager.getLineNumber());
+    }
+
+    private Token closeSpecialCharState() throws LexicalException {
+        if (currentChar == '\'') {
             changeLexeme();
             nextChar();
-            return state34();
+            return CharReturnState();
         }
         throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
     }
 
-    private Token state8() {
-        if (currentChar=='=') {
+    private Token specialCharState() throws LexicalException {
+        if (currentChar == 'u') {
             changeLexeme();
             nextChar();
-            return state33();
+            return unicodeCharState();
+        } else if (Character.isLetterOrDigit(currentChar) || currentChar >= 33 && currentChar <= 126) {
+            changeLexeme();
+            nextChar();
+            return closeSpecialCharState();
         }
-        return new Token("not",lexeme,fileManager.getLineNumber());
+        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
     }
 
-    private Token state7() {
-        if (currentChar=='=') {
+    private Token singleCharState() throws LexicalException {
+        if (currentChar == '\'') {
             changeLexeme();
             nextChar();
-            return state32();
+            return CharReturnState();
         }
-        return new Token("equals",lexeme,fileManager.getLineNumber());
+        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
     }
 
-    private Token state6() {
-        if (currentChar=='=') {
-            changeLexeme();
-            nextChar();
-            return state31();
-        }
-        return new Token("less",lexeme,fileManager.getLineNumber());
+    private Token dotState() {
+        return new Token("dot", lexeme, fileManager.getLineNumber());
     }
 
-    private Token state5() {
-        if (currentChar=='=') {
-            changeLexeme();
-            nextChar();
-            return state30();
-        }
-        return new Token("greater",lexeme,fileManager.getLineNumber());
+    private Token colonState() {
+        return new Token("colon", lexeme, fileManager.getLineNumber());
     }
 
-    private Token state4() throws LexicalException {
-        if (currentChar=='"') {
-            changeLexeme();
-            nextChar();
-            return state29();
-        }else if(currentChar=='\\'){
-            changeLexeme();
-            nextChar();
-            return state28();
-        } else if (Character.isLetterOrDigit(currentChar)){
-            changeLexeme();
-            nextChar();
-            return state4();
-        }
-        throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
+    private Token commaState() {
+        return new Token("comma", lexeme, fileManager.getLineNumber());
     }
 
-    private Token state3() throws LexicalException {
-        if(currentChar!='\\' && currentChar!='\''){
-            changeLexeme();
-            nextChar();
-            return state24();
-        } else if (currentChar=='\\') {
-            changeLexeme();
-            nextChar();
-            return state25();
-        }
-        throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
+    private Token semicolonState() {
+        return new Token("semicolon", lexeme, fileManager.getLineNumber());
     }
 
-    private Token state2() throws LexicalException {
-        if(Character.isDigit(currentChar)){
-            changeLexeme();
-            nextChar();
-            return state1();
-        } else if(lexeme.length()<10){
-            return new Token("intLiteral",lexeme,fileManager.getLineNumber());
-        }else {
-            throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
-        }
+    private Token closeBraceState() {
+        return new Token("closeBrace", lexeme, fileManager.getLineNumber());
     }
 
-    private Token state1_1() {
-        if(Character.isDigit(currentChar) || Character.isLetter(currentChar) || currentChar=='_'){
+    private Token openBraceState() {
+        return new Token("openBrace", lexeme, fileManager.getLineNumber());
+    }
+
+    private Token closeParenthesisState() {
+        return new Token("closeParenthesis", lexeme, fileManager.getLineNumber());
+    }
+
+    private Token openParenthesisState() {
+        return new Token("openParenthesis", lexeme, fileManager.getLineNumber());
+    }
+
+    private Token slashState() throws LexicalException {
+        if (currentChar == '/') {
+            nextChar();
+            return singleLineCommentState();
+        } else if (currentChar == '*') {
+            nextChar();
+            return multiLineCommentState();
+        }
+        return new Token("slash", lexeme, fileManager.getLineNumber());
+    }
+
+    private Token asteriskState() {
+        return new Token("asterisk", lexeme, fileManager.getLineNumber());
+    }
+
+    private Token moduloState() {
+        return new Token("modulo", lexeme, fileManager.getLineNumber());
+    }
+
+    private Token minusState() {
+        if (currentChar == '-') {
             changeLexeme();
             nextChar();
-            return state1_1();
+            return decrementState();
+        }
+        return new Token("minus", lexeme, fileManager.getLineNumber());
+    }
+
+    private Token plusState() {
+        if (currentChar == '+') {
+            changeLexeme();
+            nextChar();
+            return incrementState();
+        }
+        return new Token("plus", lexeme, fileManager.getLineNumber());
+    }
+
+    private Token orState() throws LexicalException {
+        if (currentChar == '|') {
+            changeLexeme();
+            nextChar();
+            return orOperatorState();
+        }
+        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
+    }
+
+    private Token andState() throws LexicalException {
+        if (currentChar == '&') {
+            changeLexeme();
+            nextChar();
+            return andOperatorState();
+        }
+        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
+    }
+
+    private Token notState() {
+        if (currentChar == '=') {
+            changeLexeme();
+            nextChar();
+            return inequalityState();
+        }
+        return new Token("not", lexeme, fileManager.getLineNumber());
+    }
+
+    private Token equalsState() {
+        if (currentChar == '=') {
+            changeLexeme();
+            nextChar();
+            return equalityState();
+        }
+        return new Token("equals", lexeme, fileManager.getLineNumber());
+    }
+
+    private Token lessState() {
+        if (currentChar == '=') {
+            changeLexeme();
+            nextChar();
+            return lessOrEqualState();
+        }
+        return new Token("less", lexeme, fileManager.getLineNumber());
+    }
+
+    private Token greaterState() {
+        if (currentChar == '=') {
+            changeLexeme();
+            nextChar();
+            return greaterOrEqualState();
+        }
+        return new Token("greater", lexeme, fileManager.getLineNumber());
+    }
+
+    private Token stringState() throws LexicalException {
+        if (currentChar == '"') {
+            changeLexeme();
+            nextChar();
+            return closeStringState();
+        } else if (currentChar == '\\') {
+            changeLexeme();
+            nextChar();
+            return specialCharOnStringState();
+        } else if (Character.isLetterOrDigit(currentChar)) {
+            changeLexeme();
+            nextChar();
+            return stringState();
+        }
+        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
+    }
+
+    private Token charState() throws LexicalException {
+        if (currentChar != '\\' && currentChar != '\'') {
+            changeLexeme();
+            nextChar();
+            return singleCharState();
+        } else if (currentChar == '\\') {
+            changeLexeme();
+            nextChar();
+            return specialCharState();
+        }
+        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
+    }
+
+    private Token integerState() throws LexicalException {
+        if (Character.isDigit(currentChar)) {
+            changeLexeme();
+            nextChar();
+            return classState();
+        } else if (lexeme.length() < 10) {
+            return new Token("intLiteral", lexeme, fileManager.getLineNumber());
         } else {
-            return new Token(wordsMap.getOrDefault(lexeme,"idMetVar"), lexeme,fileManager.getLineNumber());
+            throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
         }
     }
 
-    private Token state1() {
-        if(Character.isDigit(currentChar) || Character.isLetter(currentChar) || currentChar=='_'){
+    private Token variableOrKeywordState() {
+        if (Character.isDigit(currentChar) || Character.isLetter(currentChar) || currentChar == '_') {
             changeLexeme();
             nextChar();
-            return state1();
+            return variableOrKeywordState();
         } else {
-            return new Token("idClase",lexeme,fileManager.getLineNumber());
+            return new Token(wordsMap.getOrDefault(lexeme, "idMetVar"), lexeme, fileManager.getLineNumber());
+        }
+    }
+
+    private Token classState() {
+        if (Character.isDigit(currentChar) || Character.isLetter(currentChar) || currentChar == '_') {
+            changeLexeme();
+            nextChar();
+            return classState();
+        } else {
+            return new Token("idClase", lexeme, fileManager.getLineNumber());
         }
     }
 }
