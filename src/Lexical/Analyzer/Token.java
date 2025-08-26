@@ -5,19 +5,21 @@ public class Token {
     private final String lexeme;
     private final int line;
 
-    public Token(String name, String lex, int l){
+    public Token(String name, String lex, int l) {
         tokenName = name;
         lexeme = lex;
-        line  = l;
+        line = l;
     }
 
-    public String getTokenName(){
+    public String getTokenName() {
         return tokenName;
     }
-    public String getLexeme(){
+
+    public String getLexeme() {
         return lexeme;
     }
-    public int getLine(){
+
+    public int getLine() {
         return line;
     }
 }

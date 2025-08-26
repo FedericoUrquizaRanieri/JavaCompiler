@@ -4,7 +4,7 @@ package SourceManager;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
-public class SourceManagerImpl implements SourceManager{
+public class SourceManagerImpl implements SourceManager {
     private BufferedReader reader;
     private int lineNumber;
     private int lineIndexNumber;
@@ -14,7 +14,7 @@ public class SourceManagerImpl implements SourceManager{
     public SourceManagerImpl() {
         lineNumber = 0;
         lineIndexNumber = 0;
-        currentLine="";
+        currentLine = "";
     }
 
     @Override
@@ -33,11 +33,11 @@ public class SourceManagerImpl implements SourceManager{
     @Override
     public char getNextChar() throws IOException {
         int currentInt = reader.read();
-        if (currentInt==-1)
+        if (currentInt == -1)
             return END_OF_FILE;
         char currentChar = (char) currentInt;
-        if(currentChar=='\n'){
-            lineIndexNumber=0;
+        if (currentChar == '\n') {
+            lineIndexNumber = 0;
             lineNumber++;
             currentLine = "";
         } else {

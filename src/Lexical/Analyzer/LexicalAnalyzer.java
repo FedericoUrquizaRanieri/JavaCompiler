@@ -26,7 +26,6 @@ public class LexicalAnalyzer{
         StringBuffer result = new StringBuffer();
 
         while (matcher.find()) {
-            // convierte el grupo en número y luego en char
             char ch = (char) Integer.parseInt(matcher.group(1), 16);
             matcher.appendReplacement(result, String.valueOf(ch));
         }

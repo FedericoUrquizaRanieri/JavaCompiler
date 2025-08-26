@@ -10,34 +10,35 @@ import java.util.Objects;
 
 public class Main {
 
-    public static void printCorrect(Token token){
-        System.out.println("("+token.getTokenName()+","+token.getLexeme()+","+token.getLine()+")");
+    public static void printCorrect(Token token) {
+        System.out.println("(" + token.getTokenName() + "," + token.getLexeme() + "," + token.getLine() + ")");
     }
 
     public static void main(String[] args) {
-        Token currentToken = new Token("example","example",0); //revisit this later
+        Token currentToken = new Token("example", "example", 0); //revisit this later
         SourceManager sourceManager = new SourceManagerImpl();
-        SpecialWordsMap specialWordsMap = new SpecialWordsMap();
         try {
             sourceManager.open(args[0]);
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceManager,specialWordsMap);
-        boolean noMistakes=true;
+        SpecialWordsMap specialWordsMap = new SpecialWordsMap();
+        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceManager, specialWordsMap);
+        boolean noMistakes = true;
 
-        do{
+        do {
             try {
                 currentToken = lexicalAnalyzer.getNextToken();
                 printCorrect(currentToken);
             } catch (LexicalException e) {
                 e.printError(lexicalAnalyzer.getLine());
-                noMistakes=false;
+                noMistakes = false;
             }
-        }while(!Objects.equals(currentToken.getTokenName(), "EOF"));
-        if(noMistakes){
+        } while (!Objects.equals(currentToken.getTokenName(), "EOF"));
+        if (noMistakes) {
             System.out.println("[SinErrores]");
         }
+
         try {
             sourceManager.close();
         } catch (IOException e) {
