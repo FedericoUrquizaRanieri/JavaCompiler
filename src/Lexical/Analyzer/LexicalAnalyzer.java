@@ -172,10 +172,11 @@ public class LexicalAnalyzer {
 
     private Token unicodeCharState() throws LexicalException {
         for (int i = 0; i < 4; i++) {
-            if (Character.isDigit(currentChar) || (Character.isLetter(currentChar) && Character.isUpperCase(currentChar))) {
+            if (Character.isDigit(currentChar) || (currentChar>64 && currentChar<71) || (currentChar>96 && currentChar<103)) {
                 changeLexeme();
                 nextChar();
             } else {
+                //TODO revisar lexemas
                 throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
             }
         }
