@@ -197,6 +197,8 @@ public class LexicalAnalyzer {
         if (currentChar == '*') {
             nextChar();
             return closingMultiLineCommentState();
+        } else if (currentChar == SourceManager.END_OF_FILE){
+            throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
         } else {
             nextChar();
             return multiLineCommentState();
