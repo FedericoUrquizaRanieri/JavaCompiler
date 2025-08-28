@@ -166,7 +166,7 @@ public class LexicalAnalyzer {
         } else {
             changeLexeme();
             nextChar();
-            throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
+            throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "no se encontro un caracter valido para leer");
         }
     }
 
@@ -177,7 +177,7 @@ public class LexicalAnalyzer {
                 nextChar();
             } else {
                 //TODO revisar lexemas
-                throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
+                throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "no es valido en un char unicode");
             }
         }
         return closeSpecialCharState();
@@ -199,7 +199,7 @@ public class LexicalAnalyzer {
             nextChar();
             return closingMultiLineCommentState();
         } else if (currentChar == SourceManager.END_OF_FILE){
-            throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber());
+            throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber(), "el comentario nunca termina");
         } else {
             nextChar();
             return multiLineCommentState();
@@ -259,7 +259,7 @@ public class LexicalAnalyzer {
             nextChar();
             return stringState();
         }
-        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
+        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "no es un caracter especial valido");
     }
 
     private Token CharReturnState() {
@@ -272,7 +272,7 @@ public class LexicalAnalyzer {
             nextChar();
             return CharReturnState();
         }
-        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
+        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "no es un caracter especial valido");
     }
 
     private Token specialCharState() throws LexicalException {
@@ -285,7 +285,7 @@ public class LexicalAnalyzer {
             nextChar();
             return closeSpecialCharState();
         }
-        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
+        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "no es un caracter especial valido");
     }
 
     private Token singleCharState() throws LexicalException {
@@ -294,7 +294,7 @@ public class LexicalAnalyzer {
             nextChar();
             return CharReturnState();
         }
-        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
+        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "no es un caracter valido");
     }
 
     private Token dotState() {
@@ -372,7 +372,7 @@ public class LexicalAnalyzer {
             nextChar();
             return orOperatorState();
         }
-        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
+        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "es un operador invalido");
     }
 
     private Token andState() throws LexicalException {
@@ -381,7 +381,7 @@ public class LexicalAnalyzer {
             nextChar();
             return andOperatorState();
         }
-        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
+        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "es un operador invalido");
     }
 
     private Token notState() {
@@ -434,7 +434,7 @@ public class LexicalAnalyzer {
             nextChar();
             return stringState();
         }
-        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
+        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "es un string invalido");
     }
 
     private Token charState() throws LexicalException {
@@ -447,7 +447,7 @@ public class LexicalAnalyzer {
             nextChar();
             return specialCharState();
         }
-        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
+        throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "no es un caracter valido");
     }
 
     private Token integerState() throws LexicalException {
@@ -458,7 +458,7 @@ public class LexicalAnalyzer {
         } else if (lexeme.length() < 10) {
             return new Token("intLiteral", lexeme, fileManager.getLineNumber());
         } else {
-            throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber());
+            throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "digito de mas, numero demasiado grande");
         }
     }
 

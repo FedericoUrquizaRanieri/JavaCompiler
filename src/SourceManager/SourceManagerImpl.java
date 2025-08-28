@@ -12,7 +12,7 @@ public class SourceManagerImpl implements SourceManager {
 
 
     public SourceManagerImpl() {
-        lineNumber = 0;
+        lineNumber = 1;
         lineIndexNumber = 0;
         currentLine = "";
     }
