@@ -58,7 +58,7 @@ public class SourceManagerImpl implements SourceManager {
     }
 
     public String getLine() throws IOException {
-        reader.mark(0);
+        reader.mark(100);
         String ret = currentLine + reader.readLine();
         reader.reset();
         return ret;
