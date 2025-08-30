@@ -1,5 +1,6 @@
 package SourceManager;
 //Author: Juan Dingevan
+//Upgraded by Federico Urquiza
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

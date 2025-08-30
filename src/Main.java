@@ -15,7 +15,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        Token currentToken = new Token("example", "example", 0); //revisit this later
+        Token currentToken = new Token(" ", " ", 0);
         SourceManager sourceManager = new SourceManagerImpl();
         try {
             sourceManager.open(args[0]);

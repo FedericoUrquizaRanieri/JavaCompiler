@@ -1,3 +1,4 @@
+///[SinErrores]
 //astro 1241
 if hola is true
 //utopia if then else

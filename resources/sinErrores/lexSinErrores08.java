@@ -1,3 +1,4 @@
+///[SinErrores]
 "hola"
 "hola \m \" mundo"
 "hola \u1234"

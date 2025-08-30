@@ -1,3 +1,4 @@
+///[SinErrores]
 'a'
 '\n'
 '\x'

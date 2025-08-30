@@ -1,6 +1,8 @@
+///[Error:/|12]
+
 //homecoming
 
-kanye & chris Martin
+kanye and chris Martin
 
 
 /* do you think

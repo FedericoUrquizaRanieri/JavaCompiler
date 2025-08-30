@@ -41,7 +41,6 @@ public class LexicalAnalyzer {
 
     private void changeLexeme() {
         lexeme = lexeme + currentChar;
-        System.out.println("Lexema:"+lexeme); //TODO sacar esto ya
     }
 
     private void nextChar() {
@@ -50,12 +49,6 @@ public class LexicalAnalyzer {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        System.out.println("Caracter:"+currentChar); //TODO sacar esto ya
-//        try {
-//            Thread.sleep(1000);
-//        } catch (InterruptedException e) {
-//            throw new RuntimeException(e);
-//        }
     }
 
     public String getLine() {
@@ -181,7 +174,6 @@ public class LexicalAnalyzer {
                 changeLexeme();
                 nextChar();
             } else {
-                //TODO revisar lexemas
                 throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "no es valido en un char unicode");
             }
         }
@@ -262,7 +254,7 @@ public class LexicalAnalyzer {
     }
 
     private Token specialCharOnStringState() throws LexicalException {
-        if (Character.isLetterOrDigit(currentChar) || currentChar >= 33 && currentChar <= 126) {
+        if (Character.isDefined(currentChar) && !Character.isISOControl(currentChar)) {
             changeLexeme();
             nextChar();
             return stringState();
@@ -288,13 +280,13 @@ public class LexicalAnalyzer {
             changeLexeme();
             nextChar();
             return unicodeCharState();
-        } else if (Character.isLetterOrDigit(currentChar) || currentChar >= 33 && currentChar <= 126) {
+        } else if (Character.isDefined(currentChar) && !Character.isISOControl(currentChar)) {
             changeLexeme();
             nextChar();
             return closeSpecialCharState();
         }
         changeLexeme();
-        nextChar(); //TODO y esto?
+        nextChar();
         throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "no es un caracter especial valido");
     }
 
@@ -304,8 +296,6 @@ public class LexicalAnalyzer {
             nextChar();
             return CharReturnState();
         }
-        //changeLexeme();
-        //nextChar(); //TODO esto se saca?
         throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "no es un caracter valido");
     }
 
@@ -441,7 +431,7 @@ public class LexicalAnalyzer {
             changeLexeme();
             nextChar();
             return specialCharOnStringState();
-        } else if (Character.isLetterOrDigit(currentChar) || Character.isSpaceChar(currentChar)) { //TODO esta duda es buena Character.isDefined(currentChar)
+        } else if (Character.isDefined(currentChar) && !Character.isISOControl(currentChar)) {
             changeLexeme();
             nextChar();
             return stringState();
@@ -451,7 +441,6 @@ public class LexicalAnalyzer {
 
     private Token charState() throws LexicalException {
         if (currentChar==SourceManager.END_OF_FILE || currentChar=='\n' || currentChar== '\r'){
-            nextChar();
             throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber(), "no es un caracter valido, llega al final");
         } else if (currentChar != '\\' && currentChar != '\'') {
             changeLexeme();
@@ -462,8 +451,6 @@ public class LexicalAnalyzer {
             nextChar();
             return specialCharState();
         }
-        //changeLexeme();
-        //nextChar(); //TODO saco esto?
         throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "no es un caracter valido");
     }
 
