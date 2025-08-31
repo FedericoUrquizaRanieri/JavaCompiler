@@ -170,7 +170,7 @@ public class LexicalAnalyzer {
 
     private Token unicodeCharState() throws LexicalException {
         for (int i = 0; i < 4; i++) {
-            if (Character.isDigit(currentChar) || (currentChar>64 && currentChar<71) || (currentChar>96 && currentChar<103)) {
+            if (Character.isDigit(currentChar) || (currentChar > 64 && currentChar < 71) || (currentChar > 96 && currentChar < 103)) {
                 changeLexeme();
                 nextChar();
             } else {
@@ -195,8 +195,8 @@ public class LexicalAnalyzer {
         if (currentChar == '*') {
             nextChar();
             return closingMultiLineCommentState();
-        } else if (currentChar == SourceManager.END_OF_FILE){
-            throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber(), "el comentario nunca termina");
+        } else if (currentChar == SourceManager.END_OF_FILE) {
+            throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "el comentario nunca termina");
         } else {
             nextChar();
             return multiLineCommentState();
@@ -440,8 +440,8 @@ public class LexicalAnalyzer {
     }
 
     private Token charState() throws LexicalException {
-        if (currentChar==SourceManager.END_OF_FILE || currentChar=='\n' || currentChar== '\r'){
-            throw new LexicalException(lexeme,fileManager.getLineNumber(), fileManager.getColumnNumber(), "no es un caracter valido, llega al final");
+        if (currentChar == SourceManager.END_OF_FILE || currentChar == '\n' || currentChar == '\r') {
+            throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "no es un caracter valido, llega al final");
         } else if (currentChar != '\\' && currentChar != '\'') {
             changeLexeme();
             nextChar();
