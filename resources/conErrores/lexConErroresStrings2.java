@@ -1,5 +1,5 @@
 ///[Error:"|4]
-"shit dawg"
+"shi bro"
 fella
 "awd "dawdaw"
 "damn

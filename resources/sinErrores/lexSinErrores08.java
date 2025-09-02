@@ -1,5 +1,5 @@
 ///[SinErrores]
-"hola"
+"hola   "
 "hola \m \" mundo"
 "hola \u1234"
         //ura
