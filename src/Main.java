@@ -1,15 +1,48 @@
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
-public class Main {
-    public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
+import Lexical.LexExceptions.LexicalException;
+import Lexical.Analyzer.LexicalAnalyzer;
+import Lexical.Analyzer.Token;
+import Lexical.SpecialWordMap.SpecialWordsMap;
+import SourceManager.*;
 
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Objects;
+
+public class Main {
+
+    public static void printCorrect(Token token) {
+        System.out.println("(" + token.getTokenName() + "," + token.getLexeme() + "," + token.getLine() + ")");
+    }
+
+    public static void main(String[] args) {
+        Token currentToken = new Token(" ", " ", 0);
+        SourceManager sourceManager = new SourceManagerImpl();
+        try {
+            sourceManager.open(args[0]);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+        SpecialWordsMap specialWordsMap = new SpecialWordsMap();
+        LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceManager, specialWordsMap);
+        boolean noMistakes = true;
+
+        do {
+            try {
+                currentToken = lexicalAnalyzer.getNextToken();
+                printCorrect(currentToken);
+            } catch (LexicalException e) {
+                e.printError(lexicalAnalyzer.getLine());
+                noMistakes = false;
+            }
+        } while (!Objects.equals(currentToken.getTokenName(), "EOF"));
+        if (noMistakes) {
+            System.out.println("[SinErrores]");
+        }
+
+        try {
+            sourceManager.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
