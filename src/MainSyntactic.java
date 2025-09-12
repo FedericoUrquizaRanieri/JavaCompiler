@@ -1,21 +1,14 @@
-import Lexical.LexExceptions.LexicalException;
 import Lexical.Analyzer.LexicalAnalyzer;
-import Lexical.Analyzer.Token;
 import Lexical.SpecialWordMap.SpecialWordsMap;
 import SourceManager.*;
+import Syntactic.Analyzer.SyntacticAnalyzer;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Objects;
 
-public class Main {
-
-    public static void printCorrect(Token token) {
-        System.out.println("(" + token.getTokenName() + "," + token.getLexeme() + "," + token.getLine() + ")");
-    }
+public class MainSyntactic {
 
     public static void main(String[] args) {
-        Token currentToken = new Token(" ", " ", 0);
         SourceManager sourceManager = new SourceManagerImpl();
         try {
             sourceManager.open(args[0]);
@@ -24,18 +17,15 @@ public class Main {
         }
         SpecialWordsMap specialWordsMap = new SpecialWordsMap();
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceManager, specialWordsMap);
-        boolean noMistakes = true;
+        SyntacticAnalyzer syntacticAnalyzer = new SyntacticAnalyzer(lexicalAnalyzer);
 
-        do {
-            try {
-                currentToken = lexicalAnalyzer.getNextToken();
-                printCorrect(currentToken);
-            } catch (LexicalException e) {
-                e.printError(lexicalAnalyzer.getLine());
-                noMistakes = false;
-            }
-        } while (!Objects.equals(currentToken.getTokenName(), "EOF"));
+        boolean noMistakes = true;
+        syntacticAnalyzer.startAnalysis();
+        noMistakes = syntacticAnalyzer.notErrorInFile();
+
         if (noMistakes) {
+            System.out.println("Compilacion Exitosa");
+            System.out.println();
             System.out.println("[SinErrores]");
         }
 
