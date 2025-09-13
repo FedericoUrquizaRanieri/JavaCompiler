@@ -61,7 +61,6 @@ public class SyntacticAnalyzer {
             case "pr_class" -> {
                 match("pr_class");
                 match("idClase");
-                optionalGenerics();
                 optionalInheritance();
                 match("openBrace");
                 membersList();
@@ -71,7 +70,6 @@ public class SyntacticAnalyzer {
             case "pr_interfce" -> {
                 match("pr_interface");
                 match("idClase");
-                optionalGenerics();
                 optionalInheritance();
                 match("openBrace");
                 membersList();
@@ -87,8 +85,6 @@ public class SyntacticAnalyzer {
     private void optionalInheritance() {
     }
 
-    private void optionalGenerics() {
-    }
 
     private void optionalModifier() {
         switch (currentToken.getTokenName()){
