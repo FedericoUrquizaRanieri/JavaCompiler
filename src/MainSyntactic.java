@@ -7,6 +7,7 @@ import java.io.IOException;
 
 import Syntactic.Analyzer.FirstsMap;
 import Syntactic.Analyzer.SyntacticAnalyzer;
+import Syntactic.SynExceptions.SyntacticException;
 
 public class MainSyntactic {
 
@@ -23,8 +24,13 @@ public class MainSyntactic {
         SyntacticAnalyzer syntacticAnalyzer = new SyntacticAnalyzer(lexicalAnalyzer, firstsMap);
 
         boolean noMistakes = true;
-        syntacticAnalyzer.startAnalysis();
-        noMistakes = syntacticAnalyzer.notErrorInFile();
+        try {
+            syntacticAnalyzer.startAnalysis();
+        } catch (SyntacticException e) {
+            e.printError();
+            noMistakes=false;
+        }
+        //noMistakes = syntacticAnalyzer.notErrorInFile();
 
         if (noMistakes) {
             System.out.println("Compilacion Exitosa");

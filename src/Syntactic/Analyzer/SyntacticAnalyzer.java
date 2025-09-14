@@ -21,19 +21,21 @@ public class SyntacticAnalyzer {
         return errors;
     }
 
-    void match(String tokenName){
+    void match(String tokenName) throws SyntacticException {
+        System.out.println("voy a chequear el token "+ currentToken.getTokenName());
         if (tokenName.equals(currentToken.getTokenName())){
             try {
                 currentToken = analyzer.getNextToken();
+                System.out.println("el nuevo es "+currentToken.getTokenName());
             } catch (LexicalException e) {
                 e.printError(analyzer.getLine());
             }
         } else {
-            //now we throw
+            throw new SyntacticException(currentToken.getTokenName(),tokenName, analyzer.getLineNumber());
         }
     }
 
-    public void startAnalysis(){
+    public void startAnalysis() throws SyntacticException {
         try {
             currentToken = analyzer.getNextToken();
         } catch (LexicalException e) {
@@ -42,13 +44,13 @@ public class SyntacticAnalyzer {
         start();
     }
     
-    private void start() {
+    private void start() throws SyntacticException {
         classesList();
         match("EOF");
     }
 
-    private void classesList() {
-        if(firstsMap.getFirsts("<classState>").contains(currentToken.getTokenName())) {
+    private void classesList() throws SyntacticException {
+        if(firstsMap.getFirsts("classState").contains(currentToken.getTokenName())) {
             classState();
             classesList();
         } else {
@@ -56,7 +58,7 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void classState() {
+    private void classState() throws SyntacticException {
         optionalModifier();
         match("pr_class");
         match("idClase");
@@ -66,8 +68,8 @@ public class SyntacticAnalyzer {
         match("closeBrace");
     }
 
-    private void optionalInheritance() {
-        if (firstsMap.getFirsts("<optionalModifier>").contains(currentToken.getTokenName())){
+    private void optionalInheritance() throws SyntacticException {
+        if (firstsMap.getFirsts("optionalModifier").contains(currentToken.getTokenName())){
             match("pr_extends");
             match("idClase");
         } else {
@@ -75,7 +77,7 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void optionalModifier() {
+    private void optionalModifier() throws SyntacticException {
         switch (currentToken.getTokenName()){
             case "pr_abstract" -> match("pr_abstract");
             case "pr_static" -> match("pr_static");
@@ -83,7 +85,7 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void membersList() {
+    private void membersList() throws SyntacticException {
         if (firstsMap.getFirsts("member").contains(currentToken.getTokenName())){
             member();
             membersList();
@@ -92,16 +94,16 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void optionalMemberModifier() {
+    private void optionalMemberModifier() throws SyntacticException {
         switch (currentToken.getTokenName()){
             case "pr_abstract" -> match("pr_abstract");
             case "pr_static" -> match("pr_static");
             case "pr_final" -> match("pr_final");
-            default -> System.out.println();//TODO aca tira error?
+            default -> throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("optionalMemberModifier")), analyzer.getLineNumber());
         }
     }
 
-    private void member() {
+    private void member() throws SyntacticException {
         if (firstsMap.getFirsts("constructor").contains(currentToken.getTokenName())){
             constructor();
         } else if (firstsMap.getFirsts("optionalMemberModifier").contains(currentToken.getTokenName())){
@@ -120,62 +122,64 @@ public class SyntacticAnalyzer {
             formalArgs();
             optionalBlock();
         } else {
-            //TODO error?
+            throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("member")), analyzer.getLineNumber());
         }
     }
 
-    private void memberMethod() {
+    private void memberMethod() throws SyntacticException {
         if (firstsMap.getFirsts("formalArgs").contains(currentToken.getTokenName())){
             formalArgs();
             optionalBlock();
+        } else if (currentToken.getTokenName().equals("semicolon")){
+            match("semicolon");
         } else {
             //TODO nada
         }
     }
 
-    private void constructor() {
+    private void constructor() throws SyntacticException {
         match("pr_public");
         match("idClase");
         formalArgs();
         block();
     }
 
-    private void typeMethod() {
+    private void typeMethod() throws SyntacticException {
         if (firstsMap.getFirsts("type").contains(currentToken.getTokenName())){
             type();
         } else if (currentToken.getTokenName().equals("pr_void")){ //TODO esto esta en todos lados y esta mal creo
             match("pr_void");
         } else {
-            //TODO error?
+            throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("typeMethod")), analyzer.getLineNumber());
         }
     }
 
-    private void type() {
+    private void type() throws SyntacticException {
         if (firstsMap.getFirsts("primitiveType").contains(currentToken.getTokenName())){
             primitiveType();
-        } else if (currentToken.getTokenName().equals("idClase")){ //TODO esto esta en todos lados y esta mal creo
+        } else if (currentToken.getTokenName().equals("idClase")){
             match("idClase");
         } else {
-            //TODO error?
+            throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("type")), analyzer.getLineNumber());
         }
     }
 
-    private void primitiveType(){
+    private void primitiveType() throws SyntacticException {
         switch (currentToken.getTokenName()){
             case "pr_boolean" -> match("pr_boolean");
             case "pr_char" -> match("pr_char");
             case "pr_int" -> match("pr_int");
-            default -> System.out.println();//TODO aca tira error?
+            default -> throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("primitiveType")), analyzer.getLineNumber());
         }
     }
 
-    private void formalArgs() {
+    private void formalArgs() throws SyntacticException {
         match("openParenthesis");
         optionalFormalArgsList();
         match("closeParenthesis");
     }
 
-    private void optionalFormalArgsList(){
+    private void optionalFormalArgsList() throws SyntacticException {
         if (firstsMap.getFirsts("formalArgsList").contains(currentToken.getTokenName())){
             formalArgsList();
         } else {
@@ -183,35 +187,35 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void formalArgsList(){
-        if (firstsMap.getFirsts("formalArgs").contains(currentToken.getTokenName())){
-            formalArgs();
-            formalArgListLeft();
+    private void formalArgsList() throws SyntacticException {
+        if (firstsMap.getFirsts("formalArg").contains(currentToken.getTokenName())){
+            formalArg();
+            formalArgsLeft();
         } else {
-            //TODO error?
+            throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("formalArgsList")), analyzer.getLineNumber());
         }
     }
 
-    private void formalArgListLeft(){
+    private void formalArgsLeft() throws SyntacticException {
         if (currentToken.getTokenName().equals("comma")){ //TODO esto esta para el tuge
             match("comma");
-            formalArgs();
-            formalArgListLeft();
+            formalArg();
+            formalArgsLeft();
         } else {
             //TODO nada
         }
     }
 
-    private void formalArg(){
+    private void formalArg() throws SyntacticException {
         if (firstsMap.getFirsts("type").contains(currentToken.getTokenName())){
             type();
             match("idMetVar");
         } else {
-            //TODO error?
+            throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("formalArg")), analyzer.getLineNumber());
         }
     }
 
-    private void optionalBlock() {
+    private void optionalBlock() throws SyntacticException {
         if (firstsMap.getFirsts("block").contains(currentToken.getTokenName())){
             block();
         } else {
@@ -219,13 +223,13 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void block() {
+    private void block() throws SyntacticException {
         match("openBrace");
         sentenceList();
-        match("openBrace");
+        match("closeBrace");
     }
 
-    private void sentenceList() {
+    private void sentenceList() throws SyntacticException {
         if (firstsMap.getFirsts("sentence").contains(currentToken.getTokenName())){
             sentence();
             sentenceList();
@@ -234,7 +238,7 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void sentence() {
+    private void sentence() throws SyntacticException {
         if (currentToken.getTokenName().equals("semicolon")){
             match("semicolon");
         } else if (firstsMap.getFirsts("assignCall").contains(currentToken.getTokenName())){
@@ -250,31 +254,31 @@ public class SyntacticAnalyzer {
         } else if (firstsMap.getFirsts("block").contains(currentToken.getTokenName())){
             block();
         } else {
-            //TODO error?
+            throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("sentence")), analyzer.getLineNumber());
         }
     }
 
-    private void assignCall() {
+    private void assignCall() throws SyntacticException {
         if (firstsMap.getFirsts("expression").contains(currentToken.getTokenName())){
             expression();
         } else {
-            //TODO error?
+            throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("assignCall")), analyzer.getLineNumber());
         }
     }
 
-    private void localVar() {
+    private void localVar() throws SyntacticException {
         match("pr_var");
         match("idMetVar");
         match("equals");
         composedExpression();
     }
 
-    private void returnState() {
+    private void returnState() throws SyntacticException {
         match("pr_return");
         optionalExpression();
     }
 
-    private void optionalExpression() {
+    private void optionalExpression() throws SyntacticException {
         if (firstsMap.getFirsts("expression").contains(currentToken.getTokenName())){
             expression();
         } else {
@@ -282,7 +286,7 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void ifState() {
+    private void ifState() throws SyntacticException {
         match("ifState");
         match("openParenthesis");
         expression();
@@ -291,7 +295,7 @@ public class SyntacticAnalyzer {
         elseSentence();
     }
 
-    private void elseSentence() {
+    private void elseSentence() throws SyntacticException {
         if (currentToken.getTokenName().equals("pr_else")){
             match("pr_else");
             sentence();
@@ -300,7 +304,7 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void whileState() {
+    private void whileState() throws SyntacticException {
         match("pr_while");
         match("openParenthesis");
         expression();
@@ -308,16 +312,16 @@ public class SyntacticAnalyzer {
         sentence();
     }
 
-    private void expression() {
+    private void expression() throws SyntacticException {
         if (firstsMap.getFirsts("composedExpression").contains(currentToken.getTokenName())){
             composedExpression();
             extraExpression();
         } else {
-            //TODO error?
+            throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("expression")), analyzer.getLineNumber());
         }
     }
 
-    private void extraExpression() {
+    private void extraExpression() throws SyntacticException {
         if (firstsMap.getFirsts("assignOperator").contains(currentToken.getTokenName())){
             assignOperator();
             composedExpression();
@@ -326,11 +330,11 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void assignOperator() {
+    private void assignOperator() throws SyntacticException {
         match("equals");
     }
 
-    private void composedExpression() {
+    private void composedExpression() throws SyntacticException {
         if (firstsMap.getFirsts("basicExpression").contains(currentToken.getTokenName())){
             basicExpression();
             composedExpressionLeft();
@@ -339,7 +343,7 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void composedExpressionLeft() {
+    private void composedExpressionLeft() throws SyntacticException {
         if (firstsMap.getFirsts("binaryOperator").contains(currentToken.getTokenName())){
             binaryOperator();
             basicExpression();
@@ -348,7 +352,7 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void binaryOperator() {
+    private void binaryOperator() throws SyntacticException {
         switch (currentToken.getTokenName()){
             case "or" -> match("or");
             case "and" -> match("and");
@@ -363,63 +367,63 @@ public class SyntacticAnalyzer {
             case "asterisk" -> match("asterisk");
             case "slash" -> match("slash");
             case "modulo" -> match("modulo");
-            default -> System.out.println();//TODO aca tira error?
+            default -> throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("binaryOperator")), analyzer.getLineNumber());
         }
     }
 
-    private void basicExpression() {
+    private void basicExpression() throws SyntacticException {
         if (firstsMap.getFirsts("unaryOperator").contains(currentToken.getTokenName())){
             unaryOperator();
             operand();
         } else if (firstsMap.getFirsts("operand").contains(currentToken.getTokenName())){
             operand();
         } else {
-            //TODO error?
+            throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("basicExpression")), analyzer.getLineNumber());
         }
     }
 
-    private void unaryOperator() {
+    private void unaryOperator() throws SyntacticException {
         switch (currentToken.getTokenName()){
             case "plus" -> match("plus");
             case "minus" -> match("minus");
             case "decrement" -> match("decrement");
             case "increment" -> match("increment");
             case "not" -> match("not");
-            default -> System.out.println();//TODO aca tira error?
+            default -> throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("unaryOperator")), analyzer.getLineNumber());
         }
     }
 
-    private void operand() {
+    private void operand() throws SyntacticException {
         if (firstsMap.getFirsts("primitive").contains(currentToken.getTokenName())){
             primitive();
         } else if (firstsMap.getFirsts("reference").contains(currentToken.getTokenName())){
             reference();
         } else {
-            //TODO error?
+            throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("operand")), analyzer.getLineNumber());
         }
     }
 
-    private void primitive() {
+    private void primitive() throws SyntacticException {
         switch (currentToken.getTokenName()){
             case "pr_true" -> match("pr_true");
             case "pr_false" -> match("pr_false");
             case "intLiteral" -> match("intLiteral");
             case "charLiteral" -> match("charLiteral");
             case "pr_null" -> match("pr_null");
-            default -> System.out.println();//TODO aca tira error?
+            default -> throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("primitive")), analyzer.getLineNumber());
         }
     }
 
-    private void reference() {
+    private void reference() throws SyntacticException {
         if (firstsMap.getFirsts("primary").contains(currentToken.getTokenName())){
             primary();
             chainReference();
         } else {
-            //TODO error?
+            throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("reference")), analyzer.getLineNumber());
         }
     }
 
-    private void chainReference() {
+    private void chainReference() throws SyntacticException {
         if (currentToken.getTokenName().equals("dot")){
             match("dot");
             match("idMetVar");
@@ -430,7 +434,7 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void primary() {
+    private void primary() throws SyntacticException {
         if (currentToken.getTokenName().equals("pr_this")){
             match("pr_this");
         } else if (currentToken.getTokenName().equals("stringLiteral")){
@@ -444,16 +448,16 @@ public class SyntacticAnalyzer {
         } else if (firstsMap.getFirsts("parenthesisExpression").contains(currentToken.getTokenName())){
             parenthesisExpression();
         } else {
-            //TODO error?
+            throw new SyntacticException(currentToken.getTokenName(), String.join(", ",firstsMap.getFirsts("primary")), analyzer.getLineNumber());
         }
     }
 
-    private void varMethodAccess() {
+    private void varMethodAccess() throws SyntacticException {
         match("idMetVar");
         possibleArgs();
     }
 
-    private void possibleArgs() {
+    private void possibleArgs() throws SyntacticException {
         if (firstsMap.getFirsts("currentArgs").contains(currentToken.getTokenName())){
             currentArgs();
         } else {
@@ -461,32 +465,32 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void constructorCall() {
+    private void constructorCall() throws SyntacticException {
         match("pr_new");
         match("idClase");
         currentArgs();
     }
 
-    private void parenthesisExpression() {
+    private void parenthesisExpression() throws SyntacticException {
         match("openParenthesis");
         expression();
         match("closeParenthesis");
     }
 
-    private void staticCall() {
+    private void staticCall() throws SyntacticException {
         match("idClase");
         match("dot");
         match("idMetVar");
         currentArgs();
     }
 
-    private void currentArgs() {
+    private void currentArgs() throws SyntacticException {
         match("openParenthesis");
         optionalExpressionList();
         match("closeParenthesis");
     }
 
-    private void optionalExpressionList() {
+    private void optionalExpressionList() throws SyntacticException {
         if (firstsMap.getFirsts("expression").contains(currentToken.getTokenName())){
             expression();
             expressionList();
@@ -495,7 +499,7 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void expressionList() {
+    private void expressionList() throws SyntacticException {
         if (currentToken.getTokenName().equals("dot")){
             match("dot");
             expression();
@@ -505,7 +509,7 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void chainElement() {
+    private void chainElement() throws SyntacticException {
         if (firstsMap.getFirsts("currentArgs").contains(currentToken.getTokenName())){
             currentArgs();
         } else {

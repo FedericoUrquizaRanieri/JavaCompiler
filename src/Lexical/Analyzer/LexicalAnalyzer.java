@@ -59,6 +59,10 @@ public class LexicalAnalyzer {
         }
     }
 
+    public int getLineNumber() {
+        return fileManager.getLineNumber();
+    }
+
     private Token initialState() throws LexicalException {
         if (currentChar == SourceManager.END_OF_FILE) {
             return new Token("EOF", "EOF", fileManager.getLineNumber());
