@@ -1,19 +1,16 @@
 package Syntactic.SynExceptions;
 
 public class SyntacticException extends Exception {
-  private final String lexeme;
-  private final int line;
-  private final String errorExplanation;
+  private final String currentToken;
+  private final String tokenName;
 
-  public SyntacticException(String lexeme, int line, String errorExplanation) {
-    this.lexeme = lexeme;
-    this.line = line;
-    this.errorExplanation = errorExplanation;
+  public SyntacticException(String currentToken, String tokenName) {
+    this.currentToken = currentToken;
+    this.tokenName = tokenName;
   }
 
   public void printError() {
-    System.out.println("Error Sintactico en linea " + line + ": " + errorExplanation + " \"" + lexeme + "\"");
+    System.out.println("Se esperaba un "+tokenName+" pero se encontro "+currentToken);
     System.out.println();
-    System.out.println("[Error:" + lexeme + "|" + line + "]");
   }
 }
