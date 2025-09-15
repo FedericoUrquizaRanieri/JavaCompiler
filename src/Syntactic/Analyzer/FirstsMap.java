@@ -45,7 +45,7 @@ public class FirstsMap {
         firstHashMap.put("binaryOperator", Set.of("or", "and", "equality", "inequality", "less", "lessOrEqual", "greater", "greaterOrEqual", "plus", "minus", "asterisk", "slash", "modulo"));
         firstHashMap.put("basicExpression", Set.of("minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis"));
         firstHashMap.put("unaryOperator", Set.of("minus", "decrement", "plus", "increment", "not"));
-        firstHashMap.put("operand", Set.of("pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis","pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null"));
+        firstHashMap.put("operand", Set.of("pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null"));
         firstHashMap.put("primitive", Set.of("pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null"));
         firstHashMap.put("reference", Set.of("pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis"));
         firstHashMap.put("chainReference", Set.of("dot", "empty"));
