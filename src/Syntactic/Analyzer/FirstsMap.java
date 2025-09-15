@@ -13,10 +13,10 @@ public class FirstsMap {
         firstHashMap.put("classState", Set.of("pr_abstract", "pr_static", "pr_final", "pr_class"));
         firstHashMap.put("optionalModifier", Set.of("pr_abstract", "pr_static", "pr_final", "empty"));
         firstHashMap.put("optionalInheritance", Set.of("pr_extends", "empty"));
-        firstHashMap.put("membersList", Set.of("pr_public", "pr_abstract", "pr_static", "pr_final", "pr_void", "idClase", "pr_boolean", "pr_int", "pr_char"));
+        firstHashMap.put("membersList", Set.of("pr_public", "pr_abstract", "pr_static", "pr_final", "pr_void", "idClase", "pr_boolean", "pr_int", "pr_char","empty"));
         firstHashMap.put("optionalMemberModifier", Set.of("pr_abstract", "pr_static", "pr_final"));
         firstHashMap.put("member", Set.of("pr_public", "pr_abstract", "pr_static", "pr_final", "pr_void", "idClase", "pr_boolean", "pr_int", "pr_char"));
-        firstHashMap.put("memberMethod", Set.of("openParenthesis"));
+        firstHashMap.put("memberMethod", Set.of("openParenthesis","semicolon"));
         firstHashMap.put("constructor", Set.of("pr_public"));
         firstHashMap.put("typeMethod", Set.of("idClase", "pr_boolean", "pr_int", "pr_char", "pr_void"));
         firstHashMap.put("type", Set.of("idClase", "pr_boolean", "pr_int", "pr_char"));
@@ -28,7 +28,7 @@ public class FirstsMap {
         firstHashMap.put("formalArg", Set.of("idClase", "pr_boolean", "pr_int", "pr_char"));
         firstHashMap.put("optionalBlock", Set.of("openBrace", "semicolon"));
         firstHashMap.put("block", Set.of("openBrace"));
-        firstHashMap.put("sentenceList", Set.of("minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis", "pr_var", "pr_return", "pr_if", "pr_while", "openBrace", "empty"));
+        firstHashMap.put("sentenceList", Set.of("minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis", "pr_var", "pr_return", "pr_if", "pr_while", "openBrace", "semicolon", "empty"));
         firstHashMap.put("sentence", Set.of("minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis", "pr_var", "pr_return", "pr_if", "pr_while", "openBrace", "semicolon"));
         firstHashMap.put("assignCall", Set.of("minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis"));
         firstHashMap.put("localVar", Set.of("pr_var"));
