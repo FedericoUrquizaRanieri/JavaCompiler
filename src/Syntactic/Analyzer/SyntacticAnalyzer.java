@@ -97,8 +97,7 @@ public class SyntacticAnalyzer {
             case "pr_abstract" -> match("pr_abstract");
             case "pr_static" -> match("pr_static");
             case "pr_final" -> match("pr_final");
-            default ->
-                    throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("optionalMemberModifier")), analyzer.getLineNumber());
+            default -> throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("optionalMemberModifier")), analyzer.getLineNumber());
         }
     }
 
@@ -132,7 +131,7 @@ public class SyntacticAnalyzer {
         } else if (currentToken.getTokenName().equals("semicolon")) {
             match("semicolon");
         } else {
-            //TODO nada
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("memberMethod")), analyzer.getLineNumber());
         }
     }
 
