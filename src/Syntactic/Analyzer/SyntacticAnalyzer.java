@@ -22,7 +22,6 @@ public class SyntacticAnalyzer {
     }
 
     void match(String tokenName) throws SyntacticException {
-        var cuTokenName = currentToken.getTokenName(); //TODO retirar esto en un futuro
         if (tokenName.equals(currentToken.getTokenName())) {
             try {
                 currentToken = analyzer.getNextToken();
@@ -351,6 +350,7 @@ public class SyntacticAnalyzer {
         if (firstsMap.getFirsts("binaryOperator").contains(currentToken.getTokenName())) {
             binaryOperator();
             basicExpression();
+            composedExpressionLeft();
         } else {
             //TODO nada
         }

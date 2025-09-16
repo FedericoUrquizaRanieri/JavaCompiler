@@ -1,0 +1,3 @@
+///[SinErrores]
+final class FinalClass {
+}
