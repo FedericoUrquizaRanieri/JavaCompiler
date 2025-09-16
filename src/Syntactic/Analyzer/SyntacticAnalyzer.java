@@ -217,8 +217,11 @@ public class SyntacticAnalyzer {
     private void optionalBlock() throws SyntacticException {
         if (firstsMap.getFirsts("block").contains(currentToken.getTokenName())) {
             block();
-        } else {
+        } else if (currentToken.getTokenName().equals("semicolon")){
             match("semicolon");
+        } else {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("optionalBlock")), analyzer.getLineNumber());
+
         }
     }
 
