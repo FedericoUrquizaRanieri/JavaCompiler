@@ -3,11 +3,18 @@ package Syntactic.Analyzer;
 import java.util.HashMap;
 import java.util.Set;
 
-public class FirstsMap {
+public class ProductionsMap {
     private final HashMap<String, Set<String>> firstHashMap;
+    private final HashMap<String, Set<String>> followHashMap;
 
-    public FirstsMap() {
+    public ProductionsMap() {
         firstHashMap = new HashMap<>();
+        completeFirsts();
+        followHashMap = new HashMap<>();
+        completeNext();
+    }
+
+    private void completeFirsts(){
         firstHashMap.put("start", Set.of("EOF", "pr_abstract", "pr_static", "pr_final", "pr_class"));
         firstHashMap.put("classesList", Set.of("pr_abstract", "pr_static", "pr_final", "pr_class", "empty"));
         firstHashMap.put("classState", Set.of("pr_abstract", "pr_static", "pr_final", "pr_class"));
@@ -24,7 +31,7 @@ public class FirstsMap {
         firstHashMap.put("formalArgs", Set.of("openParenthesis"));
         firstHashMap.put("optionalFormalArgsList", Set.of("idClase", "pr_boolean", "pr_int", "pr_char", "empty"));
         firstHashMap.put("formalArgsList", Set.of("idClase", "pr_boolean", "pr_int", "pr_char"));
-        firstHashMap.put("formalArgsLeft", Set.of("comma"));
+        firstHashMap.put("formalArgsLeft", Set.of("comma","empty"));
         firstHashMap.put("formalArg", Set.of("idClase", "pr_boolean", "pr_int", "pr_char"));
         firstHashMap.put("optionalBlock", Set.of("openBrace", "semicolon"));
         firstHashMap.put("block", Set.of("openBrace"));
@@ -35,7 +42,7 @@ public class FirstsMap {
         firstHashMap.put("returnState", Set.of("pr_return"));
         firstHashMap.put("optionalExpression", Set.of("minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis", "empty"));
         firstHashMap.put("ifState", Set.of("pr_if"));
-        firstHashMap.put("elseSentence", Set.of("pr_else"));
+        firstHashMap.put("elseSentence", Set.of("pr_else","empty"));
         firstHashMap.put("whileState", Set.of("pr_while"));
         firstHashMap.put("expression", Set.of("minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis"));
         firstHashMap.put("extraExpression", Set.of("equals", "empty"));
@@ -61,7 +68,30 @@ public class FirstsMap {
         firstHashMap.put("chainElement", Set.of("openParenthesis", "empty"));
     }
 
+    private void completeNext(){
+        followHashMap.put("classesList", Set.of("EOF"));
+        followHashMap.put("optionalModifier", Set.of("pr_class"));
+        followHashMap.put("optionalInheritance", Set.of("openBrace"));
+        followHashMap.put("membersList", Set.of("closeBrace"));
+        followHashMap.put("optionalFormalArgsList", Set.of("closeParenthesis"));
+        followHashMap.put("formalArgsLeft", Set.of("closeParenthesis"));
+        followHashMap.put("sentenceList", Set.of("closeBrace"));
+        followHashMap.put("optionalExpression", Set.of("semicolon"));
+        followHashMap.put("elseSentence", Set.of("closeBrace","minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis", "pr_var", "pr_return", "pr_if", "pr_while", "openBrace", "semicolon","pr_else"));
+        followHashMap.put("extraExpression", Set.of("closeBrace","semicolon","closeParenthesis","comma"));
+        followHashMap.put("composedExpressionLeft", Set.of("closeBrace","semicolon","closeParenthesis","comma","equals"));
+        followHashMap.put("chainReference", Set.of("or", "and", "equality", "inequality", "less", "lessOrEqual", "greater", "greaterOrEqual", "plus", "minus", "asterisk", "slash", "modulo","closeBrace","semicolon","closeParenthesis","comma","equals"));
+        followHashMap.put("possibleArgs", Set.of("dot","or", "and", "equality", "inequality", "less", "lessOrEqual", "greater", "greaterOrEqual", "plus", "minus", "asterisk", "slash", "modulo","closeBrace","semicolon","closeParenthesis","comma","equals"));
+        followHashMap.put("optionalExpressionList", Set.of("closeParenthesis"));
+        followHashMap.put("expressionList", Set.of("closeParenthesis"));
+
+        followHashMap.put("chainElement", Set.of("dot","or", "and", "equality", "inequality", "less", "lessOrEqual", "greater", "greaterOrEqual", "plus", "minus", "asterisk", "slash", "modulo","closeBrace","semicolon","closeParenthesis","comma","equals"));
+    }
+
     public Set<String> getFirsts(String key) {
         return firstHashMap.get(key);
+    }
+    public Set<String> getFollow(String key) {
+        return followHashMap.get(key);
     }
 }

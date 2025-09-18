@@ -10,11 +10,11 @@ public class SyntacticAnalyzer {
     private Token currentToken;
     private boolean errors;
     private boolean panicState;
-    private final FirstsMap firstsMap;
+    private final ProductionsMap productionsMap;
 
-    public SyntacticAnalyzer(LexicalAnalyzer analyzer, FirstsMap firstsMap) {
+    public SyntacticAnalyzer(LexicalAnalyzer analyzer, ProductionsMap productionsMap) {
         this.analyzer = analyzer;
-        this.firstsMap = firstsMap;
+        this.productionsMap = productionsMap;
     }
 
     public boolean notErrorInFile() {
@@ -48,11 +48,11 @@ public class SyntacticAnalyzer {
     }
 
     private void classesList() throws SyntacticException {
-        if (firstsMap.getFirsts("classState").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("classState").contains(currentToken.getTokenName())) {
             classState();
             classesList();
-        } else {
-            //TODO nada
+        } else if (!productionsMap.getFollow("classesList").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("classesList")), analyzer.getLineNumber());
         }
     }
 
@@ -71,24 +71,24 @@ public class SyntacticAnalyzer {
             case "pr_abstract" -> match("pr_abstract");
             case "pr_static" -> match("pr_static");
             case "pr_final" -> match("pr_final");
-        }
+        } //TODO aca va
     }
 
     private void optionalInheritance() throws SyntacticException {
-        if (firstsMap.getFirsts("optionalInheritance").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("optionalInheritance").contains(currentToken.getTokenName())) {
             match("pr_extends");
             match("idClase");
-        } else {
-            //TODO nada
+        } else if (!productionsMap.getFollow("optionalInheritance").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalInheritance")), analyzer.getLineNumber());
         }
     }
 
     private void membersList() throws SyntacticException {
-        if (firstsMap.getFirsts("member").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("member").contains(currentToken.getTokenName())) {
             member();
             membersList();
-        } else {
-            //TODO nada
+        } else if (!productionsMap.getFollow("membersList").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("membersList")), analyzer.getLineNumber());
         }
     }
 
@@ -97,20 +97,20 @@ public class SyntacticAnalyzer {
             case "pr_abstract" -> match("pr_abstract");
             case "pr_static" -> match("pr_static");
             case "pr_final" -> match("pr_final");
-            default -> throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("optionalMemberModifier")), analyzer.getLineNumber());
+            default -> throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("optionalMemberModifier")), analyzer.getLineNumber());
         }
     }
 
     private void member() throws SyntacticException {
-        if (firstsMap.getFirsts("constructor").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("constructor").contains(currentToken.getTokenName())) {
             constructor();
-        } else if (firstsMap.getFirsts("optionalMemberModifier").contains(currentToken.getTokenName())) {
+        } else if (productionsMap.getFirsts("optionalMemberModifier").contains(currentToken.getTokenName())) {
             optionalMemberModifier();
             typeMethod();
             match("idMetVar");
             formalArgs();
             optionalBlock();
-        } else if (firstsMap.getFirsts("type").contains(currentToken.getTokenName())) {
+        } else if (productionsMap.getFirsts("type").contains(currentToken.getTokenName())) {
             type();
             match("idMetVar");
             memberMethod();
@@ -120,18 +120,18 @@ public class SyntacticAnalyzer {
             formalArgs();
             optionalBlock();
         } else {
-            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("member")), analyzer.getLineNumber());
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("member")), analyzer.getLineNumber());
         }
     }
 
     private void memberMethod() throws SyntacticException {
-        if (firstsMap.getFirsts("formalArgs").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("formalArgs").contains(currentToken.getTokenName())) {
             formalArgs();
             optionalBlock();
         } else if (currentToken.getTokenName().equals("semicolon")) {
             match("semicolon");
         } else {
-            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("memberMethod")), analyzer.getLineNumber());
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("memberMethod")), analyzer.getLineNumber());
         }
     }
 
@@ -143,22 +143,22 @@ public class SyntacticAnalyzer {
     }
 
     private void typeMethod() throws SyntacticException {
-        if (firstsMap.getFirsts("type").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("type").contains(currentToken.getTokenName())) {
             type();
         } else if (currentToken.getTokenName().equals("pr_void")) {
             match("pr_void");
         } else {
-            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("typeMethod")), analyzer.getLineNumber());
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("typeMethod")), analyzer.getLineNumber());
         }
     }
 
     private void type() throws SyntacticException {
-        if (firstsMap.getFirsts("primitiveType").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("primitiveType").contains(currentToken.getTokenName())) {
             primitiveType();
         } else if (currentToken.getTokenName().equals("idClase")) {
             match("idClase");
         } else {
-            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("type")), analyzer.getLineNumber());
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("type")), analyzer.getLineNumber());
         }
     }
 
@@ -168,7 +168,7 @@ public class SyntacticAnalyzer {
             case "pr_char" -> match("pr_char");
             case "pr_int" -> match("pr_int");
             default ->
-                    throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("primitiveType")), analyzer.getLineNumber());
+                    throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("primitiveType")), analyzer.getLineNumber());
         }
     }
 
@@ -179,19 +179,19 @@ public class SyntacticAnalyzer {
     }
 
     private void optionalFormalArgsList() throws SyntacticException {
-        if (firstsMap.getFirsts("formalArgsList").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("formalArgsList").contains(currentToken.getTokenName())) {
             formalArgsList();
-        } else {
-            //TODO nada
+        } else if (!productionsMap.getFollow("optionalFormalArgsList").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalFormalArgsList")), analyzer.getLineNumber());
         }
     }
 
     private void formalArgsList() throws SyntacticException {
-        if (firstsMap.getFirsts("formalArg").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("formalArg").contains(currentToken.getTokenName())) {
             formalArg();
             formalArgsLeft();
         } else {
-            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("formalArgsList")), analyzer.getLineNumber());
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("formalArgsList")), analyzer.getLineNumber());
         }
     }
 
@@ -200,27 +200,27 @@ public class SyntacticAnalyzer {
             match("comma");
             formalArg();
             formalArgsLeft();
-        } else {
-            //TODO nada
+        } else if (!productionsMap.getFollow("formalArgsLeft").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("formalArgsLeft")), analyzer.getLineNumber());
         }
     }
 
     private void formalArg() throws SyntacticException {
-        if (firstsMap.getFirsts("type").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("type").contains(currentToken.getTokenName())) {
             type();
             match("idMetVar");
         } else {
-            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("formalArg")), analyzer.getLineNumber());
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("formalArg")), analyzer.getLineNumber());
         }
     }
 
     private void optionalBlock() throws SyntacticException {
-        if (firstsMap.getFirsts("block").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("block").contains(currentToken.getTokenName())) {
             block();
         } else if (currentToken.getTokenName().equals("semicolon")){
             match("semicolon");
         } else {
-            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("optionalBlock")), analyzer.getLineNumber());
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("optionalBlock")), analyzer.getLineNumber());
 
         }
     }
@@ -232,42 +232,42 @@ public class SyntacticAnalyzer {
     }
 
     private void sentenceList() throws SyntacticException {
-        if (firstsMap.getFirsts("sentence").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("sentence").contains(currentToken.getTokenName())) {
             sentence();
             sentenceList();
-        } else {
-            //TODO nada
+        } else if (!productionsMap.getFollow("sentenceList").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("sentenceList")), analyzer.getLineNumber());
         }
     }
 
     private void sentence() throws SyntacticException {
         if (currentToken.getTokenName().equals("semicolon")) {
             match("semicolon");
-        } else if (firstsMap.getFirsts("assignCall").contains(currentToken.getTokenName())) {
+        } else if (productionsMap.getFirsts("assignCall").contains(currentToken.getTokenName())) {
             assignCall();
             match("semicolon");
-        } else if (firstsMap.getFirsts("localVar").contains(currentToken.getTokenName())) {
+        } else if (productionsMap.getFirsts("localVar").contains(currentToken.getTokenName())) {
             localVar();
             match("semicolon");
-        } else if (firstsMap.getFirsts("returnState").contains(currentToken.getTokenName())) {
+        } else if (productionsMap.getFirsts("returnState").contains(currentToken.getTokenName())) {
             returnState();
             match("semicolon");
-        } else if (firstsMap.getFirsts("ifState").contains(currentToken.getTokenName())) {
+        } else if (productionsMap.getFirsts("ifState").contains(currentToken.getTokenName())) {
             ifState();
-        } else if (firstsMap.getFirsts("whileState").contains(currentToken.getTokenName())) {
+        } else if (productionsMap.getFirsts("whileState").contains(currentToken.getTokenName())) {
             whileState();
-        } else if (firstsMap.getFirsts("block").contains(currentToken.getTokenName())) {
+        } else if (productionsMap.getFirsts("block").contains(currentToken.getTokenName())) {
             block();
         } else {
-            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("sentence")), analyzer.getLineNumber());
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("sentence")), analyzer.getLineNumber());
         }
     }
 
     private void assignCall() throws SyntacticException {
-        if (firstsMap.getFirsts("expression").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("expression").contains(currentToken.getTokenName())) {
             expression();
         } else {
-            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("assignCall")), analyzer.getLineNumber());
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("assignCall")), analyzer.getLineNumber());
         }
     }
 
@@ -284,10 +284,10 @@ public class SyntacticAnalyzer {
     }
 
     private void optionalExpression() throws SyntacticException {
-        if (firstsMap.getFirsts("expression").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("expression").contains(currentToken.getTokenName())) {
             expression();
-        } else {
-            //TODO nada
+        } else if (!productionsMap.getFollow("optionalExpression").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalExpression")), analyzer.getLineNumber());
         }
     }
 
@@ -304,8 +304,8 @@ public class SyntacticAnalyzer {
         if (currentToken.getTokenName().equals("pr_else")) {
             match("pr_else");
             sentence();
-        } else {
-            //TODO nada
+        } else if (!productionsMap.getFollow("elseSentence").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("elseSentence")), analyzer.getLineNumber());
         }
     }
 
@@ -318,20 +318,20 @@ public class SyntacticAnalyzer {
     }
 
     private void expression() throws SyntacticException {
-        if (firstsMap.getFirsts("composedExpression").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("composedExpression").contains(currentToken.getTokenName())) {
             composedExpression();
             extraExpression();
         } else {
-            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("expression")), analyzer.getLineNumber());
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("expression")), analyzer.getLineNumber());
         }
     }
 
     private void extraExpression() throws SyntacticException {
-        if (firstsMap.getFirsts("assignOperator").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("assignOperator").contains(currentToken.getTokenName())) {
             assignOperator();
             composedExpression();
-        } else {
-            //TODO nada
+        } else if (!productionsMap.getFollow("extraExpression").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("extraExpression")), analyzer.getLineNumber());
         }
     }
 
@@ -340,21 +340,21 @@ public class SyntacticAnalyzer {
     }
 
     private void composedExpression() throws SyntacticException {
-        if (firstsMap.getFirsts("basicExpression").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("basicExpression").contains(currentToken.getTokenName())) {
             basicExpression();
             composedExpressionLeft();
         } else {
-            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("composedExpression")), analyzer.getLineNumber());
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("composedExpression")), analyzer.getLineNumber());
         }
     }
 
     private void composedExpressionLeft() throws SyntacticException {
-        if (firstsMap.getFirsts("binaryOperator").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("binaryOperator").contains(currentToken.getTokenName())) {
             binaryOperator();
             basicExpression();
             composedExpressionLeft();
-        } else {
-            //TODO nada
+        } else if (!productionsMap.getFollow("composedExpressionLeft").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("composedExpressionLeft")), analyzer.getLineNumber());
         }
     }
 
@@ -374,18 +374,18 @@ public class SyntacticAnalyzer {
             case "slash" -> match("slash");
             case "modulo" -> match("modulo");
             default ->
-                    throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("binaryOperator")), analyzer.getLineNumber());
+                    throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("binaryOperator")), analyzer.getLineNumber());
         }
     }
 
     private void basicExpression() throws SyntacticException {
-        if (firstsMap.getFirsts("unaryOperator").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("unaryOperator").contains(currentToken.getTokenName())) {
             unaryOperator();
             operand();
-        } else if (firstsMap.getFirsts("operand").contains(currentToken.getTokenName())) {
+        } else if (productionsMap.getFirsts("operand").contains(currentToken.getTokenName())) {
             operand();
         } else {
-            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("basicExpression")), analyzer.getLineNumber());
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("basicExpression")), analyzer.getLineNumber());
         }
     }
 
@@ -397,17 +397,17 @@ public class SyntacticAnalyzer {
             case "increment" -> match("increment");
             case "not" -> match("not");
             default ->
-                    throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("unaryOperator")), analyzer.getLineNumber());
+                    throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("unaryOperator")), analyzer.getLineNumber());
         }
     }
 
     private void operand() throws SyntacticException {
-        if (firstsMap.getFirsts("primitive").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("primitive").contains(currentToken.getTokenName())) {
             primitive();
-        } else if (firstsMap.getFirsts("reference").contains(currentToken.getTokenName())) {
+        } else if (productionsMap.getFirsts("reference").contains(currentToken.getTokenName())) {
             reference();
         } else {
-            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("operand")), analyzer.getLineNumber());
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("operand")), analyzer.getLineNumber());
         }
     }
 
@@ -419,16 +419,16 @@ public class SyntacticAnalyzer {
             case "charLiteral" -> match("charLiteral");
             case "pr_null" -> match("pr_null");
             default ->
-                    throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("primitive")), analyzer.getLineNumber());
+                    throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("primitive")), analyzer.getLineNumber());
         }
     }
 
     private void reference() throws SyntacticException {
-        if (firstsMap.getFirsts("primary").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("primary").contains(currentToken.getTokenName())) {
             primary();
             chainReference();
         } else {
-            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("reference")), analyzer.getLineNumber());
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("reference")), analyzer.getLineNumber());
         }
     }
 
@@ -438,8 +438,8 @@ public class SyntacticAnalyzer {
             match("idMetVar");
             chainElement();
             chainReference();
-        } else {
-            //TODO nada?
+        } else if (!productionsMap.getFollow("chainReference").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("chainReference")), analyzer.getLineNumber());
         }
     }
 
@@ -448,16 +448,16 @@ public class SyntacticAnalyzer {
             match("pr_this");
         } else if (currentToken.getTokenName().equals("stringLiteral")) {
             match("stringLiteral");
-        } else if (firstsMap.getFirsts("varMethodAccess").contains(currentToken.getTokenName())) {
+        } else if (productionsMap.getFirsts("varMethodAccess").contains(currentToken.getTokenName())) {
             varMethodAccess();
-        } else if (firstsMap.getFirsts("constructorCall").contains(currentToken.getTokenName())) {
+        } else if (productionsMap.getFirsts("constructorCall").contains(currentToken.getTokenName())) {
             constructorCall();
-        } else if (firstsMap.getFirsts("staticCall").contains(currentToken.getTokenName())) {
+        } else if (productionsMap.getFirsts("staticCall").contains(currentToken.getTokenName())) {
             staticCall();
-        } else if (firstsMap.getFirsts("parenthesisExpression").contains(currentToken.getTokenName())) {
+        } else if (productionsMap.getFirsts("parenthesisExpression").contains(currentToken.getTokenName())) {
             parenthesisExpression();
         } else {
-            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", firstsMap.getFirsts("primary")), analyzer.getLineNumber());
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("primary")), analyzer.getLineNumber());
         }
     }
 
@@ -467,10 +467,10 @@ public class SyntacticAnalyzer {
     }
 
     private void possibleArgs() throws SyntacticException {
-        if (firstsMap.getFirsts("currentArgs").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("currentArgs").contains(currentToken.getTokenName())) {
             currentArgs();
-        } else {
-            //TODO nada
+        } else if (!productionsMap.getFollow("possibleArgs").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("possibleArgs")), analyzer.getLineNumber());
         }
     }
 
@@ -500,11 +500,11 @@ public class SyntacticAnalyzer {
     }
 
     private void optionalExpressionList() throws SyntacticException {
-        if (firstsMap.getFirsts("expression").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("expression").contains(currentToken.getTokenName())) {
             expression();
             expressionList();
-        } else {
-            //TODO nada
+        } else if (!productionsMap.getFollow("optionalExpressionList").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalExpressionList")), analyzer.getLineNumber());
         }
     }
 
@@ -513,16 +513,16 @@ public class SyntacticAnalyzer {
             match("comma");
             expression();
             expressionList();
-        } else {
-            //TODO nada
+        } else if (!productionsMap.getFollow("expressionList").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("expressionList")), analyzer.getLineNumber());
         }
     }
 
     private void chainElement() throws SyntacticException {
-        if (firstsMap.getFirsts("currentArgs").contains(currentToken.getTokenName())) {
+        if (productionsMap.getFirsts("currentArgs").contains(currentToken.getTokenName())) {
             currentArgs();
-        } else {
-            //TODO nada
+        } else if (!productionsMap.getFollow("chainElement").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("chainElement")), analyzer.getLineNumber());
         }
     }
 }

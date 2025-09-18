@@ -5,7 +5,7 @@ import SourceManager.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import Syntactic.Analyzer.FirstsMap;
+import Syntactic.Analyzer.ProductionsMap;
 import Syntactic.Analyzer.SyntacticAnalyzer;
 import Syntactic.SynExceptions.SyntacticException;
 
@@ -19,9 +19,9 @@ public class MainSyntactic {
             throw new RuntimeException(e);
         }
         SpecialWordsMap specialWordsMap = new SpecialWordsMap();
-        FirstsMap firstsMap = new FirstsMap();
+        ProductionsMap productionsMap = new ProductionsMap();
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceManager, specialWordsMap);
-        SyntacticAnalyzer syntacticAnalyzer = new SyntacticAnalyzer(lexicalAnalyzer, firstsMap);
+        SyntacticAnalyzer syntacticAnalyzer = new SyntacticAnalyzer(lexicalAnalyzer, productionsMap);
 
         boolean noMistakes = true;
         try {
