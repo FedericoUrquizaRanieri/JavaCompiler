@@ -27,6 +27,7 @@ public class SpecialWordsMap {
         wordMap.put("null", "pr_null");
         wordMap.put("true", "pr_true");
         wordMap.put("false", "pr_false");
+        wordMap.put("for","pr_for");
     }
 
     public String getOrDefault(String key, String def) {

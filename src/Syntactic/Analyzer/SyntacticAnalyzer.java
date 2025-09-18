@@ -71,7 +71,12 @@ public class SyntacticAnalyzer {
             case "pr_abstract" -> match("pr_abstract");
             case "pr_static" -> match("pr_static");
             case "pr_final" -> match("pr_final");
-        } //TODO aca va
+            default -> {
+                if (!productionsMap.getFollow("optionalModifier").contains(currentToken.getTokenName())) {
+                    throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalModifier")), analyzer.getLineNumber());
+                }
+            }
+        }
     }
 
     private void optionalInheritance() throws SyntacticException {
