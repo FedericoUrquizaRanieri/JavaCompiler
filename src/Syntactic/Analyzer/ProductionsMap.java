@@ -12,7 +12,7 @@ public class ProductionsMap {
         firstHashMap = new HashMap<>();
         completeFirsts();
         followHashMap = new HashMap<>();
-        completeNext();
+        completeFollow();
     }
 
     private void completeFirsts() {
@@ -37,7 +37,7 @@ public class ProductionsMap {
         firstHashMap.put("optionalBlock", new HashSet<>(Set.of("semicolon")));
         firstHashMap.put("block", new HashSet<>(Set.of("openBrace")));
         firstHashMap.put("sentenceList", new HashSet<>(Set.of()));
-        firstHashMap.put("sentence", new HashSet<>(Set.of("semicolon")));
+        firstHashMap.put("sentence", new HashSet<>(Set.of("semicolon","pr_for")));
         firstHashMap.put("assignCall", new HashSet<>(Set.of()));
         firstHashMap.put("localVar", new HashSet<>(Set.of("pr_var")));
         firstHashMap.put("returnState", new HashSet<>(Set.of("pr_return")));
@@ -46,7 +46,7 @@ public class ProductionsMap {
         firstHashMap.put("elseSentence", new HashSet<>(Set.of("pr_else")));
         firstHashMap.put("whileState", new HashSet<>(Set.of("pr_while")));
         firstHashMap.put("expression", new HashSet<>(Set.of()));
-        firstHashMap.put("extraExpression", new HashSet<>(Set.of()));
+        firstHashMap.put("extraExpression", new HashSet<>(Set.of("questionMark")));
         firstHashMap.put("assignOperator", new HashSet<>(Set.of("equals")));
         firstHashMap.put("composedExpression", new HashSet<>(Set.of()));
         firstHashMap.put("composedExpressionLeft", new HashSet<>(Set.of()));
@@ -109,7 +109,7 @@ public class ProductionsMap {
         firstHashMap.get("start").addAll(firstHashMap.get("classesList"));
     }
 
-    private void completeNext() {
+    private void completeFollow() {
         followHashMap.put("classesList", new HashSet<>(Set.of("EOF")));
         followHashMap.put("optionalModifier", new HashSet<>(Set.of("pr_class")));
         followHashMap.put("optionalInheritance", new HashSet<>(Set.of("openBrace")));
@@ -148,7 +148,7 @@ public class ProductionsMap {
         followHashMap.get("extraExpression").addAll(followHashMap.get("expression"));
 
         followHashMap.put("localVar", new HashSet<>(Set.of("semicolon")));
-        followHashMap.put("composedExpression", new HashSet<>(Set.of()));
+        followHashMap.put("composedExpression", new HashSet<>(Set.of("colon")));
         followHashMap.get("composedExpression").addAll(followHashMap.get("extraExpression"));
         followHashMap.get("composedExpression").addAll(firstHashMap.get("extraExpression"));
         followHashMap.get("composedExpression").addAll(followHashMap.get("expression"));

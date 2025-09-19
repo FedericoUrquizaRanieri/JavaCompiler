@@ -263,6 +263,8 @@ public class SyntacticAnalyzer {
             whileState();
         } else if (productionsMap.getFirsts("block").contains(currentToken.getTokenName())) {
             block();
+        } else if (currentToken.getTokenName().equals("pr_for")) {
+            forState();
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("sentence")), analyzer.getLineNumber());
         }
@@ -322,6 +324,49 @@ public class SyntacticAnalyzer {
         sentence();
     }
 
+    private void forState() throws SyntacticException {
+        match("pr_for");
+        match("openParenthesis");
+        forExpression();
+        match("closeParenthesis");
+        sentence();
+    }
+
+    private void forExpression() throws SyntacticException {
+        if (productionsMap.getFirsts("localVar").contains(currentToken.getTokenName())) {
+            localVar();
+            forDivision();
+        } else if (productionsMap.getFirsts("optionalExpression").contains(currentToken.getTokenName())) {
+            expression();
+            basicFor();
+        } else {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("expression")), analyzer.getLineNumber());
+        }
+    }
+
+    private void forDivision() throws SyntacticException {
+        if (currentToken.getTokenName().equals("colon")){
+            iteratorFor();
+        } else if (currentToken.getTokenName().equals("semicolon")) {
+            basicFor();
+        } else {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("expression")), analyzer.getLineNumber());
+
+        }
+    }
+
+    private void basicFor() throws SyntacticException {
+        match("semicolon");
+        expression();
+        match("semicolon");
+        expression();
+    }
+
+    private void iteratorFor() throws SyntacticException {
+        match("colon");
+        match("idMetVar");
+    }
+
     private void expression() throws SyntacticException {
         if (productionsMap.getFirsts("composedExpression").contains(currentToken.getTokenName())) {
             composedExpression();
@@ -335,6 +380,11 @@ public class SyntacticAnalyzer {
         if (productionsMap.getFirsts("assignOperator").contains(currentToken.getTokenName())) {
             assignOperator();
             composedExpression();
+        } else if (currentToken.getTokenName().equals("questionMark")) {
+            match("questionMark");
+            expression();
+            match("colon");
+            expression();
         } else if (!productionsMap.getFollow("extraExpression").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("extraExpression")), analyzer.getLineNumber());
         }
