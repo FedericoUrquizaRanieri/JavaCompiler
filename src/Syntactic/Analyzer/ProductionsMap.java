@@ -49,7 +49,7 @@ public class ProductionsMap {
         firstHashMap.put("extraExpression", new HashSet<>(Set.of("questionMark")));
         firstHashMap.put("assignOperator", new HashSet<>(Set.of("equals")));
         firstHashMap.put("composedExpression", new HashSet<>(Set.of()));
-        firstHashMap.put("composedExpressionLeft", new HashSet<>(Set.of()));
+        firstHashMap.put("composedExpressionLeft", new HashSet<>(Set.of("questionMark")));
         firstHashMap.put("binaryOperator", new HashSet<>(Set.of("or", "and", "equality", "inequality", "less", "lessOrEqual", "greater", "greaterOrEqual", "plus", "minus", "asterisk", "slash", "modulo")));
         firstHashMap.put("basicExpression", new HashSet<>(Set.of()));
         firstHashMap.put("unaryOperator", new HashSet<>(Set.of("minus", "decrement", "plus", "increment", "not")));
@@ -132,13 +132,13 @@ public class ProductionsMap {
         followHashMap.get("sentence").addAll(followHashMap.get("sentenceList"));
         followHashMap.get("sentence").addAll(firstHashMap.get("elseSentence"));
         followHashMap.put("ifState", new HashSet<>(Set.of()));
-        followHashMap.get("optionalExpression").addAll(followHashMap.get("sentence"));
+        followHashMap.get("ifState").addAll(followHashMap.get("sentence"));
         followHashMap.put("elseSentence", new HashSet<>(Set.of()));
         followHashMap.get("elseSentence").addAll(followHashMap.get("ifState"));
 
         followHashMap.put("assignCall", new HashSet<>(Set.of("semicolon")));
         followHashMap.get("expressionList").addAll(followHashMap.get("optionalExpressionList"));
-        followHashMap.put("expression", new HashSet<>(Set.of("closeParenthesis")));
+        followHashMap.put("expression", new HashSet<>(Set.of("closeParenthesis","colon")));
         followHashMap.get("expression").addAll(followHashMap.get("assignCall"));
         followHashMap.get("expression").addAll(followHashMap.get("optionalExpression"));
         followHashMap.get("expression").addAll(followHashMap.get("optionalExpressionList"));

@@ -408,6 +408,11 @@ public class SyntacticAnalyzer {
             binaryOperator();
             basicExpression();
             composedExpressionLeft();
+        } else if (currentToken.getTokenName().equals("questionMark")) {
+            match("questionMark");
+            expression();
+            match("colon");
+            expression();
         } else if (!productionsMap.getFollow("composedExpressionLeft").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("composedExpressionLeft")), analyzer.getLineNumber());
         }
