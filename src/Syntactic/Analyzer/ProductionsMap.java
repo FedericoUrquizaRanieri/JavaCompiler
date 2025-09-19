@@ -1,6 +1,7 @@
 package Syntactic.Analyzer;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 
 public class ProductionsMap {
@@ -14,82 +15,173 @@ public class ProductionsMap {
         completeNext();
     }
 
-    private void completeFirsts(){
-        firstHashMap.put("start", Set.of("EOF", "pr_abstract", "pr_static", "pr_final", "pr_class"));
-        firstHashMap.put("classesList", Set.of("pr_abstract", "pr_static", "pr_final", "pr_class", "empty"));
-        firstHashMap.put("classState", Set.of("pr_abstract", "pr_static", "pr_final", "pr_class"));
-        firstHashMap.put("optionalModifier", Set.of("pr_abstract", "pr_static", "pr_final", "empty"));
-        firstHashMap.put("optionalInheritance", Set.of("pr_extends", "empty"));
-        firstHashMap.put("membersList", Set.of("pr_public", "pr_abstract", "pr_static", "pr_final", "pr_void", "idClase", "pr_boolean", "pr_int", "pr_char","empty"));
-        firstHashMap.put("optionalMemberModifier", Set.of("pr_abstract", "pr_static", "pr_final"));
-        firstHashMap.put("member", Set.of("pr_public", "pr_abstract", "pr_static", "pr_final", "pr_void", "idClase", "pr_boolean", "pr_int", "pr_char"));
-        firstHashMap.put("memberMethod", Set.of("openParenthesis","semicolon"));
-        firstHashMap.put("constructor", Set.of("pr_public"));
-        firstHashMap.put("typeMethod", Set.of("idClase", "pr_boolean", "pr_int", "pr_char", "pr_void"));
-        firstHashMap.put("type", Set.of("idClase", "pr_boolean", "pr_int", "pr_char"));
-        firstHashMap.put("primitiveType", Set.of("pr_boolean", "pr_int", "pr_char"));
-        firstHashMap.put("formalArgs", Set.of("openParenthesis"));
-        firstHashMap.put("optionalFormalArgsList", Set.of("idClase", "pr_boolean", "pr_int", "pr_char", "empty"));
-        firstHashMap.put("formalArgsList", Set.of("idClase", "pr_boolean", "pr_int", "pr_char"));
-        firstHashMap.put("formalArgsLeft", Set.of("comma","empty"));
-        firstHashMap.put("formalArg", Set.of("idClase", "pr_boolean", "pr_int", "pr_char"));
-        firstHashMap.put("optionalBlock", Set.of("openBrace", "semicolon"));
-        firstHashMap.put("block", Set.of("openBrace"));
-        firstHashMap.put("sentenceList", Set.of("minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis", "pr_var", "pr_return", "pr_if", "pr_while", "openBrace", "semicolon", "pr_for", "empty"));
-        firstHashMap.put("sentence", Set.of("minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis", "pr_var", "pr_return", "pr_if", "pr_while", "openBrace", "semicolon","pr_for"));
-        firstHashMap.put("assignCall", Set.of("minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis"));
-        firstHashMap.put("localVar", Set.of("pr_var"));
-        firstHashMap.put("returnState", Set.of("pr_return"));
-        firstHashMap.put("optionalExpression", Set.of("minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis", "empty"));
-        firstHashMap.put("ifState", Set.of("pr_if"));
-        firstHashMap.put("elseSentence", Set.of("pr_else","empty"));
-        firstHashMap.put("whileState", Set.of("pr_while"));
-        firstHashMap.put("expression", Set.of("minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis"));
-        firstHashMap.put("extraExpression", Set.of("equals", "empty"));
-        firstHashMap.put("assignOperator", Set.of("equals"));
-        firstHashMap.put("composedExpression", Set.of("minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis"));
-        firstHashMap.put("composedExpressionLeft", Set.of("or", "and", "equality", "inequality", "less", "lessOrEqual", "greater", "greaterOrEqual", "plus", "minus", "asterisk", "slash", "modulo", "empty"));
-        firstHashMap.put("binaryOperator", Set.of("or", "and", "equality", "inequality", "less", "lessOrEqual", "greater", "greaterOrEqual", "plus", "minus", "asterisk", "slash", "modulo"));
-        firstHashMap.put("basicExpression", Set.of("minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis"));
-        firstHashMap.put("unaryOperator", Set.of("minus", "decrement", "plus", "increment", "not"));
-        firstHashMap.put("operand", Set.of("pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null"));
-        firstHashMap.put("primitive", Set.of("pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null"));
-        firstHashMap.put("reference", Set.of("pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis"));
-        firstHashMap.put("chainReference", Set.of("dot", "empty"));
-        firstHashMap.put("primary", Set.of("pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis"));
-        firstHashMap.put("varMethodAccess", Set.of("idMetVar"));
-        firstHashMap.put("possibleArgs", Set.of("openParenthesis", "empty"));
-        firstHashMap.put("constructorCall", Set.of("pr_new"));
-        firstHashMap.put("parenthesisExpression", Set.of("openParenthesis"));
-        firstHashMap.put("staticCall", Set.of("idClase"));
-        firstHashMap.put("currentArgs", Set.of("openParenthesis"));
-        firstHashMap.put("optionalExpressionList", Set.of("minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis", "empty"));
-        firstHashMap.put("expressionList", Set.of("comma", "empty"));
-        firstHashMap.put("chainElement", Set.of("openParenthesis", "empty"));
+    private void completeFirsts() {
+        firstHashMap.put("start", new HashSet<>(Set.of("EOF")));
+        firstHashMap.put("classesList", new HashSet<>(Set.of()));
+        firstHashMap.put("classState", new HashSet<>(Set.of("pr_class")));
+        firstHashMap.put("optionalModifier", new HashSet<>(Set.of("pr_abstract", "pr_static", "pr_final")));
+        firstHashMap.put("optionalInheritance", new HashSet<>(Set.of("pr_extends")));
+        firstHashMap.put("membersList", new HashSet<>(Set.of()));
+        firstHashMap.put("optionalMemberModifier", new HashSet<>(Set.of("pr_abstract", "pr_static", "pr_final")));
+        firstHashMap.put("member", new HashSet<>(Set.of()));
+        firstHashMap.put("memberMethod", new HashSet<>(Set.of("semicolon")));
+        firstHashMap.put("constructor", new HashSet<>(Set.of("pr_public")));
+        firstHashMap.put("typeMethod", new HashSet<>(Set.of("pr_void")));
+        firstHashMap.put("type", new HashSet<>(Set.of("idClase")));
+        firstHashMap.put("primitiveType", new HashSet<>(Set.of("pr_boolean", "pr_int", "pr_char")));
+        firstHashMap.put("formalArgs", new HashSet<>(Set.of("openParenthesis")));
+        firstHashMap.put("optionalFormalArgsList", new HashSet<>(Set.of()));
+        firstHashMap.put("formalArgsList", new HashSet<>(Set.of()));
+        firstHashMap.put("formalArgsLeft", new HashSet<>(Set.of("comma")));
+        firstHashMap.put("formalArg", new HashSet<>(Set.of()));
+        firstHashMap.put("optionalBlock", new HashSet<>(Set.of("semicolon")));
+        firstHashMap.put("block", new HashSet<>(Set.of("openBrace")));
+        firstHashMap.put("sentenceList", new HashSet<>(Set.of()));
+        firstHashMap.put("sentence", new HashSet<>(Set.of("semicolon")));
+        firstHashMap.put("assignCall", new HashSet<>(Set.of()));
+        firstHashMap.put("localVar", new HashSet<>(Set.of("pr_var")));
+        firstHashMap.put("returnState", new HashSet<>(Set.of("pr_return")));
+        firstHashMap.put("optionalExpression", new HashSet<>(Set.of()));
+        firstHashMap.put("ifState", new HashSet<>(Set.of("pr_if")));
+        firstHashMap.put("elseSentence", new HashSet<>(Set.of("pr_else")));
+        firstHashMap.put("whileState", new HashSet<>(Set.of("pr_while")));
+        firstHashMap.put("expression", new HashSet<>(Set.of()));
+        firstHashMap.put("extraExpression", new HashSet<>(Set.of()));
+        firstHashMap.put("assignOperator", new HashSet<>(Set.of("equals")));
+        firstHashMap.put("composedExpression", new HashSet<>(Set.of()));
+        firstHashMap.put("composedExpressionLeft", new HashSet<>(Set.of()));
+        firstHashMap.put("binaryOperator", new HashSet<>(Set.of("or", "and", "equality", "inequality", "less", "lessOrEqual", "greater", "greaterOrEqual", "plus", "minus", "asterisk", "slash", "modulo")));
+        firstHashMap.put("basicExpression", new HashSet<>(Set.of()));
+        firstHashMap.put("unaryOperator", new HashSet<>(Set.of("minus", "decrement", "plus", "increment", "not")));
+        firstHashMap.put("operand", new HashSet<>(Set.of()));
+        firstHashMap.put("primitive", new HashSet<>(Set.of("pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null")));
+        firstHashMap.put("reference", new HashSet<>(Set.of()));
+        firstHashMap.put("chainReference", new HashSet<>(Set.of("dot")));
+        firstHashMap.put("primary", new HashSet<>(Set.of("pr_this", "stringLiteral")));
+        firstHashMap.put("varMethodAccess", new HashSet<>(Set.of("idMetVar")));
+        firstHashMap.put("possibleArgs", new HashSet<>(Set.of()));
+        firstHashMap.put("constructorCall", new HashSet<>(Set.of("pr_new")));
+        firstHashMap.put("parenthesisExpression", new HashSet<>(Set.of("openParenthesis")));
+        firstHashMap.put("staticCall", new HashSet<>(Set.of("idClase")));
+        firstHashMap.put("currentArgs", new HashSet<>(Set.of("openParenthesis")));
+        firstHashMap.put("optionalExpressionList", new HashSet<>(Set.of()));
+        firstHashMap.put("expressionList", new HashSet<>(Set.of("comma")));
+        firstHashMap.put("chainElement", new HashSet<>(Set.of("openParenthesis")));
+
+        firstHashMap.get("chainElement").addAll(firstHashMap.get("currentArgs"));
+        firstHashMap.get("possibleArgs").addAll(firstHashMap.get("currentArgs"));
+        firstHashMap.get("primary").addAll(firstHashMap.get("parenthesisExpression"));
+        firstHashMap.get("primary").addAll(firstHashMap.get("staticCall"));
+        firstHashMap.get("primary").addAll(firstHashMap.get("constructorCall"));
+        firstHashMap.get("primary").addAll(firstHashMap.get("varMethodAccess"));
+        firstHashMap.get("reference").addAll(firstHashMap.get("primary"));
+        firstHashMap.get("operand").addAll(firstHashMap.get("reference"));
+        firstHashMap.get("operand").addAll(firstHashMap.get("primitive"));
+        firstHashMap.get("basicExpression").addAll(firstHashMap.get("operand"));
+        firstHashMap.get("basicExpression").addAll(firstHashMap.get("unaryOperator"));
+        firstHashMap.get("composedExpressionLeft").addAll(firstHashMap.get("binaryOperator"));
+        firstHashMap.get("composedExpression").addAll(firstHashMap.get("basicExpression"));
+        firstHashMap.get("extraExpression").addAll(firstHashMap.get("assignOperator"));
+        firstHashMap.get("expression").addAll(firstHashMap.get("composedExpression"));
+        firstHashMap.get("optionalExpressionList").addAll(firstHashMap.get("expression"));
+        firstHashMap.get("optionalExpression").addAll(firstHashMap.get("expression"));
+        firstHashMap.get("assignCall").addAll(firstHashMap.get("expression"));
+        firstHashMap.get("sentence").addAll(firstHashMap.get("block"));
+        firstHashMap.get("sentence").addAll(firstHashMap.get("whileState"));
+        firstHashMap.get("sentence").addAll(firstHashMap.get("ifState"));
+        firstHashMap.get("sentence").addAll(firstHashMap.get("returnState"));
+        firstHashMap.get("sentence").addAll(firstHashMap.get("localVar"));
+        firstHashMap.get("sentence").addAll(firstHashMap.get("assignCall"));
+        firstHashMap.get("sentenceList").addAll(firstHashMap.get("sentence"));
+        firstHashMap.get("optionalBlock").addAll(firstHashMap.get("block"));
+        firstHashMap.get("type").addAll(firstHashMap.get("primitiveType"));
+        firstHashMap.get("formalArg").addAll(firstHashMap.get("type"));
+        firstHashMap.get("formalArgsList").addAll(firstHashMap.get("formalArg"));
+        firstHashMap.get("optionalFormalArgsList").addAll(firstHashMap.get("formalArgsList"));
+        firstHashMap.get("typeMethod").addAll(firstHashMap.get("type"));
+        firstHashMap.get("memberMethod").addAll(firstHashMap.get("formalArgs"));
+        firstHashMap.get("member").addAll(firstHashMap.get("typeMethod"));
+        firstHashMap.get("member").addAll(firstHashMap.get("constructor"));
+        firstHashMap.get("member").addAll(firstHashMap.get("optionalMemberModifier"));
+        firstHashMap.get("membersList").addAll(firstHashMap.get("member"));
+        firstHashMap.get("classState").addAll(firstHashMap.get("optionalModifier"));
+        firstHashMap.get("classesList").addAll(firstHashMap.get("classState"));
+        firstHashMap.get("start").addAll(firstHashMap.get("classesList"));
     }
 
-    private void completeNext(){
-        followHashMap.put("classesList", Set.of("EOF"));
-        followHashMap.put("optionalModifier", Set.of("pr_class"));
-        followHashMap.put("optionalInheritance", Set.of("openBrace"));
-        followHashMap.put("membersList", Set.of("closeBrace"));
-        followHashMap.put("optionalFormalArgsList", Set.of("closeParenthesis"));
-        followHashMap.put("formalArgsLeft", Set.of("closeParenthesis"));
-        followHashMap.put("sentenceList", Set.of("closeBrace"));
-        followHashMap.put("optionalExpression", Set.of("semicolon"));
-        followHashMap.put("elseSentence", Set.of("closeBrace","minus", "decrement", "plus", "increment", "not", "pr_true", "pr_false", "intLiteral", "charLiteral", "pr_null", "pr_this", "stringLiteral", "idMetVar", "pr_new", "idClase", "openParenthesis", "pr_var", "pr_return", "pr_if", "pr_while", "openBrace", "semicolon","pr_else"));
-        followHashMap.put("extraExpression", Set.of("closeBrace","semicolon","closeParenthesis","comma"));
-        followHashMap.put("composedExpressionLeft", Set.of("closeBrace","semicolon","closeParenthesis","comma","equals"));
-        followHashMap.put("chainReference", Set.of("or", "and", "equality", "inequality", "less", "lessOrEqual", "greater", "greaterOrEqual", "plus", "minus", "asterisk", "slash", "modulo","closeBrace","semicolon","closeParenthesis","comma","equals"));
-        followHashMap.put("possibleArgs", Set.of("dot","or", "and", "equality", "inequality", "less", "lessOrEqual", "greater", "greaterOrEqual", "plus", "minus", "asterisk", "slash", "modulo","closeBrace","semicolon","closeParenthesis","comma","equals"));
-        followHashMap.put("optionalExpressionList", Set.of("closeParenthesis"));
-        followHashMap.put("expressionList", Set.of("closeParenthesis"));
-        followHashMap.put("chainElement", Set.of("dot","or", "and", "equality", "inequality", "less", "lessOrEqual", "greater", "greaterOrEqual", "plus", "minus", "asterisk", "slash", "modulo","closeBrace","semicolon","closeParenthesis","comma","equals"));
+    private void completeNext() {
+        followHashMap.put("classesList", new HashSet<>(Set.of("EOF")));
+        followHashMap.put("optionalModifier", new HashSet<>(Set.of("pr_class")));
+        followHashMap.put("optionalInheritance", new HashSet<>(Set.of("openBrace")));
+        followHashMap.put("membersList", new HashSet<>(Set.of("closeBrace")));
+        followHashMap.put("optionalFormalArgsList", new HashSet<>(Set.of("closeParenthesis")));
+        followHashMap.put("formalArgsList", new HashSet<>(Set.of()));
+        followHashMap.get("formalArgsList").addAll(followHashMap.get("optionalFormalArgsList"));
+        followHashMap.put("formalArgsLeft", new HashSet<>(Set.of()));
+        followHashMap.get("formalArgsLeft").addAll(followHashMap.get("formalArgsList"));
+        followHashMap.put("sentenceList", new HashSet<>(Set.of("closeBrace")));
+        followHashMap.put("returnState", new HashSet<>(Set.of("semicolon")));
+        followHashMap.put("optionalExpressionList", new HashSet<>(Set.of("closeParenthesis")));
+        followHashMap.put("expressionList", new HashSet<>(Set.of()));
+        followHashMap.get("expressionList").addAll(followHashMap.get("optionalExpressionList"));
+
+        followHashMap.put("optionalExpression", new HashSet<>(Set.of()));
+        followHashMap.get("optionalExpression").addAll(followHashMap.get("returnState"));
+        followHashMap.put("sentence", new HashSet<>(Set.of()));
+        followHashMap.get("sentence").addAll(firstHashMap.get("sentenceList"));
+        followHashMap.get("sentence").addAll(followHashMap.get("sentenceList"));
+        followHashMap.get("sentence").addAll(firstHashMap.get("elseSentence"));
+        followHashMap.put("ifState", new HashSet<>(Set.of()));
+        followHashMap.get("optionalExpression").addAll(followHashMap.get("sentence"));
+        followHashMap.put("elseSentence", new HashSet<>(Set.of()));
+        followHashMap.get("elseSentence").addAll(followHashMap.get("ifState"));
+
+        followHashMap.put("assignCall", new HashSet<>(Set.of("semicolon")));
+        followHashMap.get("expressionList").addAll(followHashMap.get("optionalExpressionList"));
+        followHashMap.put("expression", new HashSet<>(Set.of("closeParenthesis")));
+        followHashMap.get("expression").addAll(followHashMap.get("assignCall"));
+        followHashMap.get("expression").addAll(followHashMap.get("optionalExpression"));
+        followHashMap.get("expression").addAll(followHashMap.get("optionalExpressionList"));
+        followHashMap.get("expression").addAll(firstHashMap.get("expressionList"));
+        followHashMap.get("expression").addAll(followHashMap.get("expressionList"));
+        followHashMap.put("extraExpression", new HashSet<>(Set.of()));
+        followHashMap.get("extraExpression").addAll(followHashMap.get("expression"));
+
+        followHashMap.put("localVar", new HashSet<>(Set.of("semicolon")));
+        followHashMap.put("composedExpression", new HashSet<>(Set.of()));
+        followHashMap.get("composedExpression").addAll(followHashMap.get("extraExpression"));
+        followHashMap.get("composedExpression").addAll(firstHashMap.get("extraExpression"));
+        followHashMap.get("composedExpression").addAll(followHashMap.get("expression"));
+        followHashMap.get("composedExpression").addAll(followHashMap.get("localVar"));
+        followHashMap.put("composedExpressionLeft", new HashSet<>(Set.of()));
+        followHashMap.get("composedExpressionLeft").addAll(followHashMap.get("composedExpression"));
+        followHashMap.put("basicExpression", new HashSet<>(Set.of()));
+        followHashMap.get("basicExpression").addAll(firstHashMap.get("composedExpressionLeft"));
+        followHashMap.get("basicExpression").addAll(followHashMap.get("composedExpression"));
+        followHashMap.put("operand", new HashSet<>(Set.of()));
+        followHashMap.get("operand").addAll(followHashMap.get("basicExpression"));
+        followHashMap.put("reference", new HashSet<>(Set.of()));
+        followHashMap.get("reference").addAll(followHashMap.get("operand"));
+        followHashMap.put("chainReference", new HashSet<>(Set.of()));
+        followHashMap.get("chainReference").addAll(followHashMap.get("reference"));
+
+        followHashMap.put("primary", new HashSet<>(Set.of()));
+        followHashMap.get("primary").addAll(firstHashMap.get("chainReference"));
+        followHashMap.get("primary").addAll(followHashMap.get("reference"));
+        followHashMap.put("varMethodAccess", new HashSet<>(Set.of()));
+        followHashMap.get("varMethodAccess").addAll(followHashMap.get("primary"));
+        followHashMap.put("possibleArgs", new HashSet<>(Set.of()));
+        followHashMap.get("possibleArgs").addAll(followHashMap.get("varMethodAccess"));
+
+        followHashMap.put("chainElement", new HashSet<>(Set.of()));
+        followHashMap.get("chainElement").addAll(followHashMap.get("chainReference"));
+        followHashMap.get("chainElement").addAll(firstHashMap.get("chainReference"));
     }
 
     public Set<String> getFirsts(String key) {
         return firstHashMap.get(key);
     }
+
     public Set<String> getFollow(String key) {
         return followHashMap.get(key);
     }
