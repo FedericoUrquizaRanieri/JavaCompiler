@@ -57,13 +57,22 @@ public class SyntacticAnalyzer {
     }
 
     private void classState() throws SyntacticException {
-        optionalModifier();
-        match("pr_class");
-        match("idClase");
-        optionalInheritance();
-        match("openBrace");
-        membersList();
-        match("closeBrace");
+        if (currentToken.getTokenName().equals("pr_interface")){
+            match("pr_interface");
+            match("idClase");
+            optionalInheritanceInterface();
+            match("openBrace");
+            membersList();
+            match("closeBrace");
+        } else {
+            optionalModifier();
+            match("pr_class");
+            match("idClase");
+            optionalInheritance();
+            match("openBrace");
+            membersList();
+            match("closeBrace");
+        }
     }
 
     private void optionalModifier() throws SyntacticException {
@@ -79,10 +88,24 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void optionalInheritance() throws SyntacticException {
-        if (productionsMap.getFirsts("optionalInheritance").contains(currentToken.getTokenName())) {
+    private void optionalInheritanceInterface() throws SyntacticException {
+        if (productionsMap.getFirsts("optionalInheritanceInterface").contains(currentToken.getTokenName())) {
             match("pr_extends");
             match("idClase");
+        } else if (!productionsMap.getFollow("optionalInheritanceInterface").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalInheritance")), analyzer.getLineNumber());
+        }
+    }
+
+    private void optionalInheritance() throws SyntacticException {
+        if (productionsMap.getFirsts("optionalInheritance").contains(currentToken.getTokenName())) {
+            if (currentToken.getTokenName().equals("pr_extends")){
+                match("pr_extends");
+                match("idClase");
+            } else if (currentToken.getTokenName().equals("pr_implements")){
+                match("pr_implements");
+                match("idClase");
+            }
         } else if (!productionsMap.getFollow("optionalInheritance").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalInheritance")), analyzer.getLineNumber());
         }
@@ -402,9 +425,9 @@ public class SyntacticAnalyzer {
             composedExpression();
         } else if (currentToken.getTokenName().equals("questionMark")) {
             match("questionMark");
-            expression();
+            composedExpression();
             match("colon");
-            expression();
+            composedExpression();
         } else if (!productionsMap.getFollow("extraExpression").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("extraExpression")), analyzer.getLineNumber());
         }
@@ -430,9 +453,9 @@ public class SyntacticAnalyzer {
             composedExpressionLeft();
         } else if (currentToken.getTokenName().equals("questionMark")) {
             match("questionMark");
-            expression();
+            composedExpression();
             match("colon");
-            expression();
+            composedExpression();
         } else if (!productionsMap.getFollow("composedExpressionLeft").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("composedExpressionLeft")), analyzer.getLineNumber());
         }

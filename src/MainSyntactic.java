@@ -30,7 +30,6 @@ public class MainSyntactic {
             e.printError();
             noMistakes=false;
         }
-        //noMistakes = syntacticAnalyzer.notErrorInFile();
 
         if (noMistakes) {
             System.out.println("Compilacion Exitosa");

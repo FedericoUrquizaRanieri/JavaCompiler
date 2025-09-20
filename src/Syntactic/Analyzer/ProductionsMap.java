@@ -18,9 +18,10 @@ public class ProductionsMap {
     private void completeFirsts() {
         firstHashMap.put("start", new HashSet<>(Set.of("EOF")));
         firstHashMap.put("classesList", new HashSet<>(Set.of()));
-        firstHashMap.put("classState", new HashSet<>(Set.of("pr_class")));
+        firstHashMap.put("classState", new HashSet<>(Set.of("pr_class","pr_interface")));
         firstHashMap.put("optionalModifier", new HashSet<>(Set.of("pr_abstract", "pr_static", "pr_final")));
-        firstHashMap.put("optionalInheritance", new HashSet<>(Set.of("pr_extends")));
+        firstHashMap.put("optionalInheritance", new HashSet<>(Set.of("pr_extends","pr_implements")));
+        firstHashMap.put("optionalInheritanceInterface", new HashSet<>(Set.of("pr_extends")));
         firstHashMap.put("membersList", new HashSet<>(Set.of()));
         firstHashMap.put("optionalMemberModifier", new HashSet<>(Set.of("pr_abstract", "pr_static", "pr_final")));
         firstHashMap.put("member", new HashSet<>(Set.of()));
@@ -115,6 +116,7 @@ public class ProductionsMap {
         followHashMap.put("classesList", new HashSet<>(Set.of("EOF")));
         followHashMap.put("optionalModifier", new HashSet<>(Set.of("pr_class")));
         followHashMap.put("optionalInheritance", new HashSet<>(Set.of("openBrace")));
+        followHashMap.put("optionalInheritanceInterface", new HashSet<>(Set.of("openBrace")));
         followHashMap.put("membersList", new HashSet<>(Set.of("closeBrace")));
         followHashMap.put("optionalFormalArgsList", new HashSet<>(Set.of("closeParenthesis")));
         followHashMap.put("formalArgsList", new HashSet<>(Set.of()));
