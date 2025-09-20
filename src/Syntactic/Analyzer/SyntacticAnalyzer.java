@@ -118,7 +118,7 @@ public class SyntacticAnalyzer {
         } else if (productionsMap.getFirsts("type").contains(currentToken.getTokenName())) {
             type();
             match("idMetVar");
-            memberMethod();
+            varOrMethod();
         } else if (currentToken.getTokenName().equals("pr_void")) {
             match("pr_void");
             match("idMetVar");
@@ -126,6 +126,26 @@ public class SyntacticAnalyzer {
             optionalBlock();
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("member")), analyzer.getLineNumber());
+        }
+    }
+
+    private void varOrMethod() throws SyntacticException {
+        if (productionsMap.getFirsts("memberMethod").contains(currentToken.getTokenName())) {
+            memberMethod();
+        } else if (productionsMap.getFirsts("optionalDeclaration").contains(currentToken.getTokenName())) {
+            optionalDeclaration();
+            match("semicolon");
+        } else {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("memberMethod")), analyzer.getLineNumber());
+        }
+    }
+
+    private void optionalDeclaration() throws SyntacticException {
+        if (currentToken.getTokenName().equals("equals")) {
+            match("equals");
+            composedExpression();
+        } else if (!productionsMap.getFollow("optionalDeclaration").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalFormalArgsList")), analyzer.getLineNumber());
         }
     }
 

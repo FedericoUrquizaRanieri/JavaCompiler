@@ -107,6 +107,8 @@ public class ProductionsMap {
         firstHashMap.get("classState").addAll(firstHashMap.get("optionalModifier"));
         firstHashMap.get("classesList").addAll(firstHashMap.get("classState"));
         firstHashMap.get("start").addAll(firstHashMap.get("classesList"));
+
+        firstHashMap.put("optionalDeclaration",new HashSet<>(Set.of("equals")));
     }
 
     private void completeFollow() {
@@ -147,12 +149,15 @@ public class ProductionsMap {
         followHashMap.put("extraExpression", new HashSet<>(Set.of()));
         followHashMap.get("extraExpression").addAll(followHashMap.get("expression"));
 
+        followHashMap.put("optionalDeclaration", new HashSet<>(Set.of("semicolon")));
+
         followHashMap.put("localVar", new HashSet<>(Set.of("semicolon")));
         followHashMap.put("composedExpression", new HashSet<>(Set.of("colon")));
         followHashMap.get("composedExpression").addAll(followHashMap.get("extraExpression"));
         followHashMap.get("composedExpression").addAll(firstHashMap.get("extraExpression"));
         followHashMap.get("composedExpression").addAll(followHashMap.get("expression"));
         followHashMap.get("composedExpression").addAll(followHashMap.get("localVar"));
+        followHashMap.get("composedExpression").addAll(followHashMap.get("optionalDeclaration"));
         followHashMap.put("composedExpressionLeft", new HashSet<>(Set.of()));
         followHashMap.get("composedExpressionLeft").addAll(followHashMap.get("composedExpression"));
         followHashMap.put("basicExpression", new HashSet<>(Set.of()));
