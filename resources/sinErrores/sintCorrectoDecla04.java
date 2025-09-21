@@ -1,6 +1,4 @@
 ///[SinErrores]
 class Test4Correct {
-    int suma(int a, int b) {
-        return a + b;
-    }
+    B obj = new B();// declaración con inicialización
 }

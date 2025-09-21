@@ -19,6 +19,7 @@ public class ProductionsMap {
         firstHashMap.put("start", new HashSet<>(Set.of("EOF")));
         firstHashMap.put("classesList", new HashSet<>(Set.of()));
         firstHashMap.put("classState", new HashSet<>(Set.of("pr_class","pr_interface")));
+        firstHashMap.put("optionalGenerics", new HashSet<>(Set.of("less")));
         firstHashMap.put("optionalModifier", new HashSet<>(Set.of("pr_abstract", "pr_static", "pr_final")));
         firstHashMap.put("optionalInheritance", new HashSet<>(Set.of("pr_extends","pr_implements")));
         firstHashMap.put("optionalInheritanceInterface", new HashSet<>(Set.of("pr_extends")));
@@ -183,6 +184,21 @@ public class ProductionsMap {
         followHashMap.put("chainElement", new HashSet<>(Set.of()));
         followHashMap.get("chainElement").addAll(followHashMap.get("chainReference"));
         followHashMap.get("chainElement").addAll(firstHashMap.get("chainReference"));
+
+        followHashMap.put("typeMethod", new HashSet<>(Set.of("idMetVar")));
+        followHashMap.put("type", new HashSet<>(Set.of("idMetVar")));
+        followHashMap.get("type").addAll(followHashMap.get("typeMethod"));
+        followHashMap.put("classState", new HashSet<>(Set.of()));
+        followHashMap.get("classState").addAll(firstHashMap.get("classesList"));
+        followHashMap.get("classState").addAll(followHashMap.get("classesList"));
+        followHashMap.put("optionalGenerics", new HashSet<>(Set.of()));
+        followHashMap.get("optionalGenerics").addAll(firstHashMap.get("currentArgs"));
+        followHashMap.get("optionalGenerics").addAll(followHashMap.get("type"));
+        followHashMap.get("optionalGenerics").addAll(followHashMap.get("optionalInheritance"));
+        followHashMap.get("optionalGenerics").addAll(followHashMap.get("optionalInheritanceInterface"));
+        followHashMap.get("optionalGenerics").addAll(firstHashMap.get("optionalInheritance"));
+        followHashMap.get("optionalGenerics").addAll(firstHashMap.get("optionalInheritanceInterface"));
+        followHashMap.get("optionalGenerics").addAll(followHashMap.get("classState"));
     }
 
     public Set<String> getFirsts(String key) {

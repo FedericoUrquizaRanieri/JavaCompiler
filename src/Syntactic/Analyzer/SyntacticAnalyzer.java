@@ -60,6 +60,7 @@ public class SyntacticAnalyzer {
         if (currentToken.getTokenName().equals("pr_interface")){
             match("pr_interface");
             match("idClase");
+            optionalGenerics();
             optionalInheritanceInterface();
             match("openBrace");
             membersList();
@@ -68,10 +69,21 @@ public class SyntacticAnalyzer {
             optionalModifier();
             match("pr_class");
             match("idClase");
+            optionalGenerics();
             optionalInheritance();
             match("openBrace");
             membersList();
             match("closeBrace");
+        }
+    }
+
+    private void optionalGenerics() throws SyntacticException {
+        if (productionsMap.getFirsts("optionalGenerics").contains(currentToken.getTokenName())) {
+            match("less");
+            match("idClase");
+            match("greater");
+        } else if (!productionsMap.getFollow("optionalGenerics").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalGenerics")), analyzer.getLineNumber());
         }
     }
 
@@ -92,6 +104,7 @@ public class SyntacticAnalyzer {
         if (productionsMap.getFirsts("optionalInheritanceInterface").contains(currentToken.getTokenName())) {
             match("pr_extends");
             match("idClase");
+            optionalGenerics();
         } else if (!productionsMap.getFollow("optionalInheritanceInterface").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalInheritance")), analyzer.getLineNumber());
         }
@@ -102,9 +115,11 @@ public class SyntacticAnalyzer {
             if (currentToken.getTokenName().equals("pr_extends")){
                 match("pr_extends");
                 match("idClase");
+                optionalGenerics();
             } else if (currentToken.getTokenName().equals("pr_implements")){
                 match("pr_implements");
                 match("idClase");
+                optionalGenerics();
             }
         } else if (!productionsMap.getFollow("optionalInheritance").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalInheritance")), analyzer.getLineNumber());
@@ -205,6 +220,7 @@ public class SyntacticAnalyzer {
             primitiveType();
         } else if (currentToken.getTokenName().equals("idClase")) {
             match("idClase");
+            optionalGenerics();
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("type")), analyzer.getLineNumber());
         }
@@ -580,6 +596,7 @@ public class SyntacticAnalyzer {
     private void constructorCall() throws SyntacticException {
         match("pr_new");
         match("idClase");
+        optionalGenerics();
         currentArgs();
     }
 

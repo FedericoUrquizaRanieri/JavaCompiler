@@ -1,0 +1,2 @@
+///[SinErrores]
+class Caja<T> { }
