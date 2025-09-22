@@ -392,10 +392,11 @@ public class SyntacticAnalyzer {
     }
 
     private void forExpression() throws SyntacticException {
-        if (productionsMap.getFirsts("localVar").contains(currentToken.getTokenName())) {
-            localVar();
+        if (currentToken.getTokenName().equals("pr_var")) {
+            match("pr_var");
+            match("idMetVar");
             forDivision();
-        } else if (productionsMap.getFirsts("optionalExpression").contains(currentToken.getTokenName())) {
+        } else if (productionsMap.getFirsts("expression").contains(currentToken.getTokenName())) {
             expression();
             basicFor();
         } else {
@@ -406,11 +407,12 @@ public class SyntacticAnalyzer {
     private void forDivision() throws SyntacticException {
         if (currentToken.getTokenName().equals("colon")){
             iteratorFor();
-        } else if (currentToken.getTokenName().equals("semicolon")) {
+        } else if (currentToken.getTokenName().equals("equals")) {
+            match("equals");
+            composedExpression();
             basicFor();
         } else {
-            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("expression")), analyzer.getLineNumber());
-
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("composedExpression")), analyzer.getLineNumber());
         }
     }
 

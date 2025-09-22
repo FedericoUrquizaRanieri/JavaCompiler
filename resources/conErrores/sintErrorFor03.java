@@ -1,6 +1,6 @@
-///[Error:arr|4]
+///[Error::|4]
 class Bad3 {
     void f() {
-        for (var x arr) { }
+        for (var x = 10 : arr) { }
     }
 }
