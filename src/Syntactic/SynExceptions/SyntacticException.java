@@ -12,7 +12,9 @@ public class SyntacticException extends Exception {
   }
 
   public void printError() {
-    System.out.println("Se esperaba un "+expectedTokenName+" pero se encontro "+currentToken);
+    System.out.println("Error Sintactico:");
+    System.out.println("Se esperaban los siguientes tokens: "+expectedTokenName);
+    System.out.println("Se encontro: "+currentToken);
     System.out.println();
     System.out.println("[Error:" + currentToken + "|" + line + "]");
   }
