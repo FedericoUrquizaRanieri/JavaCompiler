@@ -168,7 +168,7 @@ public class ProductionsMap {
         followHashMap.get("basicExpression").addAll(followHashMap.get("composedExpression"));
         followHashMap.put("operand", new HashSet<>(Set.of()));
         followHashMap.get("operand").addAll(followHashMap.get("basicExpression"));
-        followHashMap.put("reference", new HashSet<>(Set.of()));
+        followHashMap.put("reference", new HashSet<>(Set.of("closeParenthesis"))); //esto viene del for iterador
         followHashMap.get("reference").addAll(followHashMap.get("operand"));
         followHashMap.put("chainReference", new HashSet<>(Set.of()));
         followHashMap.get("chainReference").addAll(followHashMap.get("reference"));

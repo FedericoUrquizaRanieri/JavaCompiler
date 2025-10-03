@@ -425,7 +425,7 @@ public class SyntacticAnalyzer {
 
     private void iteratorFor() throws SyntacticException {
         match("colon");
-        match("idMetVar");
+        reference();
     }
 
     private void expression() throws SyntacticException {
