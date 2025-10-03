@@ -59,6 +59,10 @@ public class LexicalAnalyzer {
         }
     }
 
+    public int getLineNumber() {
+        return fileManager.getLineNumber();
+    }
+
     private Token initialState() throws LexicalException {
         if (currentChar == SourceManager.END_OF_FILE) {
             return new Token("EOF", "EOF", fileManager.getLineNumber());
@@ -161,11 +165,19 @@ public class LexicalAnalyzer {
             changeLexeme();
             nextChar();
             return dotState();
+        } else if (currentChar == '?') {
+            changeLexeme();
+            nextChar();
+            return questionMarkState();
         } else {
             changeLexeme();
             nextChar();
             throw new LexicalException(lexeme, fileManager.getLineNumber(), fileManager.getColumnNumber(), "no se encontro un caracter valido para leer");
         }
+    }
+
+    private Token questionMarkState() throws LexicalException {
+        return new Token("questionMark", lexeme, fileManager.getLineNumber());
     }
 
     private Token unicodeCharState() throws LexicalException {

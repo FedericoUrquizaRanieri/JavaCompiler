@@ -1,0 +1,8 @@
+///[SinErrores]
+class ForClassic {
+    void f() {
+        for (var i = 0; i < 10; i = i + 1) {
+            var a = i;
+        }
+    }
+}
