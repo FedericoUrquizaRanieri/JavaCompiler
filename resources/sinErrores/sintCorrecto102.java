@@ -1,3 +1,0 @@
-///[SinErrores]
-final class FinalClass {
-}
