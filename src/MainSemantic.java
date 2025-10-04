@@ -12,7 +12,7 @@ import Syntactic.Analyzer.SyntacticAnalyzer;
 import Syntactic.SynExceptions.SyntacticException;
 
 public class MainSemantic {
-    static SymbolTable symbolTable;
+    public static SymbolTable symbolTable;
 
     public static void main(String[] args) {
         SourceManager sourceManager = new SourceManagerImpl();
@@ -22,10 +22,10 @@ public class MainSemantic {
             throw new RuntimeException(e);
         }
         SpecialWordsMap specialWordsMap = new SpecialWordsMap();
+        symbolTable = new SymbolTable();
         ProductionsMap productionsMap = new ProductionsMap();
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceManager, specialWordsMap);
         SyntacticAnalyzer syntacticAnalyzer = new SyntacticAnalyzer(lexicalAnalyzer, productionsMap);
-        symbolTable = new SymbolTable();
 
         boolean noMistakes = true;
         try {
