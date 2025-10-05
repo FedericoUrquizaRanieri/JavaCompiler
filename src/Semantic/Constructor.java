@@ -22,7 +22,8 @@ public class Constructor {
         throw new SemanticException("mock","mock",1);
     }
 
-    public void addParam(Parameter p){
-        parameters.put(p.name,p);
+    public void addParam(Parameter p) throws SemanticException {
+        if( parameters.putIfAbsent(p.name,p)!=null)
+            throw new SemanticException(p.name,"Se intento agregar un parametro repetido llamada ",p.token.getLine());
     }
 }

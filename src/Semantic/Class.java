@@ -32,15 +32,18 @@ public class Class {
         throw new SemanticException("mock","mock",1);
     }
 
-    public void addConstructor(Constructor c){
-        constructors.put(c.token.getLexeme(),c);
+    public void addConstructor(Constructor c) throws SemanticException {
+        if(constructors.putIfAbsent(c.token.getLexeme(),c)!=null)
+            throw new SemanticException(c.token.getLexeme(),"Se intento agregar un atributo repetido llamada ",c.token.getLine());
     }
 
-    public void addMethod(Method m){
-        methods.put(m.name,m);
+    public void addMethod(Method m) throws SemanticException {
+        if(methods.putIfAbsent(m.name,m)!=null)
+            throw new SemanticException(m.name,"Se intento agregar un atributo repetido llamada ",m.token.getLine());
     }
 
-    public void addAttribute(Attribute a){
-        attributes.put(a.name,a);
+    public void addAttribute(Attribute a) throws SemanticException {
+        if(attributes.putIfAbsent(a.name,a)!=null)
+            throw new SemanticException(a.name,"Se intento agregar un atributo repetido llamada ",a.token.getLine());
     }
 }

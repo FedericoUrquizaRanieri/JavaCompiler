@@ -23,8 +23,8 @@ public class SymbolTable {
         throw new SemanticException("mock","mock",1);
     }
 
-    public void addClass(String name, Class classElement) {
+    public void addClass(String name, Class classElement) throws SemanticException {
         if(classes.putIfAbsent(name,classElement)!=null)
-            System.out.println("aristi");
+            throw new SemanticException(name,"Se intento agregar una clase repetida llamada ",classElement.classToken.getLine());
     }
 }

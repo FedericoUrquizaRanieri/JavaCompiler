@@ -28,7 +28,7 @@ public class MainSyntactic {
         boolean noMistakes = true;
         try {
             syntacticAnalyzer.startAnalysis();
-        } catch (SyntacticException e) {
+        } catch (CompiException e) {
             e.printError();
             noMistakes=false;
         }

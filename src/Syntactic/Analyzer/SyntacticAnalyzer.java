@@ -3,6 +3,7 @@ package Syntactic.Analyzer;
 import Lexical.Analyzer.LexicalAnalyzer;
 import Lexical.Analyzer.Token;
 import Lexical.LexExceptions.LexicalException;
+import Main.CompiException;
 import Semantic.*;
 import Semantic.Class;
 import Syntactic.SynExceptions.SyntacticException;
@@ -34,7 +35,7 @@ public class SyntacticAnalyzer {
         }
     }
 
-    public void startAnalysis() throws SyntacticException {
+    public void startAnalysis() throws CompiException {
         try {
             currentToken = analyzer.getNextToken();
         } catch (LexicalException e) {
@@ -43,12 +44,12 @@ public class SyntacticAnalyzer {
         start();
     }
 
-    private void start() throws SyntacticException {
+    private void start() throws CompiException {
         classesList();
         match("EOF");
     }
 
-    private void classesList() throws SyntacticException {
+    private void classesList() throws CompiException {
         if (productionsMap.getFirsts("classState").contains(currentToken.getTokenName())) {
             classState();
             classesList();
@@ -57,7 +58,7 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void classState() throws SyntacticException {
+    private void classState() throws CompiException {
         if (currentToken.getTokenName().equals("pr_interface")){
             match("pr_interface"); //TODO aca va el logro
             match("idClase");
@@ -144,7 +145,7 @@ public class SyntacticAnalyzer {
         return father;
     }
 
-    private void membersList() throws SyntacticException {
+    private void membersList() throws CompiException {
         if (productionsMap.getFirsts("member").contains(currentToken.getTokenName())) {
             member();
             membersList();
@@ -164,7 +165,7 @@ public class SyntacticAnalyzer {
         return modifier;
     }
 
-    private void member() throws SyntacticException {
+    private void member() throws CompiException {
         if (productionsMap.getFirsts("constructor").contains(currentToken.getTokenName())) {
             constructor();
         } else if (productionsMap.getFirsts("optionalMemberModifier").contains(currentToken.getTokenName())) {
@@ -203,7 +204,7 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void varOrMethod(Type t, Token name) throws SyntacticException {
+    private void varOrMethod(Type t, Token name) throws CompiException {
         if (productionsMap.getFirsts("memberMethod").contains(currentToken.getTokenName())) {
             memberMethod(t,name);
         } else if (productionsMap.getFirsts("optionalDeclaration").contains(currentToken.getTokenName())) {
@@ -226,7 +227,7 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void memberMethod(Type t , Token name) throws SyntacticException {
+    private void memberMethod(Type t , Token name) throws CompiException {
         if (productionsMap.getFirsts("formalArgs").contains(currentToken.getTokenName())) {
             Method m = new Method(name);
             m.returnType = t;
@@ -247,7 +248,7 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void constructor() throws SyntacticException {
+    private void constructor() throws CompiException {
         match("pr_public");
         Token nom = currentToken;
         match("idClase");

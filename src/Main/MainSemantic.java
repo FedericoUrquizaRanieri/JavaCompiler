@@ -11,7 +11,6 @@ import java.io.IOException;
 
 import Syntactic.Analyzer.ProductionsMap;
 import Syntactic.Analyzer.SyntacticAnalyzer;
-import Syntactic.SynExceptions.SyntacticException;
 
 public class MainSemantic {
     public static SymbolTable symbolTable;
@@ -32,7 +31,7 @@ public class MainSemantic {
         boolean noMistakes = true;
         try {
             syntacticAnalyzer.startAnalysis();
-        } catch (SyntacticException e) {
+        } catch (CompiException e) {
             e.printError();
             noMistakes=false;
         }
@@ -40,6 +39,15 @@ public class MainSemantic {
         if (noMistakes) {
             try {
                 symbolTable.checkStatements();
+            } catch (SemanticException e) {
+                e.printError();
+                noMistakes=false;
+            }
+        }
+
+        if (noMistakes) {
+            try {
+                symbolTable.consolidate();
             } catch (SemanticException e) {
                 e.printError();
                 noMistakes=false;

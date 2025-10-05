@@ -1,6 +1,8 @@
 package Semantic.SemExceptions;
 
-public class SemanticException extends Exception {
+import Main.CompiException;
+
+public class SemanticException extends CompiException {
   private final String currentElement;
   private final String explanation;
   private final int line;

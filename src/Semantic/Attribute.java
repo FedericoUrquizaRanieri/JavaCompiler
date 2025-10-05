@@ -21,12 +21,4 @@ public class Attribute {
     public void consolidate() throws SemanticException{
         throw new SemanticException("mock","mock",1);
     }
-
-    public void setType(Type type){
-
-    }
-
-    public void setGenericType(Token genericType){
-
-    }
 }
