@@ -1,17 +1,23 @@
+package Main;
+
+import Lexical.LexExceptions.LexicalException;
 import Lexical.Analyzer.LexicalAnalyzer;
+import Lexical.Analyzer.Token;
 import Lexical.SpecialWordMap.SpecialWordsMap;
 import SourceManager.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Objects;
 
-import Syntactic.Analyzer.ProductionsMap;
-import Syntactic.Analyzer.SyntacticAnalyzer;
-import Syntactic.SynExceptions.SyntacticException;
+public class MainLexical {
 
-public class MainSyntactic {
+    public static void printCorrect(Token token) {
+        System.out.println("(" + token.getTokenName() + "," + token.getLexeme() + "," + token.getLine() + ")");
+    }
 
     public static void main(String[] args) {
+        Token currentToken = new Token(" ", " ", 0);
         SourceManager sourceManager = new SourceManagerImpl();
         try {
             sourceManager.open(args[0]);
@@ -19,21 +25,19 @@ public class MainSyntactic {
             throw new RuntimeException(e);
         }
         SpecialWordsMap specialWordsMap = new SpecialWordsMap();
-        ProductionsMap productionsMap = new ProductionsMap();
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceManager, specialWordsMap);
-        SyntacticAnalyzer syntacticAnalyzer = new SyntacticAnalyzer(lexicalAnalyzer, productionsMap);
-
         boolean noMistakes = true;
-        try {
-            syntacticAnalyzer.startAnalysis();
-        } catch (SyntacticException e) {
-            e.printError();
-            noMistakes=false;
-        }
 
+        do {
+            try {
+                currentToken = lexicalAnalyzer.getNextToken();
+                printCorrect(currentToken);
+            } catch (LexicalException e) {
+                e.printError(lexicalAnalyzer.getLine());
+                noMistakes = false;
+            }
+        } while (!Objects.equals(currentToken.getTokenName(), "EOF"));
         if (noMistakes) {
-            System.out.println("Compilacion Exitosa");
-            System.out.println();
             System.out.println("[SinErrores]");
         }
 

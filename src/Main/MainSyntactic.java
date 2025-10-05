@@ -1,21 +1,19 @@
-import Lexical.LexExceptions.LexicalException;
+package Main;
+
 import Lexical.Analyzer.LexicalAnalyzer;
-import Lexical.Analyzer.Token;
 import Lexical.SpecialWordMap.SpecialWordsMap;
 import SourceManager.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Objects;
 
-public class MainLexical {
+import Syntactic.Analyzer.ProductionsMap;
+import Syntactic.Analyzer.SyntacticAnalyzer;
+import Syntactic.SynExceptions.SyntacticException;
 
-    public static void printCorrect(Token token) {
-        System.out.println("(" + token.getTokenName() + "," + token.getLexeme() + "," + token.getLine() + ")");
-    }
+public class MainSyntactic {
 
     public static void main(String[] args) {
-        Token currentToken = new Token(" ", " ", 0);
         SourceManager sourceManager = new SourceManagerImpl();
         try {
             sourceManager.open(args[0]);
@@ -23,19 +21,21 @@ public class MainLexical {
             throw new RuntimeException(e);
         }
         SpecialWordsMap specialWordsMap = new SpecialWordsMap();
+        ProductionsMap productionsMap = new ProductionsMap();
         LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer(sourceManager, specialWordsMap);
-        boolean noMistakes = true;
+        SyntacticAnalyzer syntacticAnalyzer = new SyntacticAnalyzer(lexicalAnalyzer, productionsMap);
 
-        do {
-            try {
-                currentToken = lexicalAnalyzer.getNextToken();
-                printCorrect(currentToken);
-            } catch (LexicalException e) {
-                e.printError(lexicalAnalyzer.getLine());
-                noMistakes = false;
-            }
-        } while (!Objects.equals(currentToken.getTokenName(), "EOF"));
+        boolean noMistakes = true;
+        try {
+            syntacticAnalyzer.startAnalysis();
+        } catch (SyntacticException e) {
+            e.printError();
+            noMistakes=false;
+        }
+
         if (noMistakes) {
+            System.out.println("Compilacion Exitosa");
+            System.out.println();
             System.out.println("[SinErrores]");
         }
 

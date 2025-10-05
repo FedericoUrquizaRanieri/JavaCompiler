@@ -1,3 +1,5 @@
+package Main;
+
 import Lexical.Analyzer.LexicalAnalyzer;
 import Lexical.SpecialWordMap.SpecialWordsMap;
 import Semantic.SemExceptions.SemanticException;
