@@ -1,39 +1,46 @@
 package Semantic;
 
-import java.util.HashSet;
+import Lexical.Analyzer.Token;
+import Semantic.SemExceptions.SemanticException;
+
+import java.util.HashMap;
 
 public class Class {
-    private String name;
-    private String inheritance;
-    private HashSet<Attribute> attributes;
-    private HashSet<Method> methods;
-    private HashSet<Constructor> constructors;
+    public String className;
+    public Token classToken;
+    public Token inheritance;
+    public Token generics;
+    public Token inheritanceGenerics;
+    public Token modifierClass;
+    public HashMap<String, Attribute> attributes;
+    public HashMap<String, Method> methods;
+    public HashMap<String, Constructor> constructors;
 
-    public Class(String name, String inheritance){
-        attributes = new HashSet<>();
-        methods = new HashSet<>();
-        constructors = new HashSet<>();
-        this.name = name;
-        this.inheritance = inheritance;
+    public Class(Token token){
+        attributes = new HashMap<>();
+        methods = new HashMap<>();
+        constructors = new HashMap<>();
+        this.className = token.getLexeme();
+        this.classToken = token;
     }
 
-    public String getName() {
-        return name;
+    public void checkStatements() throws SemanticException {
+        throw new SemanticException("mock","mock",1);
     }
 
-    public HashSet<Attribute> getAttributes() {
-        return attributes;
+    public void consolidate() throws SemanticException{
+        throw new SemanticException("mock","mock",1);
     }
 
-    public HashSet<Method> getMethods() {
-        return methods;
+    public void addConstructor(Constructor c){
+        constructors.put(c.token.getLexeme(),c);
     }
 
-    public String getInheritance() {
-        return inheritance;
+    public void addMethod(Method m){
+        methods.put(m.name,m);
     }
 
-    public HashSet<Constructor> getConstructors() {
-        return constructors;
+    public void addAttribute(Attribute a){
+        attributes.put(a.name,a);
     }
 }

@@ -13,7 +13,7 @@ public class SemanticException extends Exception {
 
   public void printError() {
     System.out.println("Error Semantico en linea "+line+":");
-    System.out.println(explanation);
+    System.out.println(explanation+currentElement);
     System.out.println();
     System.out.println("[Error:" + currentElement + "|" + line + "]");
   }

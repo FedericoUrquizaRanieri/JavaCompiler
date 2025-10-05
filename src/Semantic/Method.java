@@ -1,27 +1,33 @@
 package Semantic;
 
-import java.util.HashSet;
+import Lexical.Analyzer.Token;
+import Semantic.SemExceptions.SemanticException;
+
+import java.util.HashMap;
 
 public class Method {
-    String name;
-    Type returnType;
-    private HashSet<Parameter> parameters;
+    public String name;
+    public Type returnType;
+    public Token token;
+    public Token modifier;
+    public HashMap<String,Parameter> parameters;
 
-    public Method(String name, Type returnType){
-        parameters = new HashSet<>();
-        this.name = name;
-        this.returnType = returnType;
+    public Method(Token token){
+        parameters = new HashMap<>();
+        this.name = token.getLexeme();
+        this.token = token;
     }
 
-    public String getName() {
-        return name;
+    public void checkStatements() throws SemanticException {
+        throw new SemanticException("mock","mock",1);
     }
 
-    public HashSet<Parameter> getParameters() {
-        return parameters;
+    public void consolidate() throws SemanticException{
+        throw new SemanticException("mock","mock",1);
     }
 
-    public Type getReturnType() {
-        return returnType;
+    public void addParam(Parameter p) {
+        parameters.put(p.name,p);
+                //TODO put if absent
     }
 }

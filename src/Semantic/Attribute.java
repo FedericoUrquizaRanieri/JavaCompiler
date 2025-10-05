@@ -1,21 +1,32 @@
 package Semantic;
 
-import java.util.HashSet;
+import Lexical.Analyzer.Token;
+import Semantic.SemExceptions.SemanticException;
 
 public class Attribute {
-    private String name;
-    private Type type;
+    public String name;
+    public Type type;
+    public Token token;
+    public Token genericType;
 
-    public Attribute(String name, Type type){
-        this.name = name;
-        this.type = type;
+    public Attribute(Token token){
+        this.name = token.getLexeme();
+        this.token =token;
     }
 
-    public String getName() {
-        return name;
+    public void checkStatements() throws SemanticException {
+        throw new SemanticException("mock","mock",1);
     }
 
-    public Type getType() {
-        return type;
+    public void consolidate() throws SemanticException{
+        throw new SemanticException("mock","mock",1);
+    }
+
+    public void setType(Type type){
+
+    }
+
+    public void setGenericType(Token genericType){
+
     }
 }

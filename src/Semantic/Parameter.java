@@ -1,19 +1,24 @@
 package Semantic;
 
+import Lexical.Analyzer.Token;
+import Semantic.SemExceptions.SemanticException;
+
 public class Parameter {
-    private String name;
-    private Type type;
+    public String name;
+    public Type type;
+    public Token token;
 
-    public Parameter(String name, Type type){
-        this.name = name;
+    public Parameter(Type type, Token token){
+        this.name = token.getLexeme();
         this.type = type;
+        this.token = token;
     }
 
-    public String getName() {
-        return name;
+    public void checkStatements() throws SemanticException {
+        throw new SemanticException("mock","mock",1);
     }
 
-    public Type getType() {
-        return type;
+    public void consolidate() throws SemanticException{
+        throw new SemanticException("mock","mock",1);
     }
 }

@@ -1,8 +1,15 @@
 package Semantic;
 
+import Lexical.Analyzer.Token;
+
 public class ReferenceType implements Type{
-    @Override
-    public String getType() {
-        return "";
+    public String nameType;
+    public Token token;
+    public Token optionalGeneric;
+
+    public ReferenceType(Token token, Token optionalGeneric){
+        this.token = token;
+        nameType = token.getLexeme();
+        this.optionalGeneric = optionalGeneric;
     }
 }

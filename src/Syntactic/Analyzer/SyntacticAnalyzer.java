@@ -3,22 +3,23 @@ package Syntactic.Analyzer;
 import Lexical.Analyzer.LexicalAnalyzer;
 import Lexical.Analyzer.Token;
 import Lexical.LexExceptions.LexicalException;
+import Semantic.*;
+import Semantic.Class;
 import Syntactic.SynExceptions.SyntacticException;
+import Main.MainSemantic;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class SyntacticAnalyzer {
     private final LexicalAnalyzer analyzer;
     private Token currentToken;
-    private boolean errors;
-    private boolean panicState;
     private final ProductionsMap productionsMap;
 
     public SyntacticAnalyzer(LexicalAnalyzer analyzer, ProductionsMap productionsMap) {
         this.analyzer = analyzer;
         this.productionsMap = productionsMap;
-    }
-
-    public boolean notErrorInFile() {
-        return errors;
     }
 
     void match(String tokenName) throws SyntacticException {
@@ -58,7 +59,7 @@ public class SyntacticAnalyzer {
 
     private void classState() throws SyntacticException {
         if (currentToken.getTokenName().equals("pr_interface")){
-            match("pr_interface");
+            match("pr_interface"); //TODO aca va el logro
             match("idClase");
             optionalGenerics();
             optionalInheritanceInterface();
@@ -66,28 +67,37 @@ public class SyntacticAnalyzer {
             membersList();
             match("closeBrace");
         } else {
-            optionalModifier();
+            Token modify = optionalModifier();
             match("pr_class");
+            Token name = currentToken;
             match("idClase");
-            optionalGenerics();
-            optionalInheritance();
+            MainSemantic.symbolTable.currentClass = new Class(name);
+            Token generic = optionalGenerics();
+            MainSemantic.symbolTable.currentClass.inheritance = optionalInheritance();
+            MainSemantic.symbolTable.currentClass.modifierClass = modify;
+            MainSemantic.symbolTable.currentClass.generics = generic;
             match("openBrace");
             membersList();
             match("closeBrace");
+            MainSemantic.symbolTable.addClass(name.getLexeme(),MainSemantic.symbolTable.currentClass);
         }
     }
 
-    private void optionalGenerics() throws SyntacticException {
+    private Token optionalGenerics() throws SyntacticException {
+        Token genericType = null;
         if (productionsMap.getFirsts("optionalGenerics").contains(currentToken.getTokenName())) {
             match("less");
+            genericType = currentToken;
             match("idClase");
             match("greater");
         } else if (!productionsMap.getFollow("optionalGenerics").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalGenerics")), analyzer.getLineNumber());
         }
+        return genericType;
     }
 
-    private void optionalModifier() throws SyntacticException {
+    private Token optionalModifier() throws SyntacticException {
+        Token modifier = currentToken;
         switch (currentToken.getTokenName()) {
             case "pr_abstract" -> match("pr_abstract");
             case "pr_static" -> match("pr_static");
@@ -98,6 +108,10 @@ public class SyntacticAnalyzer {
                 }
             }
         }
+        if (Objects.equals(modifier.getTokenName(), "pr_class")){
+            modifier = null;
+        }
+        return modifier;
     }
 
     private void optionalInheritanceInterface() throws SyntacticException {
@@ -110,20 +124,24 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void optionalInheritance() throws SyntacticException {
+    private Token optionalInheritance() throws SyntacticException {
+        Token father=null;
         if (productionsMap.getFirsts("optionalInheritance").contains(currentToken.getTokenName())) {
             if (currentToken.getTokenName().equals("pr_extends")){
                 match("pr_extends");
+                father = currentToken;
                 match("idClase");
                 optionalGenerics();
             } else if (currentToken.getTokenName().equals("pr_implements")){
                 match("pr_implements");
+                father = currentToken;
                 match("idClase");
                 optionalGenerics();
             }
         } else if (!productionsMap.getFollow("optionalInheritance").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalInheritance")), analyzer.getLineNumber());
         }
+        return father;
     }
 
     private void membersList() throws SyntacticException {
@@ -135,44 +153,65 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void optionalMemberModifier() throws SyntacticException {
+    private Token optionalMemberModifier() throws SyntacticException {
+        Token modifier = currentToken;
         switch (currentToken.getTokenName()) {
             case "pr_abstract" -> match("pr_abstract");
             case "pr_static" -> match("pr_static");
             case "pr_final" -> match("pr_final");
             default -> throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("optionalMemberModifier")), analyzer.getLineNumber());
         }
+        return modifier;
     }
 
     private void member() throws SyntacticException {
         if (productionsMap.getFirsts("constructor").contains(currentToken.getTokenName())) {
             constructor();
         } else if (productionsMap.getFirsts("optionalMemberModifier").contains(currentToken.getTokenName())) {
-            optionalMemberModifier();
-            typeMethod();
+            Token mod = optionalMemberModifier();
+            Type t = typeMethod();
+            Token name = currentToken;
             match("idMetVar");
-            formalArgs();
+            MainSemantic.symbolTable.currentMethod = new Method(name);
+            MainSemantic.symbolTable.currentMethod.returnType = t;
+            MainSemantic.symbolTable.currentMethod.modifier = mod;
+            List<Parameter> args = formalArgs();
+            for (Parameter m : args){
+                MainSemantic.symbolTable.currentMethod.addParam(m);
+            }
             optionalBlock();
+            MainSemantic.symbolTable.currentClass.addMethod(MainSemantic.symbolTable.currentMethod);
         } else if (productionsMap.getFirsts("type").contains(currentToken.getTokenName())) {
-            type();
+            Type t = type();
+            Token name = currentToken;
             match("idMetVar");
-            varOrMethod();
+            varOrMethod(t,name);
         } else if (currentToken.getTokenName().equals("pr_void")) {
             match("pr_void");
+            Token name = currentToken;
             match("idMetVar");
-            formalArgs();
+            MainSemantic.symbolTable.currentMethod = new Method(name);
+            MainSemantic.symbolTable.currentMethod.returnType = null;
+            List<Parameter> args = formalArgs();
+            for (Parameter m : args){
+                MainSemantic.symbolTable.currentMethod.addParam(m);
+            }
             optionalBlock();
+            MainSemantic.symbolTable.currentClass.addMethod(MainSemantic.symbolTable.currentMethod);
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("member")), analyzer.getLineNumber());
         }
     }
 
-    private void varOrMethod() throws SyntacticException {
+    private void varOrMethod(Type t, Token name) throws SyntacticException {
         if (productionsMap.getFirsts("memberMethod").contains(currentToken.getTokenName())) {
-            memberMethod();
+            memberMethod(t,name);
         } else if (productionsMap.getFirsts("optionalDeclaration").contains(currentToken.getTokenName())) {
+            Attribute a = new Attribute(name);
+            a.type = t;
             optionalDeclaration();
             match("semicolon");
+            MainSemantic.symbolTable.currentClass.addAttribute(a);
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("memberMethod")), analyzer.getLineNumber());
         }
@@ -187,12 +226,22 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void memberMethod() throws SyntacticException {
+    private void memberMethod(Type t , Token name) throws SyntacticException {
         if (productionsMap.getFirsts("formalArgs").contains(currentToken.getTokenName())) {
-            formalArgs();
+            Method m = new Method(name);
+            m.returnType = t;
+            MainSemantic.symbolTable.currentMethod = m;
+            List<Parameter> args = formalArgs();
+            for (Parameter p : args){
+                MainSemantic.symbolTable.currentMethod.addParam(p);
+            }
             optionalBlock();
+            MainSemantic.symbolTable.currentClass.addMethod(MainSemantic.symbolTable.currentMethod);
         } else if (currentToken.getTokenName().equals("semicolon")) {
+            Attribute a = new Attribute(name);
+            a.type = t;
             match("semicolon");
+            MainSemantic.symbolTable.currentClass.addAttribute(a);
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("memberMethod")), analyzer.getLineNumber());
         }
@@ -200,30 +249,45 @@ public class SyntacticAnalyzer {
 
     private void constructor() throws SyntacticException {
         match("pr_public");
+        Token nom = currentToken;
         match("idClase");
-        formalArgs();
+        MainSemantic.symbolTable.currentConstructor = new Constructor(nom);
+        List<Parameter> args = formalArgs();
+        for (Parameter m : args){
+            MainSemantic.symbolTable.currentConstructor.addParam(m);
+        }
         block();
+        MainSemantic.symbolTable.currentClass.addConstructor(MainSemantic.symbolTable.currentConstructor);
     }
 
-    private void typeMethod() throws SyntacticException {
+    private Type typeMethod() throws SyntacticException {
+        Type t = null;
         if (productionsMap.getFirsts("type").contains(currentToken.getTokenName())) {
-            type();
+            t = type();
         } else if (currentToken.getTokenName().equals("pr_void")) {
             match("pr_void");
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("typeMethod")), analyzer.getLineNumber());
         }
+        return t;
     }
 
-    private void type() throws SyntacticException {
+    private Type type() throws SyntacticException {
+        Type t = null;
+        Token name;
         if (productionsMap.getFirsts("primitiveType").contains(currentToken.getTokenName())) {
+            name = currentToken;
             primitiveType();
+            t = new PrimitiveType(name);
         } else if (currentToken.getTokenName().equals("idClase")) {
+            name = currentToken;
             match("idClase");
-            optionalGenerics();
+            Token g = optionalGenerics();
+            t = new ReferenceType(name,g);
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("type")), analyzer.getLineNumber());
         }
+        return t;
     }
 
     private void primitiveType() throws SyntacticException {
@@ -236,46 +300,57 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void formalArgs() throws SyntacticException {
+    private List<Parameter> formalArgs() throws SyntacticException {
         match("openParenthesis");
-        optionalFormalArgsList();
+        List<Parameter> args = optionalFormalArgsList();
         match("closeParenthesis");
+        return args;
     }
 
-    private void optionalFormalArgsList() throws SyntacticException {
+    private List<Parameter> optionalFormalArgsList() throws SyntacticException {
+        List<Parameter> args = new ArrayList<>();
         if (productionsMap.getFirsts("formalArgsList").contains(currentToken.getTokenName())) {
-            formalArgsList();
+            args = formalArgsList();
         } else if (!productionsMap.getFollow("optionalFormalArgsList").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalFormalArgsList")), analyzer.getLineNumber());
         }
+        return args;
     }
 
-    private void formalArgsList() throws SyntacticException {
+    private List<Parameter> formalArgsList() throws SyntacticException {
+        List<Parameter> args = new ArrayList<>();
         if (productionsMap.getFirsts("formalArg").contains(currentToken.getTokenName())) {
-            formalArg();
-            formalArgsLeft();
+            args.addLast(formalArg());
+            args.addAll(formalArgsLeft());
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("formalArgsList")), analyzer.getLineNumber());
         }
+        return args;
     }
 
-    private void formalArgsLeft() throws SyntacticException {
+    private List<Parameter> formalArgsLeft() throws SyntacticException {
+        List<Parameter> args = new ArrayList<>();
         if (currentToken.getTokenName().equals("comma")) {
             match("comma");
-            formalArg();
-            formalArgsLeft();
+            args.addLast(formalArg());
+            args.addAll(formalArgsLeft());
         } else if (!productionsMap.getFollow("formalArgsLeft").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("formalArgsLeft")), analyzer.getLineNumber());
         }
+        return args;
     }
 
-    private void formalArg() throws SyntacticException {
+    private Parameter formalArg() throws SyntacticException {
+        Parameter p = null;
         if (productionsMap.getFirsts("type").contains(currentToken.getTokenName())) {
-            type();
+            Type t = type();
+            Token name  = currentToken;
             match("idMetVar");
+            p = new Parameter(t,name);
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("formalArg")), analyzer.getLineNumber());
         }
+        return p;
     }
 
     private void optionalBlock() throws SyntacticException {

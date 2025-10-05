@@ -1,8 +1,13 @@
 package Semantic;
 
+import Lexical.Analyzer.Token;
+
 public class PrimitiveType implements Type{
-    @Override
-    public String getType() {
-        return "";
+    public String nameType;
+    public Token token;
+
+    public PrimitiveType(Token token){
+        this.token = token;
+        nameType = token.getLexeme();
     }
 }
