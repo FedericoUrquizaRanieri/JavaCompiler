@@ -180,7 +180,7 @@ public class SyntacticAnalyzer {
             for (Parameter m : args){
                 MainSemantic.symbolTable.currentMethod.addParam(m);
             }
-            optionalBlock();
+            MainSemantic.symbolTable.currentMethod.block = optionalBlock();
             MainSemantic.symbolTable.currentClass.addMethod(MainSemantic.symbolTable.currentMethod);
         } else if (productionsMap.getFirsts("type").contains(currentToken.getTokenName())) {
             Type t = type();
@@ -197,7 +197,7 @@ public class SyntacticAnalyzer {
             for (Parameter m : args){
                 MainSemantic.symbolTable.currentMethod.addParam(m);
             }
-            optionalBlock();
+            MainSemantic.symbolTable.currentMethod.block = optionalBlock();
             MainSemantic.symbolTable.currentClass.addMethod(MainSemantic.symbolTable.currentMethod);
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("member")), analyzer.getLineNumber());
@@ -354,11 +354,13 @@ public class SyntacticAnalyzer {
         return p;
     }
 
-    private void optionalBlock() throws SyntacticException {
+    private boolean optionalBlock() throws SyntacticException {
         if (productionsMap.getFirsts("block").contains(currentToken.getTokenName())) {
             block();
+            return true;
         } else if (currentToken.getTokenName().equals("semicolon")){
             match("semicolon");
+            return false;
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("optionalBlock")), analyzer.getLineNumber());
 

@@ -27,6 +27,8 @@ public class Class {
         constructors = new HashMap<>();
         this.className = token.getLexeme();
         this.classToken = token;
+        if(Objects.equals(className, "Object"))
+            isConsolidated = true;
     }
 
     public void checkStatements() throws SemanticException {
@@ -54,14 +56,18 @@ public class Class {
         }
         for (Method m : methods.values()){
             m.checkStatements();
-            if (!(Objects.equals(modifierClass.getTokenName(), "pr_abstract")) && Objects.equals(m.modifier.getTokenName(), "pr_abstract")){
-                throw new SemanticException(m.modifier.getLexeme(),"En una clase comun no es posible tener un metodo abstracto ",m.modifier.getLine());
+            if (modifierClass!=null){
+                if (!(Objects.equals(modifierClass.getTokenName(), "pr_abstract")) && Objects.equals(m.modifier.getTokenName(), "pr_abstract")){
+                    throw new SemanticException(m.modifier.getLexeme(),"En una clase comun no es posible tener un metodo abstracto ",m.modifier.getLine());
+                }
             }
         }
     }
 
     private boolean isFinalOrStatic() {
-        return Objects.equals(modifierClass.getTokenName(), "pr_static") || Objects.equals(modifierClass.getTokenName(), "pr_final");
+        if (modifierClass==null)
+            return false;
+        else return Objects.equals(modifierClass.getTokenName(), "pr_static") || Objects.equals(modifierClass.getTokenName(), "pr_final");
     }
 
     public void consolidate() throws SemanticException{
@@ -74,6 +80,9 @@ public class Class {
             confirmedFather.consolidate();
         consolidateMethods();
         consolidateAttributes();
+        if (constructors.isEmpty()){
+            constructors.put(className,new Constructor(new Token("idClase",className,0)));
+        }
         isConsolidated = true;
     }
 
@@ -81,12 +90,42 @@ public class Class {
         return isConsolidated;
     }
 
-    private void consolidateAttributes() {
-
+    private void consolidateAttributes() throws SemanticException {
+        if (inheritance!=null){
+            Class confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
+            HashMap<String, Attribute> newAttributes = confirmedFather.attributes;
+            for(Attribute a:attributes.values()){
+                if(newAttributes.putIfAbsent(a.name,a)!=null)
+                    throw new SemanticException(a.name,"Se intento cambiar un atributo del padre en ",a.token.getLine());
+            }
+            attributes = newAttributes;
+        }
     }
 
-    private void consolidateMethods() {
-        
+    private void consolidateMethods() throws SemanticException {
+        if (inheritance!=null){
+            Class confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
+            HashMap<String, Method> newMethods = confirmedFather.methods;
+            for(Method m : methods.values()){
+                Method fatherMethod = newMethods.put(m.name,m);
+                if(fatherMethod!=null){
+                    if(fatherMethod.modifier!=null){
+                        if (Objects.equals(fatherMethod.modifier.getTokenName(), "pr_final")){
+                            throw new SemanticException(m.name,"Se intento sobreescribir un metodo final en ",m.token.getLine());
+                        }
+                        if (Objects.equals(fatherMethod.modifier.getTokenName(), "pr_abstract") && !m.block){
+                            throw new SemanticException(m.name,"No se completo un metodo abstracto en ",m.token.getLine());
+                        }
+                    }
+                    if(!fatherMethod.parameters.equals(m.parameters)){
+                        throw new SemanticException(m.name,"Se intento sobreescribir un metodo de manera incorrecta en ",m.token.getLine());
+                    }
+                }
+                if(newMethods.putIfAbsent(m.name,m)!=null)
+                    throw new SemanticException(m.name,"Se intento cambiar un atributo del padre en ",m.token.getLine());
+            }
+            methods = newMethods;
+        }
     }
 
     public boolean circularInheritance(List<Class> ancestors, Class element){

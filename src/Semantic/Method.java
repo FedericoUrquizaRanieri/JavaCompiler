@@ -13,6 +13,7 @@ public class Method {
     public Token token;
     public Token modifier;
     public HashMap<String,Parameter> parameters;
+    public boolean block;
 
     public Method(Token token){
         parameters = new HashMap<>();
@@ -21,10 +22,15 @@ public class Method {
     }
 
     public void checkStatements() throws SemanticException {
-        if(Objects.equals(returnType.getTokenType().getTokenName(), "pr_class")){
-            if (MainSemantic.symbolTable.existsClass(returnType.getTokenType())==null){
-                throw new SemanticException(returnType.getTokenType().getLexeme(),"Se intento agregar un tipo de retorno inexistente ",returnType.getTokenType().getLine());
+        if(returnType!=null){
+            if(Objects.equals(returnType.getTokenType().getTokenName(), "pr_class")){
+                if (MainSemantic.symbolTable.existsClass(returnType.getTokenType())==null){
+                    throw new SemanticException(returnType.getTokenType().getLexeme(),"Se intento agregar un tipo de retorno inexistente ",returnType.getTokenType().getLine());
+                }
             }
+        }
+        if(block && modifier!=null && Objects.equals(modifier.getTokenName(), "pr_abstract")){
+            throw new SemanticException(modifier.getLexeme(), "Se intento agregar un bloque a un metodo ", modifier.getLine());
         }
         for (Parameter p : parameters.values()){
             p.checkStatements();
