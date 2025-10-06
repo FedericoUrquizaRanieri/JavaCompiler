@@ -10,4 +10,9 @@ public class PrimitiveType implements Type{
         this.token = token;
         nameType = token.getLexeme();
     }
+
+    @Override
+    public Token getTokenType() {
+        return token;
+    }
 }

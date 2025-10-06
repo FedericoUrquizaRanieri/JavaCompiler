@@ -12,4 +12,9 @@ public class ReferenceType implements Type{
         nameType = token.getLexeme();
         this.optionalGeneric = optionalGeneric;
     }
+
+    @Override
+    public Token getTokenType() {
+        return token;
+    }
 }

@@ -1,9 +1,11 @@
 package Semantic;
 
 import Lexical.Analyzer.Token;
+import Main.MainSemantic;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public class Method {
     public String name;
@@ -19,7 +21,14 @@ public class Method {
     }
 
     public void checkStatements() throws SemanticException {
-        throw new SemanticException("mock","mock",1);
+        if(Objects.equals(returnType.getTokenType().getTokenName(), "pr_class")){
+            if (MainSemantic.symbolTable.existsClass(returnType.getTokenType())==null){
+                throw new SemanticException(returnType.getTokenType().getLexeme(),"Se intento agregar un tipo de retorno inexistente ",returnType.getTokenType().getLine());
+            }
+        }
+        for (Parameter p : parameters.values()){
+            p.checkStatements();
+        }
     }
 
     public void consolidate() throws SemanticException{

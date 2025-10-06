@@ -1,7 +1,10 @@
 package Semantic;
 
 import Lexical.Analyzer.Token;
+import Main.MainSemantic;
 import Semantic.SemExceptions.SemanticException;
+
+import java.util.Objects;
 
 public class Attribute {
     public String name;
@@ -15,10 +18,10 @@ public class Attribute {
     }
 
     public void checkStatements() throws SemanticException {
-        throw new SemanticException("mock","mock",1);
-    }
-
-    public void consolidate() throws SemanticException{
-        throw new SemanticException("mock","mock",1);
+        if(Objects.equals(type.getTokenType().getTokenName(), "pr_class")){
+            if (MainSemantic.symbolTable.existsClass(type.getTokenType())==null){
+                throw new SemanticException(type.getTokenType().getLexeme(),"Se intento agregar un atributo de tipo inexistente ",type.getTokenType().getLine());
+            }
+        }
     }
 }

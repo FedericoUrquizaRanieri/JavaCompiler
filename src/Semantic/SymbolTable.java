@@ -85,16 +85,44 @@ public class SymbolTable {
         system.methods.put("printSln",printSln);
     }
 
+    /*
+        TODO aca agregar lo siguiente:
+        revisar si existe herencia circular                                                                             DONE
+        clases abstractas pueden heredar metodos abstractos                                                             DONE CREO
+        no tener metodos abstractos                                                                                     DONE
+        este tudo correctamente declarado                                                                               DONE
+        revisar que una variable de tipo clase exista                                                                   DONE
+    */
     public void checkStatements() throws SemanticException{
-        throw new SemanticException("mock","mock",1);
+        for (Class c : classes.values()) {
+            c.checkStatements();
+        }
     }
-
+    /*
+        TODO aca agregar lo siguiente:
+        pasar metodos de clase padre a esta clase
+        pasar atributos de clase padre a esta clase
+        TUDO HEREDA DE OBJECT
+        revisar que metodos final no se reescriban
+        revisar si se implementan metodos abstactos de padre y si la redefinicion esta bien (?)
+        revisar que no se reescriba un atributo
+        si no tiene constructor asignarle uno vacio
+     */
     public void consolidate() throws SemanticException{
-        throw new SemanticException("mock","mock",1);
+        for (Class c : classes.values()) {
+            c.consolidate();
+        }
     }
 
     public void addClass(String name, Class classElement) throws SemanticException {
         if(classes.putIfAbsent(name,classElement)!=null)
             throw new SemanticException(name,"Se intento agregar una clase repetida llamada ",classElement.classToken.getLine());
+    }
+
+    public Class existsClass(Token className){
+        if (classes.get(className.getLexeme())!=null){
+            return classes.get(className.getLexeme());
+        }
+        return null;
     }
 }

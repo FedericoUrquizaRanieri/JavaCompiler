@@ -4,6 +4,7 @@ import Lexical.Analyzer.Token;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.HashMap;
+import java.util.Objects;
 
 public class Constructor {
     public HashMap<String,Parameter> parameters;
@@ -14,12 +15,13 @@ public class Constructor {
         this.token = token;
     }
 
-    public void checkStatements() throws SemanticException {
-        throw new SemanticException("mock","mock",1);
-    }
-
-    public void consolidate() throws SemanticException{
-        throw new SemanticException("mock","mock",1);
+    public void checkStatements(Token classToken) throws SemanticException {
+        if (!Objects.equals(token.getLexeme(), classToken.getLexeme())){
+            throw new SemanticException(token.getLexeme(),"Se intento agregar un parametro repetido llamada ",token.getLine());
+        }
+        for (Parameter p : parameters.values()){
+            p.checkStatements();
+        }
     }
 
     public void addParam(Parameter p) throws SemanticException {
