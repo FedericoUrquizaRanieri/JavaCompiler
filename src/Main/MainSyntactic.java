@@ -9,7 +9,6 @@ import java.io.IOException;
 
 import Syntactic.Analyzer.ProductionsMap;
 import Syntactic.Analyzer.SyntacticAnalyzer;
-import Syntactic.SynExceptions.SyntacticException;
 
 public class MainSyntactic {
 

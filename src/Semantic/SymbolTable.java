@@ -76,7 +76,7 @@ public class SymbolTable {
         printIln.returnType = null;
         printIln.modifier = new Token("pr_static","static",0);
         printIln.parameters.put("i",new Parameter(new PrimitiveType(new Token("pr_int","int",0)),new Token("idMetVar","i",0)));
-        system.methods.put("printIln",printI);
+        system.methods.put("printIln",printIln);
 
         Method printSln = new Method(new Token("idMetVar","printSln",0));
         printSln.returnType = null;

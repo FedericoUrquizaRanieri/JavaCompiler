@@ -53,7 +53,6 @@ public class MainSemantic {
                 noMistakes=false;
             }
         }
-
         if (noMistakes) {
             System.out.println("Compilacion Exitosa");
             System.out.println();

@@ -4,7 +4,7 @@ import Lexical.Analyzer.Token;
 import Main.MainSemantic;
 import Semantic.SemExceptions.SemanticException;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 
 public class Method {
@@ -12,11 +12,11 @@ public class Method {
     public Type returnType;
     public Token token;
     public Token modifier;
-    public HashMap<String,Parameter> parameters;
+    public LinkedHashMap<String,Parameter> parameters;
     public boolean block;
 
     public Method(Token token){
-        parameters = new HashMap<>();
+        parameters = new LinkedHashMap<>();
         this.name = token.getLexeme();
         this.token = token;
     }
@@ -30,7 +30,7 @@ public class Method {
             }
         }
         if(block && modifier!=null && Objects.equals(modifier.getTokenName(), "pr_abstract")){
-            throw new SemanticException(modifier.getLexeme(), "Se intento agregar un bloque a un metodo ", modifier.getLine());
+            throw new SemanticException(token.getLexeme(), "Se intento agregar un bloque a un metodo ", token.getLine());
         }
         for (Parameter p : parameters.values()){
             p.checkStatements();

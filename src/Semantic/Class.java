@@ -4,10 +4,7 @@ import Lexical.Analyzer.Token;
 import Main.MainSemantic;
 import Semantic.SemExceptions.SemanticException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class Class {
     public String className;
@@ -53,6 +50,11 @@ public class Class {
         }
         for (Constructor c : constructors.values()){
             c.checkStatements(classToken);
+            if (modifierClass!=null){
+                if ((Objects.equals(modifierClass.getTokenName(), "pr_abstract"))){
+                    throw new SemanticException(c.token.getLexeme(),"En una clase abstracta no es posible tener un constructor ",c.token.getLine());
+                }
+            }
         }
         for (Method m : methods.values()){
             m.checkStatements();
@@ -74,8 +76,12 @@ public class Class {
         Class confirmedFather;
         if(inheritance!=null)
             confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
-        else
-            confirmedFather = MainSemantic.symbolTable.classes.get("Object");
+        else {
+            confirmedFather = MainSemantic.symbolTable.classes.get("Object"); //TODO problema de clases agregadas
+            if(!Objects.equals(this.className, "Object")){
+                this.inheritance=confirmedFather.classToken;
+            }
+        }
         if(!confirmedFather.isConsolidated())
             confirmedFather.consolidate();
         consolidateMethods();
@@ -93,7 +99,7 @@ public class Class {
     private void consolidateAttributes() throws SemanticException {
         if (inheritance!=null){
             Class confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
-            HashMap<String, Attribute> newAttributes = confirmedFather.attributes;
+            HashMap<String, Attribute> newAttributes = new HashMap<>(confirmedFather.attributes);
             for(Attribute a:attributes.values()){
                 if(newAttributes.putIfAbsent(a.name,a)!=null)
                     throw new SemanticException(a.name,"Se intento cambiar un atributo del padre en ",a.token.getLine());
@@ -103,9 +109,10 @@ public class Class {
     }
 
     private void consolidateMethods() throws SemanticException {
+        SymbolTable tabla = MainSemantic.symbolTable;
         if (inheritance!=null){
             Class confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
-            HashMap<String, Method> newMethods = confirmedFather.methods;
+            HashMap<String, Method> newMethods = new HashMap<>(confirmedFather.methods);
             for(Method m : methods.values()){
                 Method fatherMethod = newMethods.put(m.name,m);
                 if(fatherMethod!=null){
@@ -117,15 +124,43 @@ public class Class {
                             throw new SemanticException(m.name,"No se completo un metodo abstracto en ",m.token.getLine());
                         }
                     }
-                    if(!fatherMethod.parameters.equals(m.parameters)){
+                    if(!compareParams(fatherMethod.parameters,m.parameters)){
+                        throw new SemanticException(m.name,"Se intento sobreescribir un metodo de manera incorrecta en ",m.token.getLine());
+                    }
+                    if(differentReturnTypes(fatherMethod,m)){
                         throw new SemanticException(m.name,"Se intento sobreescribir un metodo de manera incorrecta en ",m.token.getLine());
                     }
                 }
-                if(newMethods.putIfAbsent(m.name,m)!=null)
-                    throw new SemanticException(m.name,"Se intento cambiar un atributo del padre en ",m.token.getLine());
             }
             methods = newMethods;
         }
+    }
+
+    private boolean differentReturnTypes(Method m1,Method m2){
+        if(m1.returnType!= null && m2.returnType!=null){
+            return !Objects.equals(m1.returnType.getTokenType().getTokenName(), m2.returnType.getTokenType().getTokenName());
+        } else return !(m1.returnType == null && m2.returnType == null);
+    }
+
+    private boolean compareParams(LinkedHashMap<String,Parameter> fatherParams, LinkedHashMap<String,Parameter> sonParams){
+        if (fatherParams.size()!=sonParams.size()){
+            return false;
+        }
+        Iterator<Map.Entry<String, Parameter>> itFather = fatherParams.entrySet().iterator();
+        Iterator<Map.Entry<String, Parameter>> itSon = sonParams.entrySet().iterator();
+
+        while (itFather.hasNext() && itSon.hasNext()) {
+            Map.Entry<String, Parameter> fatherEntry = itFather.next();
+            Map.Entry<String, Parameter> sonEntry = itSon.next();
+
+            Parameter fatherParam = fatherEntry.getValue();
+            Parameter sonParam = sonEntry.getValue();
+
+            if (!Objects.equals(fatherParam.name, sonParam.name) || !Objects.equals(fatherParam.type.getTokenType().getTokenName(), sonParam.type.getTokenType().getTokenName())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public boolean circularInheritance(List<Class> ancestors, Class element){
