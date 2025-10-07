@@ -35,11 +35,25 @@ public class Class {
                 if (this == confirmedFather)
                     throw new SemanticException(inheritance.getLexeme(), "La clase es igual a la clase padre ", inheritance.getLine());
                 if (confirmedFather.isFinalOrStatic()) {
-                    throw new SemanticException(inheritance.getLexeme(), "Se intenta heredar de una clase final o estatica ", inheritance.getLine());
+                    throw new SemanticException(classToken.getLexeme(), "Se intenta heredar de una clase final o estatica en ", classToken.getLine());
                 }
                 List<Class> ancestors = new ArrayList<>(List.of(this, confirmedFather));
                 if (circularInheritance(ancestors, confirmedFather)) {
                     throw new SemanticException(inheritance.getLexeme(), "Se genera herencia circular con ", inheritance.getLine());
+                }
+                if (confirmedFather.modifierClass!=null && Objects.equals(confirmedFather.modifierClass.getTokenName(), "pr_abstract")){
+                    for (Method m : confirmedFather.methods.values()){
+                        if (Objects.equals(m.modifier.getTokenName(), "pr_abstract") && methods.get(m.name)==null){
+                            throw new SemanticException(m.token.getLexeme(), "No se implementa el metodo abstracto ", m.token.getLine());
+                        } else if (Objects.equals(m.modifier.getTokenName(), "pr_abstract") && !methods.get(m.name).block){
+                            throw new SemanticException(m.token.getLexeme(), "No se implementa con bloque el metodo abstracto  ", m.token.getLine());
+                        }
+                    }
+                }
+                if (this.modifierClass!=null){
+                    if (Objects.equals(this.modifierClass.getTokenName(), "pr_abstract") && confirmedFather.modifierClass==null){
+                        throw new SemanticException(classToken.getLexeme(), "No es posible heredar de una clase concreta en la abstracta ", classToken.getLine());
+                    }
                 }
             } else {
                 throw new SemanticException(inheritance.getLexeme(), "No existe la clase padre ", inheritance.getLine());
@@ -77,7 +91,7 @@ public class Class {
         if(inheritance!=null)
             confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
         else {
-            confirmedFather = MainSemantic.symbolTable.classes.get("Object"); //TODO problema de clases agregadas
+            confirmedFather = MainSemantic.symbolTable.classes.get("Object");
             if(!Objects.equals(this.className, "Object")){
                 this.inheritance=confirmedFather.classToken;
             }
@@ -109,7 +123,6 @@ public class Class {
     }
 
     private void consolidateMethods() throws SemanticException {
-        SymbolTable tabla = MainSemantic.symbolTable;
         if (inheritance!=null){
             Class confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
             HashMap<String, Method> newMethods = new HashMap<>(confirmedFather.methods);
@@ -119,6 +132,9 @@ public class Class {
                     if(fatherMethod.modifier!=null){
                         if (Objects.equals(fatherMethod.modifier.getTokenName(), "pr_final")){
                             throw new SemanticException(m.name,"Se intento sobreescribir un metodo final en ",m.token.getLine());
+                        }
+                        if (Objects.equals(fatherMethod.modifier.getTokenName(), "pr_static")){ //TODO acaaaa
+                            throw new SemanticException(m.name,"Se intento sobreescribir un metodo static en ",m.token.getLine());
                         }
                         if (Objects.equals(fatherMethod.modifier.getTokenName(), "pr_abstract") && !m.block){
                             throw new SemanticException(m.name,"No se completo un metodo abstracto en ",m.token.getLine());

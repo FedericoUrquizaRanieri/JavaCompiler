@@ -23,7 +23,7 @@ public class Method {
 
     public void checkStatements() throws SemanticException {
         if(returnType!=null){
-            if(Objects.equals(returnType.getTokenType().getTokenName(), "pr_class")){
+            if(Objects.equals(returnType.getTokenType().getTokenName(), "idClase")){
                 if (MainSemantic.symbolTable.existsClass(returnType.getTokenType())==null){
                     throw new SemanticException(returnType.getTokenType().getLexeme(),"Se intento agregar un tipo de retorno inexistente ",returnType.getTokenType().getLine());
                 }
@@ -35,10 +35,6 @@ public class Method {
         for (Parameter p : parameters.values()){
             p.checkStatements();
         }
-    }
-
-    public void consolidate() throws SemanticException{
-        throw new SemanticException("mock","mock",1);
     }
 
     public void addParam(Parameter p) throws SemanticException {

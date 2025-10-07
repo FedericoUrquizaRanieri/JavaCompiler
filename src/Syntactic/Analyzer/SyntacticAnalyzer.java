@@ -236,7 +236,7 @@ public class SyntacticAnalyzer {
             for (Parameter p : args){
                 MainSemantic.symbolTable.currentMethod.addParam(p);
             }
-            optionalBlock();
+            MainSemantic.symbolTable.currentMethod.block = optionalBlock();
             MainSemantic.symbolTable.currentClass.addMethod(MainSemantic.symbolTable.currentMethod);
         } else if (currentToken.getTokenName().equals("semicolon")) {
             Attribute a = new Attribute(name);
@@ -274,7 +274,7 @@ public class SyntacticAnalyzer {
     }
 
     private Type type() throws SyntacticException {
-        Type t = null;
+        Type t;
         Token name;
         if (productionsMap.getFirsts("primitiveType").contains(currentToken.getTokenName())) {
             name = currentToken;
@@ -342,7 +342,7 @@ public class SyntacticAnalyzer {
     }
 
     private Parameter formalArg() throws SyntacticException {
-        Parameter p = null;
+        Parameter p;
         if (productionsMap.getFirsts("type").contains(currentToken.getTokenName())) {
             Type t = type();
             Token name  = currentToken;
