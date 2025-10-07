@@ -93,7 +93,8 @@ public class SymbolTable {
 
     public void consolidate() throws SemanticException{
         for (Class c : classes.values()) {
-            c.consolidate();
+            if (c.isConsolidated())
+                c.consolidate();
         }
     }
 

@@ -363,7 +363,6 @@ public class SyntacticAnalyzer {
             return false;
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("optionalBlock")), analyzer.getLineNumber());
-
         }
     }
 

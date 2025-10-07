@@ -96,7 +96,7 @@ public class Class {
                 this.inheritance=confirmedFather.classToken;
             }
         }
-        if(!confirmedFather.isConsolidated())
+        if(confirmedFather.isConsolidated())
             confirmedFather.consolidate();
         consolidateMethods();
         consolidateAttributes();
@@ -106,8 +106,8 @@ public class Class {
         isConsolidated = true;
     }
 
-    private boolean isConsolidated(){
-        return isConsolidated;
+    public boolean isConsolidated(){
+        return !isConsolidated;
     }
 
     private void consolidateAttributes() throws SemanticException {
