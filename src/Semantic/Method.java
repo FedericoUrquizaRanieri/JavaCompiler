@@ -32,6 +32,9 @@ public class Method {
         if(block && modifier!=null && Objects.equals(modifier.getTokenName(), "pr_abstract")){
             throw new SemanticException(token.getLexeme(), "Se intento agregar un bloque a un metodo ", token.getLine());
         }
+        if(!block && modifier!=null && !Objects.equals(modifier.getTokenName(), "pr_abstract")){
+            throw new SemanticException(token.getLexeme(), "Se intento agregar un metodo sin bloque", token.getLine());
+        }
         for (Parameter p : parameters.values()){
             p.checkStatements();
         }

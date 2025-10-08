@@ -96,7 +96,7 @@ public class Class {
                 this.inheritance=confirmedFather.classToken;
             }
         }
-        if(confirmedFather.isConsolidated())
+        if(confirmedFather.isNotConsolidated())
             confirmedFather.consolidate();
         consolidateMethods();
         consolidateAttributes();
@@ -106,7 +106,7 @@ public class Class {
         isConsolidated = true;
     }
 
-    public boolean isConsolidated(){
+    public boolean isNotConsolidated(){
         return !isConsolidated;
     }
 
@@ -133,7 +133,7 @@ public class Class {
                         if (Objects.equals(fatherMethod.modifier.getTokenName(), "pr_final")){
                             throw new SemanticException(m.name,"Se intento sobreescribir un metodo final en ",m.token.getLine());
                         }
-                        if (Objects.equals(fatherMethod.modifier.getTokenName(), "pr_static")){ //TODO acaaaa
+                        if (Objects.equals(fatherMethod.modifier.getTokenName(), "pr_static")){
                             throw new SemanticException(m.name,"Se intento sobreescribir un metodo static en ",m.token.getLine());
                         }
                         if (Objects.equals(fatherMethod.modifier.getTokenName(), "pr_abstract") && !m.block){
