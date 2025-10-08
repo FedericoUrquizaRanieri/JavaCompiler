@@ -1,4 +1,4 @@
-///[SinErrores]
+///[Error:doIt|4]
 
 class I {
     void doIt();
