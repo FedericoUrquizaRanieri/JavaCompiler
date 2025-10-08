@@ -425,7 +425,7 @@ public class SyntacticAnalyzer {
 
     private void iteratorFor() throws SyntacticException {
         match("colon");
-        reference();
+        expression();
     }
 
     private void expression() throws SyntacticException {
@@ -595,10 +595,30 @@ public class SyntacticAnalyzer {
         }
     }
 
+    private void optionalGenericsConstructor() throws SyntacticException {
+        if (productionsMap.getFirsts("optionalGenerics").contains(currentToken.getTokenName())) {
+            match("less");
+            optionalGenericsConstructorLeft();
+        } else if (!productionsMap.getFollow("optionalGenericsConstructor").contains(currentToken.getTokenName())) {
+            throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalGenericsConstructor")), analyzer.getLineNumber());
+        }
+    }
+
+    private void optionalGenericsConstructorLeft() throws SyntacticException {
+        if (currentToken.getTokenName().equals("idClase")) {
+            match("idClase");
+            match("greater");
+        } else if (currentToken.getTokenName().equals("greater")) {
+            match("greater");
+        } else {
+            throw new SyntacticException(currentToken.getLexeme(), "idClase, greater", analyzer.getLineNumber());
+        }
+    }
+
     private void constructorCall() throws SyntacticException {
         match("pr_new");
         match("idClase");
-        optionalGenerics();
+        optionalGenericsConstructor();
         currentArgs();
     }
 

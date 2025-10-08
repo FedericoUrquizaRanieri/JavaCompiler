@@ -168,7 +168,7 @@ public class ProductionsMap {
         followHashMap.get("basicExpression").addAll(followHashMap.get("composedExpression"));
         followHashMap.put("operand", new HashSet<>(Set.of()));
         followHashMap.get("operand").addAll(followHashMap.get("basicExpression"));
-        followHashMap.put("reference", new HashSet<>(Set.of("closeParenthesis"))); //esto viene del for iterador
+        followHashMap.put("reference", new HashSet<>(Set.of()));
         followHashMap.get("reference").addAll(followHashMap.get("operand"));
         followHashMap.put("chainReference", new HashSet<>(Set.of()));
         followHashMap.get("chainReference").addAll(followHashMap.get("reference"));
@@ -192,13 +192,14 @@ public class ProductionsMap {
         followHashMap.get("classState").addAll(firstHashMap.get("classesList"));
         followHashMap.get("classState").addAll(followHashMap.get("classesList"));
         followHashMap.put("optionalGenerics", new HashSet<>(Set.of()));
-        followHashMap.get("optionalGenerics").addAll(firstHashMap.get("currentArgs"));
         followHashMap.get("optionalGenerics").addAll(followHashMap.get("type"));
         followHashMap.get("optionalGenerics").addAll(followHashMap.get("optionalInheritance"));
         followHashMap.get("optionalGenerics").addAll(followHashMap.get("optionalInheritanceInterface"));
         followHashMap.get("optionalGenerics").addAll(firstHashMap.get("optionalInheritance"));
         followHashMap.get("optionalGenerics").addAll(firstHashMap.get("optionalInheritanceInterface"));
         followHashMap.get("optionalGenerics").addAll(followHashMap.get("classState"));
+        followHashMap.put("optionalGenericsConstructor", new HashSet<>(Set.of()));
+        followHashMap.get("optionalGenericsConstructor").addAll(firstHashMap.get("currentArgs"));
     }
 
     public Set<String> getFirsts(String key) {

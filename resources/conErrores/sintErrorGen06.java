@@ -1,6 +1,6 @@
-///[Error:>|4]
+///[Error:,|4]
 class Main {
     void metodo() {
-        var c = new Caja<>();
+        var mapa = new Mapa<K,V>();
     }
 }
