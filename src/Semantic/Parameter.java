@@ -20,7 +20,7 @@ public class Parameter {
     public void checkStatements() throws SemanticException {
         if (Objects.equals(type.getTokenType().getTokenName(), "idClase")){
             if (MainSemantic.symbolTable.existsClass(type.getTokenType())==null){
-                throw new SemanticException(name,"Se intento usar un parametro de un tipo inexistente ", token.getLine());
+                throw new SemanticException(type.getNameType(),"Se intento usar un parametro de un tipo inexistente ", type.getTokenType().getLine());
             }
         }
     }

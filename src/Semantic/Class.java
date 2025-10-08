@@ -45,7 +45,7 @@ public class Class {
                     for (Method m : confirmedFather.methods.values()){
                         if (Objects.equals(m.getModifier().getTokenName(), "pr_abstract") && methods.get(m.getName())==null){
                             throw new SemanticException(m.getToken().getLexeme(), "No se implementa el metodo abstracto ", m.getToken().getLine());
-                        } else if (Objects.equals(m.getModifier().getTokenName(), "pr_abstract") && methods.get(m.getName()).hasNoBlock()){
+                        } else if (Objects.equals(m.getModifier().getTokenName(), "pr_abstract") && methods.get(m.getName()).hasNoBlock() && m.getModifier()!=null && !Objects.equals(m.getModifier().getTokenName(), "pr_abstract")){
                             throw new SemanticException(m.getToken().getLexeme(), "No se implementa con bloque el metodo abstracto  ", m.getToken().getLine());
                         }
                     }
@@ -72,8 +72,8 @@ public class Class {
         }
         for (Method m : methods.values()){
             m.checkStatements();
-            if (modifierClass!=null){
-                if (!(Objects.equals(modifierClass.getTokenName(), "pr_abstract")) && Objects.equals(m.getModifier().getTokenName(), "pr_abstract")){
+            if (modifierClass == null || !(Objects.equals(modifierClass.getTokenName(), "pr_abstract"))){
+                if (m.getModifier()!=null && Objects.equals(m.getModifier().getTokenName(), "pr_abstract")){
                     throw new SemanticException(m.getModifier().getLexeme(),"En una clase comun no es posible tener un metodo abstracto ",m.getModifier().getLine());
                 }
             }
@@ -136,7 +136,7 @@ public class Class {
                         if (Objects.equals(fatherMethod.getModifier().getTokenName(), "pr_static")){
                             throw new SemanticException(m.getName(),"Se intento sobreescribir un metodo static en ",m.getToken().getLine());
                         }
-                        if (Objects.equals(fatherMethod.getModifier().getTokenName(), "pr_abstract") && m.hasNoBlock()){
+                        if (Objects.equals(fatherMethod.getModifier().getTokenName(), "pr_abstract") && m.hasNoBlock() && m.getModifier()!=null && !Objects.equals(m.getModifier().getTokenName(), "pr_abstract")){
                             throw new SemanticException(m.getName(),"No se completo un metodo abstracto en ",m.getToken().getLine());
                         }
                     }

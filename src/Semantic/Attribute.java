@@ -20,7 +20,7 @@ public class Attribute {
     public void checkStatements() throws SemanticException {
         if(Objects.equals(type.getTokenType().getTokenName(), "idClase")){
             if (MainSemantic.symbolTable.existsClass(type.getTokenType())==null){
-                throw new SemanticException(name,"Se intento agregar un atributo de tipo inexistente ", token.getLine());
+                throw new SemanticException(type.getNameType(),"Se intento agregar un atributo de tipo inexistente ", type.getTokenType().getLine());
             }
         }
     }

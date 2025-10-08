@@ -1,4 +1,4 @@
-///[Error:u|4]
+///[Error:Unknown|4]
 
 class P {
     void m(Unknown u) { }
