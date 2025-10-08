@@ -194,8 +194,12 @@ public class Class {
     }
 
     public void addConstructor(Constructor c) throws SemanticException {
-        if(constructors.putIfAbsent(c.getToken().getLexeme(),c)!=null)
+        if(constructors.isEmpty()){
+            if(constructors.putIfAbsent(c.getToken().getLexeme(),c)!=null)
+                throw new SemanticException(c.getToken().getLexeme(),"Se intento agregar un constructor repetido llamado ",c.getToken().getLine());
+        } else {
             throw new SemanticException(c.getToken().getLexeme(),"Se intento agregar un constructor repetido llamado ",c.getToken().getLine());
+        }
     }
 
     public void addMethod(Method m) throws SemanticException {
