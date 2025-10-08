@@ -3,9 +3,9 @@ package Semantic;
 import Lexical.Analyzer.Token;
 
 public class ReferenceType implements Type{
-    public String nameType;
-    public Token token;
-    public Token optionalGeneric;
+    private final String nameType;
+    private final Token token;
+    private final Token optionalGeneric;
 
     public ReferenceType(Token token, Token optionalGeneric){
         this.token = token;
@@ -16,5 +16,14 @@ public class ReferenceType implements Type{
     @Override
     public Token getTokenType() {
         return token;
+    }
+
+    @Override
+    public String getNameType() {
+        return nameType;
+    }
+
+    public Token getOptionalGeneric() {
+        return optionalGeneric;
     }
 }

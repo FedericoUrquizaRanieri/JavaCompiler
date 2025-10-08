@@ -22,4 +22,8 @@ public class Token {
     public int getLine() {
         return line;
     }
+
+    public static Token nullToken(){
+        return new Token("NaT","NaT",-1);
+    }
 }

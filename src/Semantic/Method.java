@@ -8,12 +8,12 @@ import java.util.LinkedHashMap;
 import java.util.Objects;
 
 public class Method {
-    public String name;
-    public Type returnType;
-    public Token token;
-    public Token modifier;
-    public LinkedHashMap<String,Parameter> parameters;
-    public boolean block;
+    private final String name;
+    private Type returnType;
+    private final Token token;
+    private Token modifier;
+    private final LinkedHashMap<String,Parameter> parameters;
+    private boolean block;
 
     public Method(Token token){
         parameters = new LinkedHashMap<>();
@@ -41,7 +41,43 @@ public class Method {
     }
 
     public void addParam(Parameter p) throws SemanticException {
-        if( parameters.putIfAbsent(p.name,p)!=null)
-            throw new SemanticException(p.name,"Se intento agregar un parametro repetido llamada ",p.token.getLine());
+        if( parameters.putIfAbsent(p.getName(),p)!=null)
+            throw new SemanticException(p.getName(),"Se intento agregar un parametro repetido llamada ",p.getToken().getLine());
+    }
+
+    public LinkedHashMap<String, Parameter> getParameters() {
+        return parameters;
+    }
+
+    public Token getToken() {
+        return token;
+    }
+
+    public Token getModifier() {
+        return modifier;
+    }
+
+    public Type getReturnType() {
+        return returnType;
+    }
+
+    public boolean hasNoBlock(){
+        return !block;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setModifier(Token modifier) {
+        this.modifier = modifier;
+    }
+
+    public void setReturnType(Type returnType) {
+        this.returnType = returnType;
+    }
+
+    public void setBlock(boolean block) {
+        this.block = block;
     }
 }

@@ -7,9 +7,9 @@ import Semantic.SemExceptions.SemanticException;
 import java.util.Objects;
 
 public class Parameter {
-    public String name;
-    public Type type;
-    public Token token;
+    private final String name;
+    private final Type type;
+    private final Token token;
 
     public Parameter(Type type, Token token){
         this.name = token.getLexeme();
@@ -23,5 +23,17 @@ public class Parameter {
                 throw new SemanticException(name,"Se intento usar un parametro de un tipo inexistente ", token.getLine());
             }
         }
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public Token getToken() {
+        return token;
     }
 }

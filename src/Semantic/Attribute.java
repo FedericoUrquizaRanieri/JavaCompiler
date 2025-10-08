@@ -7,10 +7,10 @@ import Semantic.SemExceptions.SemanticException;
 import java.util.Objects;
 
 public class Attribute {
-    public String name;
-    public Type type;
-    public Token token;
-    public Token genericType;
+    private final String name;
+    private Type type;
+    private final Token token;
+    private Token genericType;
 
     public Attribute(Token token){
         this.name = token.getLexeme();
@@ -23,5 +23,25 @@ public class Attribute {
                 throw new SemanticException(name,"Se intento agregar un atributo de tipo inexistente ", token.getLine());
             }
         }
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public Token getToken() {
+        return token;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Token getGenericType() {
+        return genericType;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 }

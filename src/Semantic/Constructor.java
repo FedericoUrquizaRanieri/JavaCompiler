@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class Constructor {
-    public HashMap<String,Parameter> parameters;
-    public Token token;
+    private final HashMap<String,Parameter> parameters;
+    private final Token token;
 
     public Constructor(Token token){
         parameters = new HashMap<>();
@@ -17,7 +17,7 @@ public class Constructor {
 
     public void checkStatements(Token classToken) throws SemanticException {
         if (!Objects.equals(token.getLexeme(), classToken.getLexeme())){
-            throw new SemanticException(token.getLexeme(),"Se intento agregar un parametro repetido llamada ",token.getLine());
+            throw new SemanticException(token.getLexeme(),"Nombre incorrecto en constructor ",token.getLine());
         }
         for (Parameter p : parameters.values()){
             p.checkStatements();
@@ -25,7 +25,11 @@ public class Constructor {
     }
 
     public void addParam(Parameter p) throws SemanticException {
-        if( parameters.putIfAbsent(p.name,p)!=null)
-            throw new SemanticException(p.name,"Se intento agregar un parametro repetido llamada ",p.token.getLine());
+        if( parameters.putIfAbsent(p.getName(),p)!=null)
+            throw new SemanticException(p.getName(),"Se intento agregar un parametro repetido llamada ",p.getToken().getLine());
+    }
+
+    public Token getToken() {
+        return token;
     }
 }

@@ -7,15 +7,15 @@ import Semantic.SemExceptions.SemanticException;
 import java.util.*;
 
 public class Class {
-    public String className;
-    public Token classToken;
-    public Token inheritance;
-    public Token generics;
-    public Token inheritanceGenerics;
-    public Token modifierClass;
-    public HashMap<String, Attribute> attributes;
-    public HashMap<String, Method> methods;
-    public HashMap<String, Constructor> constructors;
+    private final String className;
+    private final Token classToken;
+    private Token inheritance;
+    private Token generics;
+    private Token inheritanceGenerics;
+    private Token modifierClass;
+    private HashMap<String, Attribute> attributes;
+    private HashMap<String, Method> methods;
+    private final HashMap<String, Constructor> constructors;
     private boolean isConsolidated = false;
 
     public Class(Token token){
@@ -33,7 +33,7 @@ public class Class {
             Class confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
             if (confirmedFather != null) {
                 if (this == confirmedFather)
-                    throw new SemanticException(inheritance.getLexeme(), "La clase es igual a la clase padre ", inheritance.getLine());
+                    throw new SemanticException(inheritance.getLexeme(), "La clase actual es igual a la clase padre ", inheritance.getLine());
                 if (confirmedFather.isFinalOrStatic()) {
                     throw new SemanticException(classToken.getLexeme(), "Se intenta heredar de una clase final o estatica en ", classToken.getLine());
                 }
@@ -43,10 +43,10 @@ public class Class {
                 }
                 if (confirmedFather.modifierClass!=null && Objects.equals(confirmedFather.modifierClass.getTokenName(), "pr_abstract")){
                     for (Method m : confirmedFather.methods.values()){
-                        if (Objects.equals(m.modifier.getTokenName(), "pr_abstract") && methods.get(m.name)==null){
-                            throw new SemanticException(m.token.getLexeme(), "No se implementa el metodo abstracto ", m.token.getLine());
-                        } else if (Objects.equals(m.modifier.getTokenName(), "pr_abstract") && !methods.get(m.name).block){
-                            throw new SemanticException(m.token.getLexeme(), "No se implementa con bloque el metodo abstracto  ", m.token.getLine());
+                        if (Objects.equals(m.getModifier().getTokenName(), "pr_abstract") && methods.get(m.getName())==null){
+                            throw new SemanticException(m.getToken().getLexeme(), "No se implementa el metodo abstracto ", m.getToken().getLine());
+                        } else if (Objects.equals(m.getModifier().getTokenName(), "pr_abstract") && methods.get(m.getName()).hasNoBlock()){
+                            throw new SemanticException(m.getToken().getLexeme(), "No se implementa con bloque el metodo abstracto  ", m.getToken().getLine());
                         }
                     }
                 }
@@ -66,15 +66,15 @@ public class Class {
             c.checkStatements(classToken);
             if (modifierClass!=null){
                 if ((Objects.equals(modifierClass.getTokenName(), "pr_abstract"))){
-                    throw new SemanticException(c.token.getLexeme(),"En una clase abstracta no es posible tener un constructor ",c.token.getLine());
+                    throw new SemanticException(c.getToken().getLexeme(),"En una clase abstracta no es posible tener un constructor ",c.getToken().getLine());
                 }
             }
         }
         for (Method m : methods.values()){
             m.checkStatements();
             if (modifierClass!=null){
-                if (!(Objects.equals(modifierClass.getTokenName(), "pr_abstract")) && Objects.equals(m.modifier.getTokenName(), "pr_abstract")){
-                    throw new SemanticException(m.modifier.getLexeme(),"En una clase comun no es posible tener un metodo abstracto ",m.modifier.getLine());
+                if (!(Objects.equals(modifierClass.getTokenName(), "pr_abstract")) && Objects.equals(m.getModifier().getTokenName(), "pr_abstract")){
+                    throw new SemanticException(m.getModifier().getLexeme(),"En una clase comun no es posible tener un metodo abstracto ",m.getModifier().getLine());
                 }
             }
         }
@@ -115,8 +115,8 @@ public class Class {
             Class confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
             HashMap<String, Attribute> newAttributes = new HashMap<>(confirmedFather.attributes);
             for(Attribute a:attributes.values()){
-                if(newAttributes.putIfAbsent(a.name,a)!=null)
-                    throw new SemanticException(a.name,"Se intento cambiar un atributo del padre en ",a.token.getLine());
+                if(newAttributes.putIfAbsent(a.getName(),a)!=null)
+                    throw new SemanticException(a.getName(),"Se intento cambiar un atributo del padre en ",a.getToken().getLine());
             }
             attributes = newAttributes;
         }
@@ -127,24 +127,24 @@ public class Class {
             Class confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
             HashMap<String, Method> newMethods = new HashMap<>(confirmedFather.methods);
             for(Method m : methods.values()){
-                Method fatherMethod = newMethods.put(m.name,m);
+                Method fatherMethod = newMethods.put(m.getName(),m);
                 if(fatherMethod!=null){
-                    if(fatherMethod.modifier!=null){
-                        if (Objects.equals(fatherMethod.modifier.getTokenName(), "pr_final")){
-                            throw new SemanticException(m.name,"Se intento sobreescribir un metodo final en ",m.token.getLine());
+                    if(fatherMethod.getModifier()!=null){
+                        if (Objects.equals(fatherMethod.getModifier().getTokenName(), "pr_final")){
+                            throw new SemanticException(m.getName(),"Se intento sobreescribir un metodo final en ",m.getToken().getLine());
                         }
-                        if (Objects.equals(fatherMethod.modifier.getTokenName(), "pr_static")){
-                            throw new SemanticException(m.name,"Se intento sobreescribir un metodo static en ",m.token.getLine());
+                        if (Objects.equals(fatherMethod.getModifier().getTokenName(), "pr_static")){
+                            throw new SemanticException(m.getName(),"Se intento sobreescribir un metodo static en ",m.getToken().getLine());
                         }
-                        if (Objects.equals(fatherMethod.modifier.getTokenName(), "pr_abstract") && !m.block){
-                            throw new SemanticException(m.name,"No se completo un metodo abstracto en ",m.token.getLine());
+                        if (Objects.equals(fatherMethod.getModifier().getTokenName(), "pr_abstract") && m.hasNoBlock()){
+                            throw new SemanticException(m.getName(),"No se completo un metodo abstracto en ",m.getToken().getLine());
                         }
                     }
-                    if(!compareParams(fatherMethod.parameters,m.parameters)){
-                        throw new SemanticException(m.name,"Se intento sobreescribir un metodo de manera incorrecta en ",m.token.getLine());
+                    if(!compareParams(fatherMethod.getParameters(),m.getParameters())){
+                        throw new SemanticException(m.getName(),"Se intento sobreescribir un metodo de manera incorrecta en ",m.getToken().getLine());
                     }
                     if(differentReturnTypes(fatherMethod,m)){
-                        throw new SemanticException(m.name,"Se intento sobreescribir un metodo de manera incorrecta en ",m.token.getLine());
+                        throw new SemanticException(m.getName(),"Se intento sobreescribir un metodo de manera incorrecta en ",m.getToken().getLine());
                     }
                 }
             }
@@ -153,9 +153,9 @@ public class Class {
     }
 
     private boolean differentReturnTypes(Method m1,Method m2){
-        if(m1.returnType!= null && m2.returnType!=null){
-            return !Objects.equals(m1.returnType.getTokenType().getTokenName(), m2.returnType.getTokenType().getTokenName());
-        } else return !(m1.returnType == null && m2.returnType == null);
+        if(m1.getReturnType()!= null && m2.getReturnType()!=null){
+            return !Objects.equals(m1.getReturnType().getTokenType().getTokenName(), m2.getReturnType().getTokenType().getTokenName());
+        } else return !(m1.getReturnType() == null && m2.getReturnType() == null);
     }
 
     private boolean compareParams(LinkedHashMap<String,Parameter> fatherParams, LinkedHashMap<String,Parameter> sonParams){
@@ -172,7 +172,7 @@ public class Class {
             Parameter fatherParam = fatherEntry.getValue();
             Parameter sonParam = sonEntry.getValue();
 
-            if (!Objects.equals(fatherParam.name, sonParam.name) || !Objects.equals(fatherParam.type.getTokenType().getTokenName(), sonParam.type.getTokenType().getTokenName())) {
+            if (!Objects.equals(fatherParam.getName(), sonParam.getName()) || !Objects.equals(fatherParam.getType().getTokenType().getTokenName(), sonParam.getType().getTokenType().getTokenName())) {
                 return false;
             }
         }
@@ -194,17 +194,49 @@ public class Class {
     }
 
     public void addConstructor(Constructor c) throws SemanticException {
-        if(constructors.putIfAbsent(c.token.getLexeme(),c)!=null)
-            throw new SemanticException(c.token.getLexeme(),"Se intento agregar un atributo repetido llamada ",c.token.getLine());
+        if(constructors.putIfAbsent(c.getToken().getLexeme(),c)!=null)
+            throw new SemanticException(c.getToken().getLexeme(),"Se intento agregar un constructor repetido llamado ",c.getToken().getLine());
     }
 
     public void addMethod(Method m) throws SemanticException {
-        if(methods.putIfAbsent(m.name,m)!=null)
-            throw new SemanticException(m.name,"Se intento agregar un atributo repetido llamada ",m.token.getLine());
+        if(methods.putIfAbsent(m.getName(),m)!=null)
+            throw new SemanticException(m.getName(),"Se intento agregar un metodo repetido llamado ",m.getToken().getLine());
     }
 
     public void addAttribute(Attribute a) throws SemanticException {
-        if(attributes.putIfAbsent(a.name,a)!=null)
-            throw new SemanticException(a.name,"Se intento agregar un atributo repetido llamada ",a.token.getLine());
+        if(attributes.putIfAbsent(a.getName(),a)!=null)
+            throw new SemanticException(a.getName(),"Se intento agregar un atributo repetido llamada ",a.getToken().getLine());
+    }
+
+    public Token getClassToken() {
+        return classToken;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public Token getInheritance() {
+        return inheritance;
+    }
+
+    public Token getModifierClass() {
+        return modifierClass;
+    }
+
+    public HashMap<String, Method> getMethods() {
+        return methods;
+    }
+
+    public void setInheritance(Token inheritance) {
+        this.inheritance = inheritance;
+    }
+
+    public void setModifierClass(Token modifierClass) {
+        this.modifierClass = modifierClass;
+    }
+
+    public void setGenerics(Token generics) {
+        this.generics = generics;
     }
 }

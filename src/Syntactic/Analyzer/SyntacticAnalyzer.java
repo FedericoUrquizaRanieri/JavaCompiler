@@ -60,7 +60,7 @@ public class SyntacticAnalyzer {
 
     private void classState() throws CompiException {
         if (currentToken.getTokenName().equals("pr_interface")){
-            match("pr_interface"); //TODO aca va el logro
+            match("pr_interface");
             match("idClase");
             optionalGenerics();
             optionalInheritanceInterface();
@@ -74,9 +74,9 @@ public class SyntacticAnalyzer {
             match("idClase");
             MainSemantic.symbolTable.currentClass = new Class(name);
             Token generic = optionalGenerics();
-            MainSemantic.symbolTable.currentClass.inheritance = optionalInheritance();
-            MainSemantic.symbolTable.currentClass.modifierClass = modify;
-            MainSemantic.symbolTable.currentClass.generics = generic;
+            MainSemantic.symbolTable.currentClass.setInheritance(optionalInheritance());
+            MainSemantic.symbolTable.currentClass.setModifierClass(modify);
+            MainSemantic.symbolTable.currentClass.setGenerics(generic);
             match("openBrace");
             membersList();
             match("closeBrace");
@@ -174,13 +174,13 @@ public class SyntacticAnalyzer {
             Token name = currentToken;
             match("idMetVar");
             MainSemantic.symbolTable.currentMethod = new Method(name);
-            MainSemantic.symbolTable.currentMethod.returnType = t;
-            MainSemantic.symbolTable.currentMethod.modifier = mod;
+            MainSemantic.symbolTable.currentMethod.setReturnType(t);
+            MainSemantic.symbolTable.currentMethod.setModifier(mod);
             List<Parameter> args = formalArgs();
             for (Parameter m : args){
                 MainSemantic.symbolTable.currentMethod.addParam(m);
             }
-            MainSemantic.symbolTable.currentMethod.block = optionalBlock();
+            MainSemantic.symbolTable.currentMethod.setBlock(optionalBlock());
             MainSemantic.symbolTable.currentClass.addMethod(MainSemantic.symbolTable.currentMethod);
         } else if (productionsMap.getFirsts("type").contains(currentToken.getTokenName())) {
             Type t = type();
@@ -192,12 +192,12 @@ public class SyntacticAnalyzer {
             Token name = currentToken;
             match("idMetVar");
             MainSemantic.symbolTable.currentMethod = new Method(name);
-            MainSemantic.symbolTable.currentMethod.returnType = null;
+            MainSemantic.symbolTable.currentMethod.setReturnType(null);
             List<Parameter> args = formalArgs();
             for (Parameter m : args){
                 MainSemantic.symbolTable.currentMethod.addParam(m);
             }
-            MainSemantic.symbolTable.currentMethod.block = optionalBlock();
+            MainSemantic.symbolTable.currentMethod.setBlock(optionalBlock());
             MainSemantic.symbolTable.currentClass.addMethod(MainSemantic.symbolTable.currentMethod);
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("member")), analyzer.getLineNumber());
@@ -209,7 +209,7 @@ public class SyntacticAnalyzer {
             memberMethod(t,name);
         } else if (productionsMap.getFirsts("optionalDeclaration").contains(currentToken.getTokenName())) {
             Attribute a = new Attribute(name);
-            a.type = t;
+            a.setType(t);
             optionalDeclaration();
             match("semicolon");
             MainSemantic.symbolTable.currentClass.addAttribute(a);
@@ -230,17 +230,17 @@ public class SyntacticAnalyzer {
     private void memberMethod(Type t , Token name) throws CompiException {
         if (productionsMap.getFirsts("formalArgs").contains(currentToken.getTokenName())) {
             Method m = new Method(name);
-            m.returnType = t;
+            m.setReturnType(t);
             MainSemantic.symbolTable.currentMethod = m;
             List<Parameter> args = formalArgs();
             for (Parameter p : args){
                 MainSemantic.symbolTable.currentMethod.addParam(p);
             }
-            MainSemantic.symbolTable.currentMethod.block = optionalBlock();
+            MainSemantic.symbolTable.currentMethod.setBlock(optionalBlock());
             MainSemantic.symbolTable.currentClass.addMethod(MainSemantic.symbolTable.currentMethod);
         } else if (currentToken.getTokenName().equals("semicolon")) {
             Attribute a = new Attribute(name);
-            a.type = t;
+            a.setType(t);
             match("semicolon");
             MainSemantic.symbolTable.currentClass.addAttribute(a);
         } else {
