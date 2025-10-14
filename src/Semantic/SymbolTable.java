@@ -1,0 +1,127 @@
+package Semantic;
+
+import Lexical.Analyzer.Token;
+import Semantic.SemExceptions.SemanticException;
+
+import java.util.HashMap;
+
+public class SymbolTable {
+    public HashMap<String,Class> classes;
+    public Method currentMethod;
+    public Class currentClass;
+    public Constructor currentConstructor;
+
+    public SymbolTable(){
+        classes = new HashMap<>();
+        putPredefinedClasses();
+    }
+
+    public void checkStatements() throws SemanticException{
+        for (Class c : classes.values()) {
+            c.checkStatements();
+        }
+    }
+
+    public void consolidate() throws SemanticException{
+        for (Class c : classes.values()) {
+            if (c.isNotConsolidated())
+                c.consolidate();
+        }
+    }
+
+    public void addClass(String name, Class classElement) throws SemanticException {
+        if(classes.putIfAbsent(name,classElement)!=null)
+            throw new SemanticException(name,"Se intento agregar una clase repetida llamada ",classElement.getClassToken().getLine());
+    }
+
+    public Class existsClass(Token className){
+        if (classes.get(className.getLexeme())!=null){
+            return classes.get(className.getLexeme());
+        }
+        return null;
+    }
+
+    private void putPredefinedClasses(){
+        Class object = new Class(new Token("idClase","Object",0));
+        classes.put("Object",object);
+        Class string = new Class(new Token("idClase","String",0));
+        classes.put("String",string);
+        Class system = new Class(new Token("idClase","System",0));
+        classes.put("System",system);
+
+        Method debugPrint = new Method(new Token("idMetVar","debugPrint",0));
+        debugPrint.setBlock(true);
+        debugPrint.setReturnType(null);
+        debugPrint.setModifier(new Token("pr_static","static",0));
+        debugPrint.getParameters().put("i",new Parameter(new PrimitiveType(new Token("pr_int","int",0)),new Token("idMetVar","i",0)));
+        object.getMethods().put("debugPrint",debugPrint);
+
+        Method read = new Method(new Token("idMetVar","read",0));
+        read.setBlock(true);
+        read.setReturnType(new PrimitiveType(new Token("pr_int","int",0)));
+        read.setModifier(new Token("pr_static","static",0));
+        system.getMethods().put("read",read);
+
+        Method printB = new Method(new Token("idMetVar","printB",0));
+        printB.setBlock(true);
+        printB.setReturnType(null);
+        printB.setModifier(new Token("pr_static","static",0));
+        printB.getParameters().put("b",new Parameter(new PrimitiveType(new Token("pr_boolean","boolean",0)),new Token("idMetVar","b",0)));
+        system.getMethods().put("printB",printB);
+
+        Method printC = new Method(new Token("idMetVar","printC",0));
+        printC.setBlock(true);
+        printC.setReturnType(null);
+        printC.setModifier(new Token("pr_static","static",0));
+        printC.getParameters().put("c",new Parameter(new PrimitiveType(new Token("pr_char","char",0)),new Token("idMetVar","c",0)));
+        system.getMethods().put("printC",printC);
+
+        Method printI = new Method(new Token("idMetVar","printI",0));
+        printI.setBlock(true);
+        printI.setReturnType(null);
+        printI.setModifier(new Token("pr_static","static",0));
+        printI.getParameters().put("i",new Parameter(new PrimitiveType(new Token("pr_int","int",0)),new Token("idMetVar","i",0)));
+        system.getMethods().put("printI",printI);
+
+        Method printS = new Method(new Token("idMetVar","printS",0));
+        printS.setBlock(true);
+        printS.setReturnType(null);
+        printS.setModifier(new Token("pr_static","static",0));
+        printS.getParameters().put("s",new Parameter(new PrimitiveType(new Token("idClase","String",0)),new Token("idMetVar","s",0)));
+        system.getMethods().put("printS",printS);
+
+        Method println = new Method(new Token("idMetVar","println",0));
+        println.setBlock(true);
+        println.setReturnType(null);
+        println.setModifier(new Token("pr_static","static",0));
+        system.getMethods().put("println",println);
+
+        Method printBln = new Method(new Token("idMetVar","printBln",0));
+        printBln.setBlock(true);
+        printBln.setReturnType(null);
+        printBln.setModifier(new Token("pr_static","static",0));
+        printBln.getParameters().put("b",new Parameter(new PrimitiveType(new Token("pr_boolean","boolean",0)),new Token("idMetVar","b",0)));
+        system.getMethods().put("printBln",printBln);
+
+        Method printCln = new Method(new Token("idMetVar","printCln",0));
+        printCln.setBlock(true);
+        printCln.setReturnType(null);
+        printCln.setModifier(new Token("pr_static","static",0));
+        printCln.getParameters().put("c",new Parameter(new PrimitiveType(new Token("pr_char","char",0)),new Token("idMetVar","c",0)));
+        system.getMethods().put("printCln",printCln);
+
+        Method printIln = new Method(new Token("idMetVar","printIln",0));
+        printIln.setBlock(true);
+        printIln.setReturnType(null);
+        printIln.setModifier(new Token("pr_static","static",0));
+        printIln.getParameters().put("i",new Parameter(new PrimitiveType(new Token("pr_int","int",0)),new Token("idMetVar","i",0)));
+        system.getMethods().put("printIln",printIln);
+
+        Method printSln = new Method(new Token("idMetVar","printSln",0));
+        printSln.setBlock(true);
+        printSln.setReturnType(null);
+        printSln.setModifier(new Token("pr_static","static",0));
+        printSln.getParameters().put("s",new Parameter(new PrimitiveType(new Token("idClase","String",0)),new Token("idMetVar","s",0)));
+        system.getMethods().put("printSln",printSln);
+    }
+}

@@ -1,0 +1,47 @@
+package Semantic;
+
+import Lexical.Analyzer.Token;
+import Main.MainSemantic;
+import Semantic.SemExceptions.SemanticException;
+
+import java.util.Objects;
+
+public class Attribute {
+    private final String name;
+    private Type type;
+    private final Token token;
+    private Token genericType;
+
+    public Attribute(Token token){
+        this.name = token.getLexeme();
+        this.token =token;
+    }
+
+    public void checkStatements() throws SemanticException {
+        if(Objects.equals(type.getTokenType().getTokenName(), "idClase")){
+            if (MainSemantic.symbolTable.existsClass(type.getTokenType())==null){
+                throw new SemanticException(type.getNameType(),"Se intento agregar un atributo de tipo inexistente ", type.getTokenType().getLine());
+            }
+        }
+    }
+
+    public Type getType() {
+        return type;
+    }
+
+    public Token getToken() {
+        return token;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Token getGenericType() {
+        return genericType;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+}

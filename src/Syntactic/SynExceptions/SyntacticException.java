@@ -1,6 +1,8 @@
 package Syntactic.SynExceptions;
 
-public class SyntacticException extends Exception {
+import Main.CompiException;
+
+public class SyntacticException extends CompiException {
   private final String currentToken;
   private final String expectedTokenName;
   private final int line;

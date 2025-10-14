@@ -1,6 +1,8 @@
 package Lexical.LexExceptions;
 
-public class LexicalException extends Exception {
+import Main.CompiException;
+
+public class LexicalException extends CompiException {
     private final String lexeme;
     private final int line;
     private final int column;

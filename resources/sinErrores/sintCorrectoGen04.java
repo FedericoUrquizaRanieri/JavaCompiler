@@ -1,2 +1,0 @@
-///[SinErrores]
-interface Coleccion<T> { }
