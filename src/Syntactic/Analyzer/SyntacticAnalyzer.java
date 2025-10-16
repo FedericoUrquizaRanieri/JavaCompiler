@@ -4,8 +4,8 @@ import Lexical.Analyzer.LexicalAnalyzer;
 import Lexical.Analyzer.Token;
 import Lexical.LexExceptions.LexicalException;
 import Main.CompiException;
-import Semantic.*;
-import Semantic.Class;
+import Semantic.ST.*;
+import Semantic.ST.Class;
 import Syntactic.SynExceptions.SyntacticException;
 import Main.MainSemantic;
 

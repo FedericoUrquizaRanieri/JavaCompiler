@@ -3,7 +3,7 @@ package Main;
 import Lexical.Analyzer.LexicalAnalyzer;
 import Lexical.SpecialWordMap.SpecialWordsMap;
 import Semantic.SemExceptions.SemanticException;
-import Semantic.SymbolTable;
+import Semantic.ST.SymbolTable;
 import SourceManager.*;
 
 import java.io.FileNotFoundException;

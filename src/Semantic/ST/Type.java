@@ -1,4 +1,4 @@
-package Semantic;
+package Semantic.ST;
 
 import Lexical.Analyzer.Token;
 
