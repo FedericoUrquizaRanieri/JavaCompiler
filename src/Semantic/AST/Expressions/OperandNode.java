@@ -1,4 +1,5 @@
 package Semantic.AST.Expressions;
 
-public class OperandNode extends ExpressionNode{
+public abstract class OperandNode extends ComposedExpressionNode{
+
 }

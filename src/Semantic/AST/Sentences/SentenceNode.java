@@ -1,11 +1,11 @@
 package Semantic.AST.Sentences;
 
-public class SentenceNode {
-    public SentenceNode(){
+import Semantic.SemExceptions.SemanticException;
 
-    }
-
-    public void check(){
-
+public abstract class SentenceNode {
+    protected boolean checked = false;
+    public abstract void check();
+    public boolean isChecked() {
+        return checked;
     }
 }

@@ -1,4 +1,5 @@
 package Semantic.AST.Expressions;
 
-public class ReferenceNode extends ExpressionNode{
+public abstract class ReferenceNode extends OperandNode{
+
 }
