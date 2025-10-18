@@ -20,4 +20,19 @@ public class PrimitiveType implements Type{
     public String getNameType() {
         return nameType;
     }
+
+    @Override
+    public boolean isCompatible(String neededType) {
+        return token.getLexeme().equals(neededType);
+    }
+
+    @Override
+    public boolean isOperandCompatible(Token typeToken) {
+        return false; //TODO revisar el tipo del operador?
+    }
+
+    @Override
+    public boolean compareTypes(Type type) {
+        return token.getTokenName().equals(type.getTokenType().getTokenName());
+    }
 }

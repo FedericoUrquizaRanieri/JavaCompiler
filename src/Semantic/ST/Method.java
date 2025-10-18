@@ -2,6 +2,8 @@ package Semantic.ST;
 
 import Lexical.Analyzer.Token;
 import Main.MainSemantic;
+import Semantic.AST.Sentences.BlockNode;
+import Semantic.AST.Sentences.NullBlockNode;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.LinkedHashMap;
@@ -13,7 +15,7 @@ public class Method {
     private final Token token;
     private Token modifier;
     private final LinkedHashMap<String,Parameter> parameters;
-    private boolean block;
+    private BlockNode block;
 
     public Method(Token token){
         parameters = new LinkedHashMap<>();
@@ -29,15 +31,19 @@ public class Method {
                 }
             }
         }
-        if(block && modifier!=null && Objects.equals(modifier.getTokenName(), "pr_abstract")){
+        if(!hasNoBlock() && modifier!=null && Objects.equals(modifier.getTokenName(), "pr_abstract")){
             throw new SemanticException(token.getLexeme(), "Se intento agregar un bloque a un metodo ", token.getLine());
         }
-        if(!block && (modifier == null || !Objects.equals(modifier.getTokenName(), "pr_abstract"))){
+        if(hasNoBlock() && (modifier == null || !Objects.equals(modifier.getTokenName(), "pr_abstract"))){
             throw new SemanticException(token.getLexeme(), "Se intento agregar un metodo sin bloque ", token.getLine());
         }
         for (Parameter p : parameters.values()){
             p.checkStatements();
         }
+    }
+
+    public void checkSentences() throws SemanticException{
+        block.check();
     }
 
     public void addParam(Parameter p) throws SemanticException {
@@ -62,7 +68,15 @@ public class Method {
     }
 
     public boolean hasNoBlock(){
-        return !block;
+        return block instanceof NullBlockNode;
+    }
+
+    public void setBlock(BlockNode block){
+        this.block=block;
+    }
+
+    public BlockNode getBlock() {
+        return block;
     }
 
     public String getName() {
@@ -77,7 +91,4 @@ public class Method {
         this.returnType = returnType;
     }
 
-    public void setBlock(boolean block) {
-        this.block = block;
-    }
 }

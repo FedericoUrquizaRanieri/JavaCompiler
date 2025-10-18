@@ -53,6 +53,16 @@ public class MainSemantic {
                 noMistakes=false;
             }
         }
+
+        if (noMistakes) {
+            try {
+                symbolTable.checkSentences();
+            } catch (SemanticException e) {
+                e.printError();
+                noMistakes=false;
+            }
+        }
+
         if (noMistakes) {
             System.out.println("Compilacion Exitosa");
             System.out.println();

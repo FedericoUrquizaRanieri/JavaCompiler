@@ -193,6 +193,12 @@ public class Class {
         } else return false;
     }
 
+    public void checkSentences() throws SemanticException{
+        for (Method m : methods.values()) {
+            m.checkSentences();
+        }
+    }
+
     public void addConstructor(Constructor c) throws SemanticException {
         if(constructors.isEmpty()){
             if(constructors.putIfAbsent(c.getToken().getLexeme(),c)!=null)
