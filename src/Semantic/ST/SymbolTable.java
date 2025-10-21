@@ -1,16 +1,19 @@
 package Semantic.ST;
 
 import Lexical.Analyzer.Token;
+import Semantic.AST.Sentences.BlockNode;
 import Semantic.AST.Sentences.NullBlockNode;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.HashMap;
+import java.util.Stack;
 
 public class SymbolTable {
     public HashMap<String,Class> classes;
     public Method currentMethod;
     public Class currentClass;
     public Constructor currentConstructor;
+    public Stack<BlockNode> currentBlock;
 
     public SymbolTable(){
         classes = new HashMap<>();

@@ -1,6 +1,7 @@
 package Semantic.ST;
 
 import Lexical.Analyzer.Token;
+import Semantic.AST.Sentences.BlockNode;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.HashMap;
@@ -9,6 +10,7 @@ import java.util.Objects;
 public class Constructor {
     private final HashMap<String,Parameter> parameters;
     private final Token token;
+    private BlockNode block;
 
     public Constructor(Token token){
         parameters = new HashMap<>();
@@ -31,5 +33,9 @@ public class Constructor {
 
     public Token getToken() {
         return token;
+    }
+
+    public void setBlock(BlockNode block){
+        this.block=block;
     }
 }
