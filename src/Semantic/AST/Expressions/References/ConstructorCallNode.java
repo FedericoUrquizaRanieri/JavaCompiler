@@ -1,5 +1,6 @@
 package Semantic.AST.Expressions.References;
 
+import Lexical.Analyzer.Token;
 import Semantic.AST.Expressions.ExpressionNode;
 import Semantic.AST.Expressions.ReferenceNode;
 import Semantic.ST.Class;
@@ -7,12 +8,13 @@ import Semantic.ST.Parameter;
 import Semantic.ST.Type;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class ConstructorCallNode extends ReferenceNode {
-    private final Class classElement;
-    private final HashMap<String, Parameter> args;
+    private final Token classElement;
+    private final List<ExpressionNode> args;
 
-    public ConstructorCallNode(Class classElement, HashMap<String, Parameter> args) {
+    public ConstructorCallNode(Token classElement, List<ExpressionNode> args) {
         this.classElement = classElement;
         this.args = args;
     }
@@ -20,5 +22,15 @@ public class ConstructorCallNode extends ReferenceNode {
     @Override
     public Type check() {
         return null; //TODO revisar clase que existe y los params
+    }
+
+    @Override
+    public List<ReferenceNode> getChainedElements() {
+        return null;
+    }
+
+    @Override
+    public void setChainedElements(List<ReferenceNode> refList) {
+        chainedElements = refList;
     }
 }

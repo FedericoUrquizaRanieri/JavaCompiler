@@ -13,7 +13,10 @@ public class WhileNode extends SentenceNode{
 
     @Override
     public void check() {
-        condition.check().isCompatible("boolean");
+        if (!condition.check().isCompatible("boolean")){
+            //TODO throw
+        }
         body.check();
+        checked = true;
     }
 }

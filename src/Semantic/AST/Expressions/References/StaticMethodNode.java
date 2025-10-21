@@ -1,5 +1,7 @@
 package Semantic.AST.Expressions.References;
 
+import Lexical.Analyzer.Token;
+import Semantic.AST.Expressions.ExpressionNode;
 import Semantic.AST.Expressions.ReferenceNode;
 import Semantic.ST.Class;
 import Semantic.ST.Method;
@@ -7,13 +9,14 @@ import Semantic.ST.Parameter;
 import Semantic.ST.Type;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class StaticMethodNode extends ReferenceNode {
-    private final Class classElement;
-    private final Method methodElement;
-    private final HashMap<String, Parameter> args;
+    private final Token classElement;
+    private final Token methodElement;
+    private final List<ExpressionNode> args;
 
-    public StaticMethodNode(Class classElement, Method methodElement, HashMap<String, Parameter> args) {
+    public StaticMethodNode(Token classElement, Token methodElement, List<ExpressionNode> args) {
         this.classElement = classElement;
         this.methodElement = methodElement;
         this.args = args;
@@ -21,6 +24,16 @@ public class StaticMethodNode extends ReferenceNode {
 
     @Override
     public Type check() {
-        return null; //TODO aca revisar metodos y retornos
+        return null; //TODO aca revisar metodos en clases, que las clases existen y retornos
+    }
+
+    @Override
+    public List<ReferenceNode> getChainedElements() {
+        return null;
+    }
+
+    @Override
+    public void setChainedElements(List<ReferenceNode> refList) {
+        chainedElements = refList;
     }
 }

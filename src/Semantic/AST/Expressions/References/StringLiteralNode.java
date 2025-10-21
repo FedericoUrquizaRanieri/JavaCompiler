@@ -5,6 +5,8 @@ import Semantic.AST.Expressions.ReferenceNode;
 import Semantic.ST.PrimitiveType;
 import Semantic.ST.Type;
 
+import java.util.List;
+
 public class StringLiteralNode extends ReferenceNode {
     private final Token string;
 
@@ -15,5 +17,15 @@ public class StringLiteralNode extends ReferenceNode {
     @Override
     public Type check() {
         return new PrimitiveType(string);
+    }
+
+    @Override
+    public List<ReferenceNode> getChainedElements() {
+        return null;
+    }
+
+    @Override
+    public void setChainedElements(List<ReferenceNode> refList) {
+        chainedElements = refList;
     }
 }

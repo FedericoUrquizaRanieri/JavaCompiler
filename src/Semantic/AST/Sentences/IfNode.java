@@ -16,9 +16,10 @@ public class IfNode extends SentenceNode{
     @Override
     public void check() {
         if(!condition.check().isCompatible("boolean")){
-
+            //TODO tirar error
         }
         body.check();
         elseSentence.check();
+        checked = true;
     }
 }

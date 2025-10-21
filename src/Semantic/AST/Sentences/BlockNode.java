@@ -1,17 +1,16 @@
 package Semantic.AST.Sentences;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class BlockNode extends SentenceNode{
     private final List<SentenceNode> sentenceNodeList;
-    private final HashMap<String,LocalVarNode> localVarList;
+    private final List<LocalVarNode> localVarList;
     protected boolean checked;
 
     public BlockNode(){
         sentenceNodeList = new ArrayList<>();
-        localVarList = new HashMap<>();
+        localVarList = new ArrayList<>();
         checked = false;
     }
 
@@ -32,10 +31,10 @@ public class BlockNode extends SentenceNode{
     }
 
     public void addLocalVar(SentenceNode sentenceNode){
-        sentenceNodeList.add(sentenceNode); //TODO agregar chequeos
+        localVarList.add((LocalVarNode) sentenceNode); //TODO agregar chequeos
     }
 
-    public HashMap<String,LocalVarNode> getLocalVarList() {
+    public List<LocalVarNode> getLocalVarList() {
         return localVarList;
     }
 

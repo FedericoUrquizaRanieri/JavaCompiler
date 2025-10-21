@@ -5,9 +5,9 @@ import Semantic.ST.Type;
 
 public class UnaryExpressionNode extends ComposedExpressionNode{
     private final Token operator;
-    private final ComposedExpressionNode expression;
+    private final ExpressionNode expression;
 
-    public UnaryExpressionNode(ComposedExpressionNode expression, Token operator) {
+    public UnaryExpressionNode(ExpressionNode expression, Token operator) {
         this.expression = expression;
         this.operator = operator;
     }

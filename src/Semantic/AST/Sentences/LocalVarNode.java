@@ -1,6 +1,5 @@
 package Semantic.AST.Sentences;
 
-import Semantic.AST.Expressions.ComposedExpressionNode;
 import Semantic.AST.Expressions.ExpressionNode;
 import Semantic.ST.Type;
 

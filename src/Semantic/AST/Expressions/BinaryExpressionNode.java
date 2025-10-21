@@ -4,11 +4,11 @@ import Lexical.Analyzer.Token;
 import Semantic.ST.Type;
 
 public class BinaryExpressionNode extends ComposedExpressionNode{
-    private final ComposedExpressionNode leftExpression;
+    private final ExpressionNode leftExpression;
     private final Token operator;
-    private final ComposedExpressionNode rightExpression;
+    private final ExpressionNode rightExpression;
 
-    public BinaryExpressionNode(ComposedExpressionNode leftExpression, Token operator, ComposedExpressionNode rightExpression) {
+    public BinaryExpressionNode(ExpressionNode leftExpression, Token operator, ExpressionNode rightExpression) {
         this.leftExpression = leftExpression;
         this.operator = operator;
         this.rightExpression = rightExpression;
