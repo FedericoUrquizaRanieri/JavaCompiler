@@ -711,7 +711,7 @@ public class SyntacticAnalyzer {
             Token ct = currentToken;
             match("idMetVar");
             List<ExpressionNode> params = chainElement();
-            if (params.isEmpty()){
+            if (params==null){
                 reference = new AccessVarNode(ct,null);
             } else {
                 reference = new AccessMethodNode(params,ct,null);
@@ -843,11 +843,13 @@ public class SyntacticAnalyzer {
     }
 
     private List<ExpressionNode> chainElement() throws SyntacticException {
-        List<ExpressionNode> retList = new ArrayList<>();
+        List<ExpressionNode> retList;
         if (productionsMap.getFirsts("currentArgs").contains(currentToken.getTokenName())) {
             retList = currentArgs();
         } else if (!productionsMap.getFollow("chainElement").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("chainElement")), analyzer.getLineNumber());
+        } else {
+            retList = null;
         }
         return retList;
     }
