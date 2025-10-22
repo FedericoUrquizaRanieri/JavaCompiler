@@ -364,7 +364,7 @@ public class SyntacticAnalyzer {
             return block();
         } else if (currentToken.getTokenName().equals("semicolon")){
             match("semicolon");
-            return new NullBlockNode();
+            return null;
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("optionalBlock")), analyzer.getLineNumber());
         }
@@ -444,9 +444,10 @@ public class SyntacticAnalyzer {
 
     private SentenceNode localVar() throws SyntacticException {
         match("pr_var");
+        Token ct = currentToken;
         match("idMetVar");
         match("equals");
-        return new LocalVarNode(composedExpression());
+        return new LocalVarNode(ct,composedExpression());
     }
 
     private SentenceNode returnState() throws SyntacticException {

@@ -68,7 +68,7 @@ public class Method {
     }
 
     public boolean hasNoBlock(){
-        return block instanceof NullBlockNode;
+        return block==null;
     }
 
     public void setBlock(BlockNode block){

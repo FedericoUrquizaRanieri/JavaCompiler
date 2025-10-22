@@ -17,6 +17,7 @@ public class SymbolTable {
 
     public SymbolTable(){
         classes = new HashMap<>();
+        currentBlock = new Stack<>();
         putPredefinedClasses();
     }
 
