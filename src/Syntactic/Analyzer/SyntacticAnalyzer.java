@@ -4,6 +4,10 @@ import Lexical.Analyzer.LexicalAnalyzer;
 import Lexical.Analyzer.Token;
 import Lexical.LexExceptions.LexicalException;
 import Main.CompiException;
+import Semantic.AST.Chains.ChainedMethodNode;
+import Semantic.AST.Chains.ChainedNode;
+import Semantic.AST.Chains.ChainedVarNode;
+import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.AST.Expressions.*;
 import Semantic.AST.Expressions.References.*;
 import Semantic.AST.Expressions.TypeNode.*;
@@ -693,36 +697,34 @@ public class SyntacticAnalyzer {
 
     private ExpressionNode reference() throws SyntacticException {
         ReferenceNode e;
-        List<ReferenceNode> chainedExp;
         if (productionsMap.getFirsts("primary").contains(currentToken.getTokenName())) {
             e = primary();
-            chainedExp = chainReference();
-            e.setChainedElements(chainedExp);
+            ChainedNode chainedExp = chainReference();
+            e.setChainedElement(chainedExp);
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("reference")), analyzer.getLineNumber());
         }
         return e;
     }
 
-    private List<ReferenceNode> chainReference() throws SyntacticException {
-        List<ReferenceNode> retList = new ArrayList<>();
-        ReferenceNode reference;
+    private ChainedNode chainReference() throws SyntacticException {
+        ChainedNode newNode;
         if (currentToken.getTokenName().equals("dot")) {
             match("dot");
             Token ct = currentToken;
             match("idMetVar");
             List<ExpressionNode> params = chainElement();
             if (params==null){
-                reference = new AccessVarNode(ct,null);
+                newNode = new ChainedVarNode(ct);
             } else {
-                reference = new AccessMethodNode(params,ct,null);
+                newNode = new ChainedMethodNode(params,ct);
             }
-            retList.add(reference);
-            retList.addAll(chainReference());
+            newNode.setChainedNode(chainReference());
         } else if (!productionsMap.getFollow("chainReference").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("chainReference")), analyzer.getLineNumber());
-        }
-        return retList;
+        } else
+            newNode = new EmptyChainedNode();
+        return newNode;
     }
 
     private ReferenceNode primary() throws SyntacticException {
@@ -752,13 +754,13 @@ public class SyntacticAnalyzer {
         match("idMetVar");
         List<ExpressionNode> l = possibleArgs();
         if (l==null)
-            return new AccessVarNode(ct,null);
+            return new AccessVarNode(ct);
         else
-            return new AccessMethodNode(l,ct,null); //TODO revisar este null
+            return new AccessMethodNode(l,ct);
     }
 
     private List<ExpressionNode> possibleArgs() throws SyntacticException {
-        List<ExpressionNode> l = new ArrayList<>();
+        List<ExpressionNode> l;
         if (productionsMap.getFirsts("currentArgs").contains(currentToken.getTokenName())) {
             l = currentArgs();
         } else if (!productionsMap.getFollow("possibleArgs").contains(currentToken.getTokenName())) {
