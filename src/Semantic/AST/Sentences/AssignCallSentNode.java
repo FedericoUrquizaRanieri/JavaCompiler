@@ -12,6 +12,7 @@ public class AssignCallSentNode extends SentenceNode{
 
     @Override
     public void check() throws SemanticException {
+        //TODO revisar que sea solo llamada o asignacion?
         innerExpression.check();
         checked = true;
     }

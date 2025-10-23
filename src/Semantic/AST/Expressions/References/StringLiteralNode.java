@@ -1,7 +1,8 @@
 package Semantic.AST.Expressions.References;
 
 import Lexical.Analyzer.Token;
-import Semantic.AST.Expressions.ReferenceNode;
+import Semantic.AST.Chains.ChainedNode;
+import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.ST.PrimitiveType;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
@@ -13,6 +14,7 @@ public class StringLiteralNode extends ReferenceNode {
 
     public StringLiteralNode(Token string) {
         this.string = string;
+        chainedElement = new EmptyChainedNode();
     }
 
     @Override
@@ -21,12 +23,12 @@ public class StringLiteralNode extends ReferenceNode {
     }
 
     @Override
-    public List<ReferenceNode> getChainedElements() {
+    public ChainedNode getChainedElement() {
         return null;
     }
 
     @Override
-    public void setChainedElements(List<ReferenceNode> refList) {
-        chainedElements = refList;
+    public void setChainedElement(ChainedNode chainedNode) {
+        chainedElement = chainedNode;
     }
 }

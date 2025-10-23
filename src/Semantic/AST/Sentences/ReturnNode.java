@@ -24,9 +24,7 @@ public class ReturnNode extends SentenceNode{
                 throw new SemanticException(mainToken.getLexeme(),"El tipo de retorno esperado por el metodo no coincide con el retorno vacio en ", mainToken.getLine());
             }
         }
-        else if (!retType.compareTypes(retValue.check())){ //TODO revisar codigos de error en estos casos donde no hay elemento para elegir
-            throw new SemanticException(mainToken.getLexeme(),"El tipo de retorno esperado por el metodo no coincide con "+realType.getNameType()+" en ", mainToken.getLine());
-        }
+        else retType.compareTypes(retValue.check());
         checked = true;
     }
 }

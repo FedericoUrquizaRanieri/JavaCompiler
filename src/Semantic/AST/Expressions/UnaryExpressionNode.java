@@ -15,9 +15,9 @@ public class UnaryExpressionNode extends ComposedExpressionNode{
 
     @Override
     public Type check() throws SemanticException {
-        if (expression.check().isOperandCompatible(operator)){
-            checked = true;
-        } else;//TODO throw
-        return null;
+        Type retType = expression.check();
+        retType.isOperandCompatibleUnary(operator);
+        checked = true;
+        return retType;
     }
 }

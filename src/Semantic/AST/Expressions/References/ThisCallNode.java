@@ -1,6 +1,7 @@
 package Semantic.AST.Expressions.References;
 
-import Semantic.AST.Expressions.ReferenceNode;
+import Semantic.AST.Chains.ChainedNode;
+import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.ST.Class;
 import Semantic.ST.ReferenceType;
 import Semantic.ST.Type;
@@ -13,6 +14,7 @@ public class ThisCallNode extends ReferenceNode {
 
     public ThisCallNode(Class c){
         thisClass = c;
+        chainedElement = new EmptyChainedNode();
     }
 
     @Override
@@ -21,12 +23,12 @@ public class ThisCallNode extends ReferenceNode {
     }
 
     @Override
-    public List<ReferenceNode> getChainedElements() {
+    public ChainedNode getChainedElement() {
         return null;
     }
 
     @Override
-    public void setChainedElements(List<ReferenceNode> refList) {
-        chainedElements = refList;
+    public void setChainedElement(ChainedNode chainedNode) {
+        chainedElement = chainedNode;
     }
 }

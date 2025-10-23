@@ -1,15 +1,11 @@
 package Semantic.AST.Expressions.References;
 
 import Lexical.Analyzer.Token;
+import Semantic.AST.Chains.ChainedNode;
+import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.AST.Expressions.ExpressionNode;
-import Semantic.AST.Expressions.ReferenceNode;
-import Semantic.ST.Class;
-import Semantic.ST.Method;
-import Semantic.ST.Parameter;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
-
-import java.util.HashMap;
 import java.util.List;
 
 public class StaticMethodNode extends ReferenceNode {
@@ -21,6 +17,7 @@ public class StaticMethodNode extends ReferenceNode {
         this.classElement = classElement;
         this.methodElement = methodElement;
         this.args = args;
+        chainedElement = new EmptyChainedNode();
     }
 
     @Override
@@ -29,12 +26,12 @@ public class StaticMethodNode extends ReferenceNode {
     }
 
     @Override
-    public List<ReferenceNode> getChainedElements() {
+    public ChainedNode getChainedElement() {
         return null;
     }
 
     @Override
-    public void setChainedElements(List<ReferenceNode> refList) {
-        chainedElements = refList;
+    public void setChainedElement(ChainedNode chainedNode) {
+        chainedElement = chainedNode;
     }
 }

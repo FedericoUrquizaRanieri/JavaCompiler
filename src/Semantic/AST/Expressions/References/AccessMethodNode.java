@@ -1,21 +1,22 @@
 package Semantic.AST.Expressions.References;
 
 import Lexical.Analyzer.Token;
+import Semantic.AST.Chains.ChainedNode;
+import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.AST.Expressions.ExpressionNode;
-import Semantic.AST.Expressions.ReferenceNode;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.List;
 
 public class AccessMethodNode extends ReferenceNode {
-    private final Token lastMethod;
+    private final Token methodToken;
     private final List<ExpressionNode> params;
 
-    public AccessMethodNode(List<ExpressionNode> params, Token lastMethod, List<ReferenceNode> chainedElements) {
-        this.chainedElements = chainedElements;
+    public AccessMethodNode(List<ExpressionNode> params, Token methodToken) {
+        chainedElement = new EmptyChainedNode();
         this.params = params;
-        this.lastMethod = lastMethod;
+        this.methodToken = methodToken;
     }
 
     @Override
@@ -24,12 +25,12 @@ public class AccessMethodNode extends ReferenceNode {
     }
 
     @Override
-    public List<ReferenceNode> getChainedElements() {
+    public ChainedNode getChainedElement() {
         return null;
     }
 
     @Override
-    public void setChainedElements(List<ReferenceNode> refList) {
-        chainedElements = refList;
+    public void setChainedElement(ChainedNode chainedElement) {
+        this.chainedElement = chainedElement;
     }
 }

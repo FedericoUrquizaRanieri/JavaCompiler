@@ -17,9 +17,7 @@ public class WhileNode extends SentenceNode{
 
     @Override
     public void check() throws SemanticException{
-        if (!condition.check().isCompatible("boolean")){
-            throw new SemanticException(mainToken.getLexeme(),"Los tipos son incompatibles en condicion de ",mainToken.getLine());
-        }
+        condition.check().isCompatible("boolean");
         body.check();
         checked = true;
     }

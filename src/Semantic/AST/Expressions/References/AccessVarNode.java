@@ -1,19 +1,17 @@
 package Semantic.AST.Expressions.References;
 
 import Lexical.Analyzer.Token;
-import Semantic.AST.Expressions.ExpressionNode;
-import Semantic.AST.Expressions.ReferenceNode;
+import Semantic.AST.Chains.ChainedNode;
+import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
 
-import java.util.List;
-
 public class AccessVarNode extends ReferenceNode {
-    private final Token lastVar;
+    private final Token varToken;
 
-    public AccessVarNode(Token lastVar,List<ReferenceNode> chainedElements) {
-        this.chainedElements = chainedElements;
-        this.lastVar = lastVar;
+    public AccessVarNode(Token varToken) {
+        chainedElement = new EmptyChainedNode();
+        this.varToken = varToken;
     }
 
     @Override
@@ -22,12 +20,12 @@ public class AccessVarNode extends ReferenceNode {
     }
 
     @Override
-    public List<ReferenceNode> getChainedElements() {
+    public ChainedNode getChainedElement() {
         return null;
     }
 
     @Override
-    public void setChainedElements(List<ReferenceNode> refList) {
-        chainedElements = refList;
+    public void setChainedElement(ChainedNode chainedNode) {
+        chainedElement = chainedNode;
     }
 }

@@ -17,9 +17,9 @@ public class BinaryExpressionNode extends ComposedExpressionNode{
 
     @Override
     public Type check() throws SemanticException {
-        if (leftExpression.check().compareTypes(rightExpression.check()) && leftExpression.check().isOperandCompatible(operator)){
-            checked = true;
-        } else ;//TODO throw
+        leftExpression.check().isOperandCompatibleBinary(operator, rightExpression.check());
+        checked = true;
+        //TODO retornar tipo de op segun el operador
         return null;
     }
 }

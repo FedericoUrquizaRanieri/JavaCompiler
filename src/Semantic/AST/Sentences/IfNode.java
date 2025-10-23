@@ -19,9 +19,7 @@ public class IfNode extends SentenceNode{
 
     @Override
     public void check() throws SemanticException {
-        if(!condition.check().isCompatible("boolean")){
-            throw new SemanticException(mainToken.getLexeme(), "La condicion no es booleana en ", mainToken.getLine());
-        }
+        condition.check().isCompatible("boolean");
         body.check();
         elseSentence.check();
         checked = true;

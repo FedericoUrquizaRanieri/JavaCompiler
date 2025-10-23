@@ -1,7 +1,8 @@
 package Semantic.AST.Expressions.References;
 
+import Semantic.AST.Chains.ChainedNode;
+import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.AST.Expressions.ExpressionNode;
-import Semantic.AST.Expressions.ReferenceNode;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
 
@@ -12,6 +13,7 @@ public class ParamExpressionNode extends ReferenceNode {
 
     public ParamExpressionNode(ExpressionNode expression) {
         this.expression = expression;
+        chainedElement = new EmptyChainedNode();
     }
 
     @Override
@@ -20,12 +22,12 @@ public class ParamExpressionNode extends ReferenceNode {
     }
 
     @Override
-    public List<ReferenceNode> getChainedElements() {
+    public ChainedNode getChainedElement() {
         return null;
     }
 
     @Override
-    public void setChainedElements(List<ReferenceNode> refList) {
-        chainedElements = refList;
+    public void setChainedElement(ChainedNode chainedNode) {
+        chainedElement = chainedNode;
     }
 }
