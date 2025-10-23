@@ -4,6 +4,7 @@ import Semantic.AST.Expressions.ReferenceNode;
 import Semantic.ST.Class;
 import Semantic.ST.ReferenceType;
 import Semantic.ST.Type;
+import Semantic.SemExceptions.SemanticException;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class ThisCallNode extends ReferenceNode {
     }
 
     @Override
-    public Type check() {
+    public Type check() throws SemanticException {
         return new ReferenceType(thisClass.getClassToken(),null);
     }
 

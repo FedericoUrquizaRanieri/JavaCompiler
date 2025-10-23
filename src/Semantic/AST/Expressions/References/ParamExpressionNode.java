@@ -3,6 +3,7 @@ package Semantic.AST.Expressions.References;
 import Semantic.AST.Expressions.ExpressionNode;
 import Semantic.AST.Expressions.ReferenceNode;
 import Semantic.ST.Type;
+import Semantic.SemExceptions.SemanticException;
 
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class ParamExpressionNode extends ReferenceNode {
     }
 
     @Override
-    public Type check() {
+    public Type check() throws SemanticException {
         return expression.check();
     }
 

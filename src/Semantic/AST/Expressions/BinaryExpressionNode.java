@@ -2,6 +2,7 @@ package Semantic.AST.Expressions;
 
 import Lexical.Analyzer.Token;
 import Semantic.ST.Type;
+import Semantic.SemExceptions.SemanticException;
 
 public class BinaryExpressionNode extends ComposedExpressionNode{
     private final ExpressionNode leftExpression;
@@ -15,7 +16,7 @@ public class BinaryExpressionNode extends ComposedExpressionNode{
     }
 
     @Override
-    public Type check() {
+    public Type check() throws SemanticException {
         if (leftExpression.check().compareTypes(rightExpression.check()) && leftExpression.check().isOperandCompatible(operator)){
             checked = true;
         } else ;//TODO throw

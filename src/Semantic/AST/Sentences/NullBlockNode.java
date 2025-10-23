@@ -1,13 +1,15 @@
 package Semantic.AST.Sentences;
 
+import Semantic.SemExceptions.SemanticException;
+
 public class NullBlockNode extends BlockNode{
     public NullBlockNode(){
-        super();
+        super(null);
         checked = false;
     }
 
     @Override
-    public void check() {
+    public void check() throws SemanticException {
         checked = true;
     }
 
@@ -17,7 +19,7 @@ public class NullBlockNode extends BlockNode{
     }
 
     @Override
-    public void addLocalVar(SentenceNode sentenceNode) {
+    public void addLocalVar(String name,LocalVarNode sentenceNode){
 
     }
 }

@@ -1,9 +1,11 @@
 package Semantic.AST.Sentences;
 
+import Semantic.SemExceptions.SemanticException;
+
 public class EmptySentenceNode extends SentenceNode{
 
     public EmptySentenceNode() {
     }
 
-    public void check(){}
+    public void check() throws SemanticException {}
 }

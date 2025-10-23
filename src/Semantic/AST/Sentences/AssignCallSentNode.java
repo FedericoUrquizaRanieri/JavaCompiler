@@ -1,6 +1,7 @@
 package Semantic.AST.Sentences;
 
 import Semantic.AST.Expressions.ExpressionNode;
+import Semantic.SemExceptions.SemanticException;
 
 public class AssignCallSentNode extends SentenceNode{
     private final ExpressionNode innerExpression;
@@ -10,7 +11,7 @@ public class AssignCallSentNode extends SentenceNode{
     }
 
     @Override
-    public void check() {
+    public void check() throws SemanticException {
         innerExpression.check();
         checked = true;
     }

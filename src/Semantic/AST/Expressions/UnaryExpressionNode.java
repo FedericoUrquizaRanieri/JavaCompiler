@@ -2,6 +2,7 @@ package Semantic.AST.Expressions;
 
 import Lexical.Analyzer.Token;
 import Semantic.ST.Type;
+import Semantic.SemExceptions.SemanticException;
 
 public class UnaryExpressionNode extends ComposedExpressionNode{
     private final Token operator;
@@ -13,7 +14,7 @@ public class UnaryExpressionNode extends ComposedExpressionNode{
     }
 
     @Override
-    public Type check() {
+    public Type check() throws SemanticException {
         if (expression.check().isOperandCompatible(operator)){
             checked = true;
         } else;//TODO throw

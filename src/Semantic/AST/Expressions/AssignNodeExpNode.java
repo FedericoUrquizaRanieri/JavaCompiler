@@ -1,6 +1,7 @@
 package Semantic.AST.Expressions;
 
 import Semantic.ST.Type;
+import Semantic.SemExceptions.SemanticException;
 
 public class AssignNodeExpNode extends ExpressionNode {
     private final ExpressionNode leftExpression;
@@ -12,7 +13,7 @@ public class AssignNodeExpNode extends ExpressionNode {
     }
 
     @Override
-    public Type check() {
+    public Type check() throws SemanticException {
         if (leftExpression.check().compareTypes(rightExpression.check())){
             checked = true;
         } else ;//TODO throw

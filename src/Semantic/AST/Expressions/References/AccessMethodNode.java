@@ -4,6 +4,7 @@ import Lexical.Analyzer.Token;
 import Semantic.AST.Expressions.ExpressionNode;
 import Semantic.AST.Expressions.ReferenceNode;
 import Semantic.ST.Type;
+import Semantic.SemExceptions.SemanticException;
 
 import java.util.List;
 
@@ -18,7 +19,7 @@ public class AccessMethodNode extends ReferenceNode {
     }
 
     @Override
-    public Type check() {
+    public Type check() throws SemanticException {
         return null; //TODO revisar elementos previos y actual
     }
 

@@ -4,6 +4,7 @@ import Lexical.Analyzer.Token;
 import Semantic.AST.Expressions.ReferenceNode;
 import Semantic.ST.PrimitiveType;
 import Semantic.ST.Type;
+import Semantic.SemExceptions.SemanticException;
 
 import java.util.List;
 
@@ -15,7 +16,7 @@ public class StringLiteralNode extends ReferenceNode {
     }
 
     @Override
-    public Type check() {
+    public Type check() throws SemanticException {
         return new PrimitiveType(string);
     }
 

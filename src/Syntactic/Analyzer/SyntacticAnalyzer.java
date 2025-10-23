@@ -10,13 +10,11 @@ import Semantic.AST.Expressions.TypeNode.*;
 import Semantic.AST.Sentences.*;
 import Semantic.ST.*;
 import Semantic.ST.Class;
+import Semantic.SemExceptions.SemanticException;
 import Syntactic.SynExceptions.SyntacticException;
 import Main.MainSemantic;
 
-import java.util.ArrayList;
-import java.util.EmptyStackException;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class SyntacticAnalyzer {
     private final LexicalAnalyzer analyzer;
@@ -359,7 +357,7 @@ public class SyntacticAnalyzer {
         return p;
     }
 
-    private BlockNode optionalBlock() throws SyntacticException {
+    private BlockNode optionalBlock() throws SyntacticException, SemanticException {
         if (productionsMap.getFirsts("block").contains(currentToken.getTokenName())) {
             return block();
         } else if (currentToken.getTokenName().equals("semicolon")){
@@ -370,8 +368,8 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private BlockNode block() throws SyntacticException {
-        BlockNode b = new BlockNode();
+    private BlockNode block() throws SyntacticException, SemanticException {
+        BlockNode b = new BlockNode(MainSemantic.symbolTable.currentMethod);
         BlockNode container;
         try {
             container = MainSemantic.symbolTable.currentBlock.peek();
@@ -379,15 +377,15 @@ public class SyntacticAnalyzer {
             container = new NullBlockNode();
         }
         MainSemantic.symbolTable.currentBlock.push(b);
-        for (LocalVarNode l : container.getLocalVarList()){
-            b.addLocalVar(l);
+        for (Map.Entry<String,LocalVarNode> l : container.getLocalVarList().entrySet()){
+            b.addLocalVar(l.getKey(),l.getValue());
         }
         match("openBrace");
         List<SentenceNode> sentences = sentenceList();
         for (SentenceNode s : sentences){
             b.addSentence(s);
-            if (s instanceof LocalVarNode){
-                b.addLocalVar(s);
+            if (s instanceof LocalVarNode l){
+                b.addLocalVar(l.getTokenName(),l);
             }
         }
         match("closeBrace");
@@ -395,7 +393,7 @@ public class SyntacticAnalyzer {
         return b;
     }
 
-    private List<SentenceNode> sentenceList() throws SyntacticException {
+    private List<SentenceNode> sentenceList() throws SyntacticException, SemanticException {
         List<SentenceNode> sent = new ArrayList<>();
         if (productionsMap.getFirsts("sentence").contains(currentToken.getTokenName())) {
             sent.addLast(sentence());
@@ -406,7 +404,7 @@ public class SyntacticAnalyzer {
         return sent;
     }
 
-    private SentenceNode sentence() throws SyntacticException {
+    private SentenceNode sentence() throws SyntacticException, SemanticException {
         SentenceNode sent = new EmptySentenceNode();
         if (currentToken.getTokenName().equals("semicolon")) {
             match("semicolon");
@@ -451,8 +449,9 @@ public class SyntacticAnalyzer {
     }
 
     private SentenceNode returnState() throws SyntacticException {
+        Token ct = currentToken;
         match("pr_return");
-        return new ReturnNode(optionalExpression(),MainSemantic.symbolTable.currentMethod.getReturnType());
+        return new ReturnNode(optionalExpression(),MainSemantic.symbolTable.currentMethod.getReturnType(),ct);
     }
 
     private ExpressionNode optionalExpression() throws SyntacticException {
@@ -464,17 +463,18 @@ public class SyntacticAnalyzer {
         return new EmptyExpressionNode();
     }
 
-    private IfNode ifState() throws SyntacticException {
+    private IfNode ifState() throws SyntacticException, SemanticException {
+        Token ct = currentToken;
         match("pr_if");
         match("openParenthesis");
         ExpressionNode e = expression();
         match("closeParenthesis");
         SentenceNode s = sentence();
         SentenceNode es = elseSentence();
-        return new IfNode(e,s,es);
+        return new IfNode(e,s,es,ct);
     }
 
-    private SentenceNode elseSentence() throws SyntacticException {
+    private SentenceNode elseSentence() throws SyntacticException, SemanticException {
         if (currentToken.getTokenName().equals("pr_else")) {
             match("pr_else");
             return sentence();
@@ -484,16 +484,17 @@ public class SyntacticAnalyzer {
         return new EmptySentenceNode();
     }
 
-    private SentenceNode whileState() throws SyntacticException {
+    private SentenceNode whileState() throws SyntacticException, SemanticException {
+        Token ct = currentToken;
         match("pr_while");
         match("openParenthesis");
         ExpressionNode e = expression();
         match("closeParenthesis");
         SentenceNode s = sentence();
-        return new WhileNode(e,s);
+        return new WhileNode(e,s,ct);
     }
 
-    private void forState() throws SyntacticException {
+    private void forState() throws SyntacticException, SemanticException {
         match("pr_for");
         match("openParenthesis");
         forExpression();
@@ -750,7 +751,7 @@ public class SyntacticAnalyzer {
         Token ct = currentToken;
         match("idMetVar");
         List<ExpressionNode> l = possibleArgs();
-        if (l.isEmpty())
+        if (l==null)
             return new AccessVarNode(ct,null);
         else
             return new AccessMethodNode(l,ct,null); //TODO revisar este null
@@ -762,6 +763,8 @@ public class SyntacticAnalyzer {
             l = currentArgs();
         } else if (!productionsMap.getFollow("possibleArgs").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("possibleArgs")), analyzer.getLineNumber());
+        } else {
+            l = null;
         }
         return l;
     }

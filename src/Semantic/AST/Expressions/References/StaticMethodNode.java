@@ -7,6 +7,7 @@ import Semantic.ST.Class;
 import Semantic.ST.Method;
 import Semantic.ST.Parameter;
 import Semantic.ST.Type;
+import Semantic.SemExceptions.SemanticException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -23,7 +24,7 @@ public class StaticMethodNode extends ReferenceNode {
     }
 
     @Override
-    public Type check() {
+    public Type check() throws SemanticException {
         return null; //TODO aca revisar metodos en clases, que las clases existen y retornos
     }
 
