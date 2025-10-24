@@ -3,6 +3,7 @@ package Semantic.AST.Expressions.References;
 import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.AST.Expressions.ExpressionNode;
+import Semantic.ST.ReferenceType;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
 
@@ -18,12 +19,17 @@ public class ParamExpressionNode extends ReferenceNode {
 
     @Override
     public Type check() throws SemanticException {
-        return expression.check();
+        Type chainedType = chainedElement.check();
+        if(chainedType.getNameType().equals("Universal")){
+            return expression.check();
+        } else {
+            return chainedType;
+        }
     }
 
     @Override
     public ChainedNode getChainedElement() {
-        return null;
+        return chainedElement;
     }
 
     @Override

@@ -31,4 +31,8 @@ public class LocalVarNode extends SentenceNode{
     public int getTokenLine(){
         return tokenName.getLine();
     }
+
+    public Type getVarType() {
+        return varType;
+    }
 }

@@ -38,4 +38,8 @@ public class Constructor {
     public void setBlock(BlockNode block){
         this.block=block;
     }
+
+    public HashMap<String, Parameter> getParameters() {
+        return parameters;
+    }
 }

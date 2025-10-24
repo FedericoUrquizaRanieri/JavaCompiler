@@ -4,7 +4,7 @@ import Semantic.SemExceptions.SemanticException;
 
 public class NullBlockNode extends BlockNode{
     public NullBlockNode(){
-        super(null);
+        super(null,null);
         checked = false;
     }
 

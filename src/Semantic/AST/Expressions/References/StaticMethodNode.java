@@ -27,7 +27,7 @@ public class StaticMethodNode extends ReferenceNode {
 
     @Override
     public ChainedNode getChainedElement() {
-        return null;
+        return chainedElement;
     }
 
     @Override

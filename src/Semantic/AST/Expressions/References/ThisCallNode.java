@@ -7,8 +7,6 @@ import Semantic.ST.ReferenceType;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
 
-import java.util.List;
-
 public class ThisCallNode extends ReferenceNode {
     private final Class thisClass;
 
@@ -19,12 +17,18 @@ public class ThisCallNode extends ReferenceNode {
 
     @Override
     public Type check() throws SemanticException {
-        return new ReferenceType(thisClass.getClassToken(),null);
+        //TODO revisar metodo estatico
+        Type chainedType = chainedElement.check();
+        if(chainedType.getNameType().equals("Universal")){
+            return new ReferenceType(thisClass.getClassToken(),null);
+        } else {
+            return chainedType;
+        }
     }
 
     @Override
     public ChainedNode getChainedElement() {
-        return null;
+        return chainedElement;
     }
 
     @Override

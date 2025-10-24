@@ -14,6 +14,7 @@ public class AssignNodeExpNode extends ExpressionNode {
 
     @Override
     public Type check() throws SemanticException {
+        //TODO revisar encadenado a izquierda
         Type retType = leftExpression.check();
         retType.compareTypes(rightExpression.check());
         checked = true;

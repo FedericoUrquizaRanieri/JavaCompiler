@@ -373,7 +373,7 @@ public class SyntacticAnalyzer {
     }
 
     private BlockNode block() throws SyntacticException, SemanticException {
-        BlockNode b = new BlockNode(MainSemantic.symbolTable.currentMethod);
+        BlockNode b = new BlockNode(MainSemantic.symbolTable.currentMethod,MainSemantic.symbolTable.currentClass);
         BlockNode container;
         try {
             container = MainSemantic.symbolTable.currentBlock.peek();
@@ -754,9 +754,9 @@ public class SyntacticAnalyzer {
         match("idMetVar");
         List<ExpressionNode> l = possibleArgs();
         if (l==null)
-            return new AccessVarNode(ct);
+            return new AccessVarNode(ct,MainSemantic.symbolTable.currentBlock.peek());
         else
-            return new AccessMethodNode(l,ct);
+            return new AccessMethodNode(l,ct,MainSemantic.symbolTable.currentBlock.peek()); //TODO por que esto no pide control de error me pregunto
     }
 
     private List<ExpressionNode> possibleArgs() throws SyntacticException {

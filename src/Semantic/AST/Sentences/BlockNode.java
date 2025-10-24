@@ -1,6 +1,7 @@
 package Semantic.AST.Sentences;
 
 import Semantic.ST.Method;
+import Semantic.ST.Class;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.ArrayList;
@@ -12,12 +13,14 @@ public class BlockNode extends SentenceNode{
     private final HashMap<String,LocalVarNode> localVarList;
     protected boolean checked;
     private final Method method;
+    private final Class classElement;
 
-    public BlockNode(Method method){
+    public BlockNode(Method method,Class classElement){
         sentenceNodeList = new ArrayList<>();
         localVarList = new HashMap<>();
         checked = false;
         this.method = method;
+        this.classElement = classElement;
     }
 
     @Override
@@ -38,11 +41,12 @@ public class BlockNode extends SentenceNode{
 
     public void addLocalVar(String name,LocalVarNode sentenceNode) throws SemanticException {
         if (localVarList.put(name,sentenceNode) != null){
-            throw new SemanticException(sentenceNode.getTokenName(), "Se intento crear una var local repetida de nombre ", sentenceNode.getTokenLine());
+            throw new SemanticException(sentenceNode.getTokenName(), "Se intento crear una var local repetida de nombre: ", sentenceNode.getTokenLine());
         }
         if (method.getParameters().containsKey(name)){
-            throw new SemanticException(sentenceNode.getTokenName(), "se intento crear una var local con nombre de parametro de nombre", sentenceNode.getTokenLine());
+            throw new SemanticException(sentenceNode.getTokenName(), "Se intento crear una var local con nombre de parametro de nombre: ", sentenceNode.getTokenLine());
         }
+        //TODO revisar atributos de clase, pedir clase por param
     }
 
     public HashMap<String,LocalVarNode> getLocalVarList() {
@@ -55,5 +59,13 @@ public class BlockNode extends SentenceNode{
 
     public void setChecked(boolean checked) {
         this.checked = checked;
+    }
+
+    public Class getClassElement() {
+        return classElement;
+    }
+
+    public Method getMethod() {
+        return method;
     }
 }

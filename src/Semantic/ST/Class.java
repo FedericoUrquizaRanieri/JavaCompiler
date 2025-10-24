@@ -254,4 +254,12 @@ public class Class {
     public void setGenerics(Token generics) {
         this.generics = generics;
     }
+
+    public HashMap<String, Constructor> getConstructors() {
+        return constructors;
+    }
+
+    public HashMap<String, Attribute> getAttributes() {
+        return attributes;
+    }
 }

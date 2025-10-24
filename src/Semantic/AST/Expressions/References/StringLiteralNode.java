@@ -4,6 +4,7 @@ import Lexical.Analyzer.Token;
 import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.ST.PrimitiveType;
+import Semantic.ST.ReferenceType;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
 
@@ -19,12 +20,17 @@ public class StringLiteralNode extends ReferenceNode {
 
     @Override
     public Type check() throws SemanticException {
-        return new PrimitiveType(string);
+        Type chainedType = chainedElement.check();
+        if(chainedType.getNameType().equals("Universal")){
+            return new ReferenceType(string,null);
+        } else {
+            return chainedType;
+        }
     }
 
     @Override
     public ChainedNode getChainedElement() {
-        return null;
+        return chainedElement;
     }
 
     @Override
