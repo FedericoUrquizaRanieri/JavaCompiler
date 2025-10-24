@@ -5,10 +5,8 @@ import Main.MainSemantic;
 import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.AST.Expressions.ExpressionNode;
+import Semantic.ST.*;
 import Semantic.ST.Class;
-import Semantic.ST.Constructor;
-import Semantic.ST.Parameter;
-import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.HashMap;
@@ -27,12 +25,19 @@ public class ConstructorCallNode extends ReferenceNode {
     @Override
     public Type check() throws SemanticException {
         Class currentClass = MainSemantic.symbolTable.existsClass(classElement);
+        Type retType = new ReferenceType(classElement,null);
         if(currentClass == null){
+            throw new SemanticException(classElement.getLexeme(),"La clase del constructor referenciado no existe: ",classElement.getLine());
+        } else{
             Constructor c = MainSemantic.symbolTable.currentClass.getConstructors().get(classElement.getLexeme());
             parametersAreEqual(c.getParameters());
-        } else
-            throw new SemanticException(classElement.getLexeme(),"La clase del constructor referenciado no existe: ",classElement.getLine());
-        return null;
+        }
+        Type chainedType = chainedElement.check(retType);
+        if(chainedType.getNameType().equals("Universal")){
+            return retType;
+        } else {
+            return chainedType;
+        }
     }
 
     @Override
@@ -52,7 +57,7 @@ public class ConstructorCallNode extends ReferenceNode {
         for (Parameter p : map1.values()) {
             Token ct = args.get(i).check().getTokenType();
             if (!p.getType().getTokenType().getTokenName().equals(ct.getTokenName()))
-                throw new SemanticException(ct.getLexeme(),"El parametro es de tipo incorrecot: ",ct.getLine());
+                throw new SemanticException(ct.getLexeme(),"El parametro es de tipo incorrecto: ",ct.getLine());
             i++;
         }
     }

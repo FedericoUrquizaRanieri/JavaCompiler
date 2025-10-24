@@ -428,7 +428,7 @@ public class SyntacticAnalyzer {
         } else if (productionsMap.getFirsts("block").contains(currentToken.getTokenName())) {
             sent = block();
         } else if (currentToken.getTokenName().equals("pr_for")) {
-            forState(); //TODO completar por logro
+            forState();
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("sentence")), analyzer.getLineNumber());
         }
@@ -438,7 +438,7 @@ public class SyntacticAnalyzer {
     private SentenceNode assignCall() throws SyntacticException {
         if (productionsMap.getFirsts("expression").contains(currentToken.getTokenName())) {
             ExpressionNode exp = expression();
-            return new AssignCallSentNode(exp); //TODO revisar los tipos de las expresiones
+            return new AssignCallSentNode(exp);
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("assignCall")), analyzer.getLineNumber());
         }
@@ -468,14 +468,13 @@ public class SyntacticAnalyzer {
     }
 
     private IfNode ifState() throws SyntacticException, SemanticException {
-        Token ct = currentToken;
         match("pr_if");
         match("openParenthesis");
         ExpressionNode e = expression();
         match("closeParenthesis");
         SentenceNode s = sentence();
         SentenceNode es = elseSentence();
-        return new IfNode(e,s,es,ct);
+        return new IfNode(e,s,es);
     }
 
     private SentenceNode elseSentence() throws SyntacticException, SemanticException {
@@ -489,13 +488,12 @@ public class SyntacticAnalyzer {
     }
 
     private SentenceNode whileState() throws SyntacticException, SemanticException {
-        Token ct = currentToken;
         match("pr_while");
         match("openParenthesis");
         ExpressionNode e = expression();
         match("closeParenthesis");
         SentenceNode s = sentence();
-        return new WhileNode(e,s,ct);
+        return new WhileNode(e,s);
     }
 
     private void forState() throws SyntacticException, SemanticException {
@@ -556,9 +554,9 @@ public class SyntacticAnalyzer {
 
     private ExpressionNode extraExpression(ExpressionNode e) throws SyntacticException {
         if (productionsMap.getFirsts("assignOperator").contains(currentToken.getTokenName())) {
-            assignOperator();
+            Token ct = assignOperator();
             ExpressionNode c = composedExpression();
-            return new AssignNodeExpNode(e,c);
+            return new AssignExpNode(e,c,ct);
         } else if (currentToken.getTokenName().equals("questionMark")) {
             match("questionMark");
             composedExpression();
@@ -570,8 +568,10 @@ public class SyntacticAnalyzer {
         return e;
     }
 
-    private void assignOperator() throws SyntacticException {
+    private Token assignOperator() throws SyntacticException {
+        Token ct = currentToken;
         match("equals");
+        return ct;
     }
 
     private ExpressionNode composedExpression() throws SyntacticException {
@@ -753,10 +753,11 @@ public class SyntacticAnalyzer {
         Token ct = currentToken;
         match("idMetVar");
         List<ExpressionNode> l = possibleArgs();
+        BlockNode blockNode = MainSemantic.symbolTable.currentBlock.peek();
         if (l==null)
-            return new AccessVarNode(ct,MainSemantic.symbolTable.currentBlock.peek());
+            return new AccessVarNode(ct,blockNode);
         else
-            return new AccessMethodNode(l,ct,MainSemantic.symbolTable.currentBlock.peek()); //TODO por que esto no pide control de error me pregunto
+            return new AccessMethodNode(l,ct,blockNode);
     }
 
     private List<ExpressionNode> possibleArgs() throws SyntacticException {

@@ -7,12 +7,10 @@ import Semantic.SemExceptions.SemanticException;
 public class WhileNode extends SentenceNode{
     private final ExpressionNode condition;
     private final SentenceNode body;
-    private final Token mainToken;
 
-    public WhileNode(ExpressionNode cond, SentenceNode body, Token mainToken){
+    public WhileNode(ExpressionNode cond, SentenceNode body){
         this.condition = cond;
         this.body = body;
-        this.mainToken = mainToken;
     }
 
     @Override

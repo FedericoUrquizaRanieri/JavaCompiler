@@ -26,20 +26,26 @@ public class PrimitiveType implements Type{
 
     @Override
     public void isCompatible(String neededType) throws SemanticException{
-        if (!token.getLexeme().equals(neededType)){
-            throw new SemanticException(token.getLexeme(),"El tipo actual no es el tipo esperado: ",token.getLine());
+        if (neededType.equals("boolean")){
+            if (!token.getLexeme().equals("false") && !token.getLexeme().equals("true")){
+                throw new SemanticException(token.getLexeme(),"El tipo actual no es el tipo esperado: ",token.getLine());
+            }
+        } else {
+            if (!token.getLexeme().equals(neededType)){
+                throw new SemanticException(token.getLexeme(),"El tipo actual no es el tipo esperado: ",token.getLine());
+            }
         }
     }
 
     @Override
     public void isOperandCompatibleUnary(Token typeToken) throws SemanticException {
-        if (nameType.equals("int") && typeToken.getTokenName().equals("not")){
+        if (token.getTokenName().equals("pr_int") && typeToken.getTokenName().equals("not")){
             throw new SemanticException(typeToken.getLexeme(),"Operacion incompatible sobre tipo int: ",typeToken.getLine());
         }
-        if (nameType.equals("boolean") && !typeToken.getTokenName().equals("not")){
+        if ((nameType.equals("false") || nameType.equals("true")) && !typeToken.getTokenName().equals("not")){
             throw new SemanticException(typeToken.getLexeme(),"Operacion incompatible sobre tipo boolean: ",typeToken.getLine());
         }
-        if (!(nameType.equals("boolean") || nameType.equals("int"))){
+        if (!((nameType.equals("false") || nameType.equals("true")) || token.getTokenName().equals("pr_int"))){
             throw new SemanticException(token.getLexeme(),"Tipo incompatible para operaciones unarias: ",token.getLine());
         }
     }
@@ -51,10 +57,10 @@ public class PrimitiveType implements Type{
         if(!nameType.equals(typeExp.getNameType())){
             throw new SemanticException(typeToken.getLexeme(),"Tipos incompatibles para operar sobre",typeToken.getLine());
         }
-        if (nameType.equals("int") && typeExp.getNameType().equals("int") && (!listInt.contains(typeToken.getLexeme()))){
+        if (token.getTokenName().equals("pr_int") && typeExp.getNameType().equals("pr_int") && (!listInt.contains(typeToken.getLexeme()))){
             throw new SemanticException(typeToken.getLexeme(),"Tipos actuales incompatibles con operacion ",typeToken.getLine());
         }
-        if (nameType.equals("boolean") && typeExp.getNameType().equals("boolean") && !listBool.contains(typeToken.getLexeme())){
+        if ((nameType.equals("false") || nameType.equals("true")) && (typeExp.getNameType().equals("false") || typeExp.getNameType().equals("true")) && !listBool.contains(typeToken.getLexeme())){
             throw new SemanticException(token.getLexeme(),"Tipos actuales incompatibles con operacion ",token.getLine());
         }
     }

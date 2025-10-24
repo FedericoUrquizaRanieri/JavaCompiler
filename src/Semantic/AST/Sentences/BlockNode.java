@@ -46,7 +46,9 @@ public class BlockNode extends SentenceNode{
         if (method.getParameters().containsKey(name)){
             throw new SemanticException(sentenceNode.getTokenName(), "Se intento crear una var local con nombre de parametro de nombre: ", sentenceNode.getTokenLine());
         }
-        //TODO revisar atributos de clase, pedir clase por param
+        if (classElement.getAttributes().containsKey(name)){
+            throw new SemanticException(sentenceNode.getTokenName(), "Se intento crear una var local con nombre de atributo: ", sentenceNode.getTokenLine());
+        }
     }
 
     public HashMap<String,LocalVarNode> getLocalVarList() {

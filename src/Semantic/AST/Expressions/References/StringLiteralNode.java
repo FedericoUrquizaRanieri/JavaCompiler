@@ -3,24 +3,24 @@ package Semantic.AST.Expressions.References;
 import Lexical.Analyzer.Token;
 import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.EmptyChainedNode;
-import Semantic.ST.PrimitiveType;
 import Semantic.ST.ReferenceType;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
 
-import java.util.List;
-
 public class StringLiteralNode extends ReferenceNode {
     private final Token string;
+    private final ReferenceType stringType;
 
     public StringLiteralNode(Token string) {
         this.string = string;
         chainedElement = new EmptyChainedNode();
+        stringType = new ReferenceType(new Token("String",string.getLexeme(), string.getLine()),null);
+        //TODO revisar esto que es horrible
     }
 
     @Override
     public Type check() throws SemanticException {
-        Type chainedType = chainedElement.check();
+        Type chainedType = chainedElement.check(stringType);
         if(chainedType.getNameType().equals("Universal")){
             return new ReferenceType(string,null);
         } else {

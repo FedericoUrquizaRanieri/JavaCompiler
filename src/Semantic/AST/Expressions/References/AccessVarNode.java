@@ -7,7 +7,7 @@ import Semantic.AST.Sentences.BlockNode;
 import Semantic.AST.Sentences.LocalVarNode;
 import Semantic.ST.Attribute;
 import Semantic.ST.Parameter;
-import Semantic.ST.ReferenceType;
+import Semantic.ST.PrimitiveType;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
 
@@ -26,18 +26,19 @@ public class AccessVarNode extends ReferenceNode {
         LocalVarNode localVar = blockNode.getLocalVarList().get(varToken.getLexeme());
         Parameter param = blockNode.getMethod().getParameters().get(varToken.getLexeme());
         Attribute attribute = blockNode.getClassElement().getAttributes().get(varToken.getLexeme());
-        if (localVar == null && param == null && attribute == null){
-            throw new SemanticException(varToken.getLexeme(),"La variable a la que se accede no exite: ", varToken.getLine());
+        Type retType;
+        if (localVar != null) {
+            retType = localVar.getVarType();
+        } else if (param != null) {
+            retType = param.getType();
+        } else if (attribute != null) {
+            retType = attribute.getType();
+        } else{
+            throw new SemanticException(varToken.getLexeme(), "La variable a la que se accede no exite: ", varToken.getLine());
         }
-        Type chainedType = chainedElement.check();
+        Type chainedType = chainedElement.check(retType);
         if(chainedType.getNameType().equals("Universal")){
-            if (localVar != null) {
-                return localVar.getVarType();
-            } else if (param != null) {
-                return param.getType();
-            } else {
-                return attribute.getType();
-            }
+            return retType;
         } else {
             return chainedType;
         }

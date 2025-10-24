@@ -5,9 +5,7 @@ import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.AST.Expressions.ExpressionNode;
 import Semantic.AST.Sentences.BlockNode;
-import Semantic.ST.Method;
-import Semantic.ST.Parameter;
-import Semantic.ST.Type;
+import Semantic.ST.*;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.HashMap;
@@ -30,8 +28,10 @@ public class AccessMethodNode extends ReferenceNode {
         Method method = blockNode.getClassElement().getMethods().get(methodToken.getLexeme());
         if (method == null) {
             throw new SemanticException(methodToken.getLexeme(), "El metodo no existe: ", methodToken.getLine());
-        } else parametersAreEqual(method.getParameters());
-        Type chainedType = chainedElement.check();
+        } else {
+            parametersAreEqual(method.getParameters());
+        }
+        Type chainedType = chainedElement.check(method.getReturnType());
         if(chainedType.getNameType().equals("Universal")){
             return method.getReturnType();
         } else {
@@ -56,7 +56,7 @@ public class AccessMethodNode extends ReferenceNode {
         for (Parameter p : map1.values()) {
             Token ct = params.get(i).check().getTokenType();
             if (!p.getType().getTokenType().getTokenName().equals(ct.getTokenName()))
-                throw new SemanticException(ct.getLexeme(),"El parametro es de tipo incorrecot: ",ct.getLine());
+                throw new SemanticException(ct.getLexeme(),"El parametro es de tipo incorrecto: ",ct.getLine());
             i++;
         }
     }

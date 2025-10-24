@@ -8,13 +8,11 @@ public class IfNode extends SentenceNode{
     private final ExpressionNode condition;
     private final SentenceNode body;
     private final SentenceNode elseSentence;
-    private final Token mainToken;
 
-    public IfNode(ExpressionNode cond, SentenceNode body,SentenceNode elseS,Token mainToken){
+    public IfNode(ExpressionNode cond, SentenceNode body,SentenceNode elseS){
         this.condition = cond;
         this.body = body;
         this.elseSentence = elseS;
-        this.mainToken = mainToken;
     }
 
     @Override

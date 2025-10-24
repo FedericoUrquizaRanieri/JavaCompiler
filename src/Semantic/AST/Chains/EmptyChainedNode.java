@@ -15,7 +15,7 @@ public class EmptyChainedNode extends ChainedNode{
     }
 
     @Override
-    public Type check() throws SemanticException {
+    public Type check(Type lastClass) throws SemanticException {
         return new PrimitiveType(new Token("Universal","Universal",0));
     }
 

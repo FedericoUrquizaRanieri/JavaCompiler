@@ -18,7 +18,8 @@ public class ThisCallNode extends ReferenceNode {
     @Override
     public Type check() throws SemanticException {
         //TODO revisar metodo estatico
-        Type chainedType = chainedElement.check();
+        Type retType = new ReferenceType(thisClass.getClassToken(),null);
+        Type chainedType = chainedElement.check(retType);
         if(chainedType.getNameType().equals("Universal")){
             return new ReferenceType(thisClass.getClassToken(),null);
         } else {
