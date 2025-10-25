@@ -20,20 +20,23 @@ public class ChainedVarNode extends ChainedNode{
 
     @Override
     public Type check(Type lastClass) throws SemanticException {
-        if (lastClass instanceof PrimitiveType){
-            throw new SemanticException(lastClass.getNameType(), "La llamada encadenada se hace sobre una variable primitiva: ", lastClass.getTokenType().getLine());
+        if (lastClass != null){
+            if (lastClass instanceof PrimitiveType){
+                throw new SemanticException(lastClass.getNameType(), "La llamada encadenada se hace sobre una variable primitiva: ", lastClass.getTokenType().getLine());
+            }
+            Class previousClass = MainSemantic.symbolTable.existsClass(lastClass.getTokenType());
+            Attribute attribute = previousClass.getAttributes().get(idToken.getLexeme());
+            if(attribute==null){
+                throw new SemanticException(idToken.getLexeme(),"La variable a la que se accede no exite: ", idToken.getLine());
+            }
+            Type chainedType = chainedNode.check(attribute.getType());
+            if(chainedType.getNameType().equals("Universal")){
+                return attribute.getType();
+            } else {
+                return chainedType;
+            }
         }
-        Class previousClass = MainSemantic.symbolTable.existsClass(lastClass.getTokenType());
-        Attribute attribute = previousClass.getAttributes().get(idToken.getLexeme());
-        if(attribute==null){
-            throw new SemanticException(idToken.getLexeme(),"La variable a la que se accede no exite: ", idToken.getLine());
-        }
-        Type chainedType = chainedNode.check(attribute.getType());
-        if(chainedType.getNameType().equals("Universal")){
-            return attribute.getType();
-        } else {
-            return chainedType;
-        }
+        throw new SemanticException(idToken.getLexeme(), "Se intenta llamar sobre tipo nulo: ", idToken.getLine());
     }
 
     @Override

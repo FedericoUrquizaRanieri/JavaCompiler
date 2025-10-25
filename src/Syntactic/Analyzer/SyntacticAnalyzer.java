@@ -449,7 +449,7 @@ public class SyntacticAnalyzer {
         Token ct = currentToken;
         match("idMetVar");
         match("equals");
-        return new LocalVarNode(ct,composedExpression());
+        return new LocalVarNode(ct,composedExpression(),MainSemantic.symbolTable.currentBlock.peek());
     }
 
     private SentenceNode returnState() throws SyntacticException {
@@ -730,7 +730,7 @@ public class SyntacticAnalyzer {
     private ReferenceNode primary() throws SyntacticException {
         ReferenceNode p;
         if (currentToken.getTokenName().equals("pr_this")) {
-            p = new ThisCallNode(MainSemantic.symbolTable.currentClass);
+            p = new ThisCallNode(currentToken,MainSemantic.symbolTable.currentClass,MainSemantic.symbolTable.currentBlock.peek());
             match("pr_this");
         } else if (currentToken.getTokenName().equals("stringLiteral")) {
             p = new StringLiteralNode(currentToken);

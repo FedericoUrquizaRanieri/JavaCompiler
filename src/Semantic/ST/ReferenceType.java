@@ -1,6 +1,7 @@
 package Semantic.ST;
 
 import Lexical.Analyzer.Token;
+import Main.MainSemantic;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.List;
@@ -42,8 +43,7 @@ public class ReferenceType implements Type{
     public void isOperandCompatibleBinary(Token typeToken, Type typeExp) throws SemanticException {
         var listOp = List.of("!=","==");
         if(!nameType.equals(typeExp.getNameType())){
-            //TODO revisar herencia aca
-            throw new SemanticException(typeToken.getLexeme(),"Tipos incompatibles para operar sobre",typeToken.getLine());
+            isSameType(typeExp);
         }
         if (!listOp.contains(typeToken.getLexeme())){
             throw new SemanticException(typeToken.getLexeme(),"Tipos actuales incompatibles con operacion ",typeToken.getLine());
@@ -53,9 +53,19 @@ public class ReferenceType implements Type{
     @Override
     public void compareTypes(Type type) throws SemanticException{
         if (!token.getTokenName().equals(type.getTokenType().getTokenName())){
-            //TODO revisar herencia aca?
-            throw new SemanticException(type.getTokenType().getLexeme(),"Asignacion fallida por tipo incompatible: ",type.getTokenType().getLine());
+            isSameType(type);
         }
+    }
+
+    public void isSameType(Type typeSon) throws SemanticException{
+        Token currentFather = MainSemantic.symbolTable.classes.get(typeSon.getNameType()).getInheritance();
+        while (currentFather!=null){
+            if (currentFather.getLexeme().equals(nameType)){
+                return;
+            }
+            currentFather = MainSemantic.symbolTable.classes.get(currentFather.getLexeme()).getInheritance();
+        }
+        throw new SemanticException(typeSon.getTokenType().getLexeme(),"Operacion fallida por tipo incompatible: ",typeSon.getTokenType().getLine());
     }
 
     public Token getOptionalGeneric() {

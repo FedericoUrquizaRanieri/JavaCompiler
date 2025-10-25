@@ -24,20 +24,23 @@ public class ChainedMethodNode extends ChainedNode{
 
     @Override
     public Type check(Type lastClass) throws SemanticException {
-        if (lastClass instanceof ReferenceType){
-            throw new SemanticException(lastClass.getNameType(),"La llamada encadenada se hace sobre una variable primitiva: ", lastClass.getTokenType().getLine());
+        if (lastClass != null) {
+            if (lastClass instanceof ReferenceType){
+                throw new SemanticException(lastClass.getNameType(),"La llamada encadenada se hace sobre una variable primitiva: ", lastClass.getTokenType().getLine());
+            }
+            Class previousClass = MainSemantic.symbolTable.existsClass(lastClass.getTokenType());
+            Method method = previousClass.getMethods().get(idToken.getLexeme());
+            if(method==null){
+                throw new SemanticException(idToken.getLexeme(),"El metodo al que se accede no exite: ", idToken.getLine());
+            } else parametersAreEqual(method.getParameters());
+            Type chainedType = chainedNode.check(method.getReturnType());
+            if(chainedType.getNameType().equals("Universal")){
+                return method.getReturnType();
+            } else {
+                return chainedType;
+            }
         }
-        Class previousClass = MainSemantic.symbolTable.existsClass(lastClass.getTokenType());
-        Method method = previousClass.getMethods().get(idToken.getLexeme());
-        if(method==null){
-            throw new SemanticException(idToken.getLexeme(),"El metodo al que se accede no exite: ", idToken.getLine());
-        } else parametersAreEqual(method.getParameters());
-        Type chainedType = chainedNode.check(method.getReturnType());
-        if(chainedType.getNameType().equals("Universal")){
-            return method.getReturnType();
-        } else {
-            return chainedType;
-        }
+        throw new SemanticException(idToken.getLexeme(), "Se intenta llamar sobre tipo nulo: ", idToken.getLine());
     }
 
     @Override
