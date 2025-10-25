@@ -29,7 +29,6 @@ public class BlockNode extends SentenceNode{
             s.check();
         }
         checked = true;
-        //TODO es necesario que las llamadas a metodos se revise que sean static si estamos en una clase estatica
     }
 
     public void addSentence(SentenceNode sentenceNode){

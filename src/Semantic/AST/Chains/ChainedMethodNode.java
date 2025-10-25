@@ -29,10 +29,17 @@ public class ChainedMethodNode extends ChainedNode{
                 throw new SemanticException(lastClass.getNameType(),"La llamada encadenada se hace sobre una variable primitiva: ", lastClass.getTokenType().getLine());
             }
             Class previousClass = MainSemantic.symbolTable.existsClass(lastClass.getTokenType());
+            if(previousClass==null){
+                throw new SemanticException(idToken.getLexeme(),"La clase encadenada previa no existe: ", idToken.getLine());
+            }
             Method method = previousClass.getMethods().get(idToken.getLexeme());
             if(method==null){
                 throw new SemanticException(idToken.getLexeme(),"El metodo al que se accede no exite: ", idToken.getLine());
-            } else parametersAreEqual(method.getParameters());
+            } else if (method.getModifier() != null && method.getModifier().getLexeme().equals("static")) {
+                throw new SemanticException(method.getToken().getLexeme(), "No es posible llamar a un metodo estatico en esta secuencia: ", method.getToken().getLine());
+            } else{
+                parametersAreEqual(method.getParameters());
+            }
             Type chainedType = chainedNode.check(method.getReturnType());
             if(chainedType.getNameType().equals("Universal")){
                 return method.getReturnType();

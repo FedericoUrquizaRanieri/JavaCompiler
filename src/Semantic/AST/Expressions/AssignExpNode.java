@@ -34,7 +34,7 @@ public class AssignExpNode extends ExpressionNode {
         checked = true;
         return retType;
     }
-
+    //TODO preguntar que hago aca con los instaceof
     public boolean endsInVariable(ReferenceNode ref) {
         ChainedNode chain = ref.getChainedElement();
         while (!(chain instanceof EmptyChainedNode)) {
