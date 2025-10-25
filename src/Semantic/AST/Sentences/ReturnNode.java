@@ -24,7 +24,7 @@ public class ReturnNode extends SentenceNode{
                 throw new SemanticException(mainToken.getLexeme(),"El tipo de retorno esperado por el metodo no coincide con el retorno vacio en ", mainToken.getLine());
             }
         }
-        else retType.compareTypes(retValue.check());
+        else retType.compareTypes(retValue.check(),mainToken);
         checked = true;
     }
 }

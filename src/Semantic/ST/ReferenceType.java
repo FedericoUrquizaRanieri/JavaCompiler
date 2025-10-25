@@ -43,7 +43,7 @@ public class ReferenceType implements Type{
     public void isOperandCompatibleBinary(Token typeToken, Type typeExp) throws SemanticException {
         var listOp = List.of("!=","==");
         if(!nameType.equals(typeExp.getNameType())){
-            isSameType(typeExp);
+            isSameType(typeExp, typeToken);
         }
         if (!listOp.contains(typeToken.getLexeme())){
             throw new SemanticException(typeToken.getLexeme(),"Tipos actuales incompatibles con operacion ",typeToken.getLine());
@@ -51,13 +51,13 @@ public class ReferenceType implements Type{
     }
 
     @Override
-    public void compareTypes(Type type) throws SemanticException{
-        if (!token.getTokenName().equals(type.getTokenType().getTokenName())){
-            isSameType(type);
+    public void compareTypes(Type type, Token operator) throws SemanticException{
+        if (!token.getLexeme().equals(type.getTokenType().getLexeme())){
+            isSameType(type,operator);
         }
     }
 
-    public void isSameType(Type typeSon) throws SemanticException{
+    public void isSameType(Type typeSon, Token operator) throws SemanticException{
         Token currentFather = MainSemantic.symbolTable.classes.get(typeSon.getNameType()).getInheritance();
         while (currentFather!=null){
             if (currentFather.getLexeme().equals(nameType)){
@@ -65,7 +65,7 @@ public class ReferenceType implements Type{
             }
             currentFather = MainSemantic.symbolTable.classes.get(currentFather.getLexeme()).getInheritance();
         }
-        throw new SemanticException(typeSon.getTokenType().getLexeme(),"Operacion fallida por tipo incompatible: ",typeSon.getTokenType().getLine());
+        throw new SemanticException(operator.getLexeme(),"Operacion fallida por tipo incompatible: ",operator.getLine());
     }
 
     public Token getOptionalGeneric() {

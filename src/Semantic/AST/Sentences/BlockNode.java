@@ -1,5 +1,6 @@
 package Semantic.AST.Sentences;
 
+import Lexical.Analyzer.Token;
 import Semantic.ST.Method;
 import Semantic.ST.Class;
 import Semantic.SemExceptions.SemanticException;
@@ -14,13 +15,15 @@ public class BlockNode extends SentenceNode{
     protected boolean checked;
     private final Method method;
     private final Class classElement;
+    private final BlockNode fatherBlock;
 
-    public BlockNode(Method method,Class classElement){
+    public BlockNode(Method method,Class classElement, BlockNode fatherBlock){
         sentenceNodeList = new ArrayList<>();
         localVarList = new HashMap<>();
         checked = false;
         this.method = method;
         this.classElement = classElement;
+        this.fatherBlock = fatherBlock;
     }
 
     @Override
@@ -69,5 +72,24 @@ public class BlockNode extends SentenceNode{
 
     public Method getMethod() {
         return method;
+    }
+
+    public BlockNode getFatherBlock() {
+        return fatherBlock;
+    }
+
+    public LocalVarNode getVar(Token nameClass){
+        if (fatherBlock == null){
+            return null;
+        }
+        LocalVarNode fatherVar= fatherBlock.getLocalVarList().get(nameClass.getLexeme());
+        LocalVarNode fatherOldVar;
+        if (fatherBlock.getFatherBlock() == null){
+            fatherOldVar = null;
+        }
+        fatherOldVar= fatherBlock.getVar(nameClass);
+        if (fatherOldVar==null)
+            return fatherVar;
+        else return fatherOldVar;
     }
 }

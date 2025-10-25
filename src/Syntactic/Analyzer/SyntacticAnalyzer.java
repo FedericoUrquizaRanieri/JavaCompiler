@@ -373,39 +373,22 @@ public class SyntacticAnalyzer {
     }
 
     private BlockNode block() throws SyntacticException, SemanticException {
-        BlockNode b = new BlockNode(MainSemantic.symbolTable.currentMethod,MainSemantic.symbolTable.currentClass);
-        BlockNode container;
-        try {
-            container = MainSemantic.symbolTable.currentBlock.peek();
-        } catch (EmptyStackException e){
-            container = new NullBlockNode();
-        }
-        MainSemantic.symbolTable.currentBlock.push(b);
-        for (Map.Entry<String,LocalVarNode> l : container.getLocalVarList().entrySet()){
-            b.addLocalVar(l.getKey(),l.getValue());
-        }
+        BlockNode b = new BlockNode(MainSemantic.symbolTable.currentMethod,MainSemantic.symbolTable.currentClass,MainSemantic.symbolTable.currentBlock);
+        MainSemantic.symbolTable.currentBlock = b;
         match("openBrace");
-        List<SentenceNode> sentences = sentenceList();
-        for (SentenceNode s : sentences){
-            b.addSentence(s);
-            if (s instanceof LocalVarNode l){
-                b.addLocalVar(l.getTokenName(),l);
-            }
-        }
+        sentenceList(b);
         match("closeBrace");
-        MainSemantic.symbolTable.currentBlock.pop();
+        MainSemantic.symbolTable.currentBlock = b.getFatherBlock();
         return b;
     }
 
-    private List<SentenceNode> sentenceList() throws SyntacticException, SemanticException {
-        List<SentenceNode> sent = new ArrayList<>();
+    private void sentenceList(BlockNode blockNode) throws SyntacticException, SemanticException {
         if (productionsMap.getFirsts("sentence").contains(currentToken.getTokenName())) {
-            sent.addLast(sentence());
-            sent.addAll(sentenceList());
+            blockNode.addSentence(sentence());
+            sentenceList(blockNode);
         } else if (!productionsMap.getFollow("sentenceList").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("sentenceList")), analyzer.getLineNumber());
         }
-        return sent;
     }
 
     private SentenceNode sentence() throws SyntacticException, SemanticException {
@@ -449,7 +432,7 @@ public class SyntacticAnalyzer {
         Token ct = currentToken;
         match("idMetVar");
         match("equals");
-        return new LocalVarNode(ct,composedExpression(),MainSemantic.symbolTable.currentBlock.peek());
+        return new LocalVarNode(ct,composedExpression(),MainSemantic.symbolTable.currentBlock);
     }
 
     private SentenceNode returnState() throws SyntacticException {
@@ -730,7 +713,7 @@ public class SyntacticAnalyzer {
     private ReferenceNode primary() throws SyntacticException {
         ReferenceNode p;
         if (currentToken.getTokenName().equals("pr_this")) {
-            p = new ThisCallNode(currentToken,MainSemantic.symbolTable.currentClass,MainSemantic.symbolTable.currentBlock.peek());
+            p = new ThisCallNode(currentToken,MainSemantic.symbolTable.currentClass,MainSemantic.symbolTable.currentBlock);
             match("pr_this");
         } else if (currentToken.getTokenName().equals("stringLiteral")) {
             p = new StringLiteralNode(currentToken);
@@ -753,7 +736,7 @@ public class SyntacticAnalyzer {
         Token ct = currentToken;
         match("idMetVar");
         List<ExpressionNode> l = possibleArgs();
-        BlockNode blockNode = MainSemantic.symbolTable.currentBlock.peek();
+        BlockNode blockNode = MainSemantic.symbolTable.currentBlock;
         if (l==null)
             return new AccessVarNode(ct,blockNode);
         else

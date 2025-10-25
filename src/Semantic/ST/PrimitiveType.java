@@ -66,9 +66,9 @@ public class PrimitiveType implements Type{
     }
 
     @Override
-    public void compareTypes(Type type) throws SemanticException{
+    public void compareTypes(Type type, Token operator) throws SemanticException{
         if (!token.getTokenName().equals(type.getTokenType().getTokenName())){
-            throw new SemanticException(type.getTokenType().getLexeme(),"Asignacion fallida por tipo incompatible: ",type.getTokenType().getLine());
+            throw new SemanticException(operator.getLexeme(),"Asignacion fallida por tipo incompatible: ",operator.getLine());
         }
     }
 }

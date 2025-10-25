@@ -25,13 +25,14 @@ public class LocalVarNode extends SentenceNode{
         if (varType.getNameType().equals("null")) {
             throw new SemanticException(tokenName.getLexeme(),"Se intento crear una variable de tipo null: ",tokenName.getLine());
         }
+        LocalVarNode fatherVar = blockNode.getVar(tokenName);
         LocalVarNode localVar = blockNode.getLocalVarList().get(tokenName.getLexeme());
         Parameter param = blockNode.getMethod().getParameters().get(tokenName.getLexeme());
         Attribute attribute = blockNode.getClassElement().getAttributes().get(tokenName.getLexeme());
-        if (localVar != null || param != null || attribute != null) {
+        if (localVar != null || param != null || attribute != null || fatherVar != null) {
             throw new SemanticException(tokenName.getLexeme(), "La variable ya existe: ", tokenName.getLine());
         }
-        //blockNode.addLocalVar(tokenName.getLexeme(),this);
+        blockNode.addLocalVar(tokenName.getLexeme(),this);
         checked = true;
     }
 

@@ -23,6 +23,7 @@ public class AccessVarNode extends ReferenceNode {
 
     @Override
     public Type check() throws SemanticException {
+        LocalVarNode fatherVar = blockNode.getVar(varToken);
         LocalVarNode localVar = blockNode.getLocalVarList().get(varToken.getLexeme());
         Parameter param = blockNode.getMethod().getParameters().get(varToken.getLexeme());
         Attribute attribute = blockNode.getClassElement().getAttributes().get(varToken.getLexeme());
@@ -33,8 +34,13 @@ public class AccessVarNode extends ReferenceNode {
             retType = param.getType();
         } else if (attribute != null) {
             retType = attribute.getType();
-        } else{
+        } else if (fatherVar != null) {
+            retType = fatherVar.getVarType();
+        } else {
             throw new SemanticException(varToken.getLexeme(), "La variable a la que se accede no exite: ", varToken.getLine());
+        }
+        if (blockNode.getMethod().getModifier() != null && blockNode.getMethod().getModifier().getLexeme().equals("static") && localVar == null) {
+            throw new SemanticException(varToken.getLexeme(), "No es posible llamar a la variable en un metodo estatico: ", varToken.getLine());
         }
         Type chainedType = chainedElement.check(retType);
         if(chainedType.getNameType().equals("Universal")){

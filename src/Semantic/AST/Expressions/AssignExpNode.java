@@ -30,7 +30,7 @@ public class AssignExpNode extends ExpressionNode {
             }
         } else throw new SemanticException(equalToken.getLexeme(),"Expresion invalida a izquierda de asignacion: ", equalToken.getLine());
         Type retType = leftExpression.check();
-        retType.compareTypes(rightExpression.check());
+        retType.compareTypes(rightExpression.check(),equalToken);
         checked = true;
         return retType;
     }

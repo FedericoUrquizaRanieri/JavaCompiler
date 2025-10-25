@@ -2,6 +2,7 @@ package Semantic.ST;
 
 import Lexical.Analyzer.Token;
 import Main.MainSemantic;
+import Semantic.AST.Sentences.NullBlockNode;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.*;
@@ -103,7 +104,9 @@ public class Class {
         consolidateMethods();
         consolidateAttributes();
         if (constructors.isEmpty()){
-            constructors.put(className,new Constructor(new Token("idClase",className,0)));
+            Constructor c = new Constructor(new Token("idClase",className,0));
+            c.setBlock(new NullBlockNode());
+            constructors.put(className,c);
         }
         isConsolidated = true;
     }
@@ -201,6 +204,9 @@ public class Class {
     public void checkSentences() throws SemanticException{
         for (Method m : methods.values()) {
             m.checkSentences();
+        }
+        for (Constructor c : constructors.values()) {
+            c.checkSentences();
         }
     }
 

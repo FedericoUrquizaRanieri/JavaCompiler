@@ -13,11 +13,11 @@ public class SymbolTable {
     public Method currentMethod;
     public Class currentClass;
     public Constructor currentConstructor;
-    public Stack<BlockNode> currentBlock;
+    public BlockNode currentBlock;
 
     public SymbolTable(){
         classes = new HashMap<>();
-        currentBlock = new Stack<>();
+        currentBlock = new NullBlockNode();
         putPredefinedClasses();
     }
 

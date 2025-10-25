@@ -9,5 +9,5 @@ public interface Type {
     void isCompatible(String neededType) throws SemanticException;
     void isOperandCompatibleUnary(Token typeToken) throws SemanticException;
     void isOperandCompatibleBinary(Token typeToken, Type typeExp) throws SemanticException;
-    void compareTypes(Type type) throws SemanticException;
+    void compareTypes(Type type, Token operator) throws SemanticException;
 }

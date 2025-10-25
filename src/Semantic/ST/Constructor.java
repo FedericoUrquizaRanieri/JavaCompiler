@@ -31,6 +31,10 @@ public class Constructor {
             throw new SemanticException(p.getName(),"Se intento agregar un parametro repetido llamada ",p.getToken().getLine());
     }
 
+    public void checkSentences() throws SemanticException{
+        block.check();
+    }
+
     public Token getToken() {
         return token;
     }
