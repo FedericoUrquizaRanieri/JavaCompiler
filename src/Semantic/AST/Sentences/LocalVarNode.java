@@ -31,6 +31,7 @@ public class LocalVarNode extends SentenceNode{
         if (localVar != null || param != null || attribute != null) {
             throw new SemanticException(tokenName.getLexeme(), "La variable ya existe: ", tokenName.getLine());
         }
+        //blockNode.addLocalVar(tokenName.getLexeme(),this);
         checked = true;
     }
 
