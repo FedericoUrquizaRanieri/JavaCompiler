@@ -25,7 +25,7 @@ public class BinaryExpressionNode extends ComposedExpressionNode{
         var listInt = List.of("+","-","*","%","/");
         var listBool = List.of("&&","||","<","<=",">",">=","==","!=");
         if (listBool.contains(operator.getLexeme())){
-            return new PrimitiveType(new Token("pr_true","true", operator.getLine()));
+            return new PrimitiveType(new Token("pr_boolean","true", operator.getLine()));
         } else if (listInt.contains(operator.getLexeme())){
             return new PrimitiveType(new Token("pr_int"," ", operator.getLine()));
             //TODO aca se supone que pongo un result???

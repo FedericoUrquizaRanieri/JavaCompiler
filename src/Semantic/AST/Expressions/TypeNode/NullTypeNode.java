@@ -10,5 +10,5 @@ public class NullTypeNode extends OperandNode {
     @Override
     public Type check() {
         return null;
-    }
+    } //TODO revisar operaciones con esto
 }

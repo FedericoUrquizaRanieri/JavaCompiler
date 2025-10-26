@@ -58,7 +58,7 @@ public class AccessMethodNode extends ReferenceNode {
         for (Parameter p : map1.values()) {
             Token ct = params.get(i).check().getTokenType();
             if (!p.getType().getTokenType().getTokenName().equals(ct.getTokenName()))
-                throw new SemanticException(ct.getLexeme(),"El parametro es de tipo incorrecto: ",ct.getLine());
+                throw new SemanticException(methodToken.getLexeme(),"El parametro es de tipo incorrecto: ",methodToken.getLine());
             i++;
         }
     }

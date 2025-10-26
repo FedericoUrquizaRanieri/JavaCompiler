@@ -1,5 +1,7 @@
 package Semantic.AST.Expressions;
 
-public abstract class OperandNode extends ComposedExpressionNode{
+import Semantic.ST.Type;
 
+public abstract class OperandNode extends ComposedExpressionNode{
+    protected Type staticToken;
 }
