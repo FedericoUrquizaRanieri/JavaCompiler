@@ -451,13 +451,14 @@ public class SyntacticAnalyzer {
     }
 
     private IfNode ifState() throws SyntacticException, SemanticException {
+        Token ct = currentToken;
         match("pr_if");
         match("openParenthesis");
         ExpressionNode e = expression();
         match("closeParenthesis");
         SentenceNode s = sentence();
         SentenceNode es = elseSentence();
-        return new IfNode(e,s,es);
+        return new IfNode(e,s,es,ct);
     }
 
     private SentenceNode elseSentence() throws SyntacticException, SemanticException {
@@ -471,12 +472,13 @@ public class SyntacticAnalyzer {
     }
 
     private SentenceNode whileState() throws SyntacticException, SemanticException {
+        Token ct = currentToken;
         match("pr_while");
         match("openParenthesis");
         ExpressionNode e = expression();
         match("closeParenthesis");
         SentenceNode s = sentence();
-        return new WhileNode(e,s);
+        return new WhileNode(e,s,ct);
     }
 
     private void forState() throws SyntacticException, SemanticException {

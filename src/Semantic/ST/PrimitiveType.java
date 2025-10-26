@@ -25,14 +25,14 @@ public class PrimitiveType implements Type{
     }
 
     @Override
-    public void isCompatible(String neededType) throws SemanticException{
+    public void isCompatible(String neededType, Token operation) throws SemanticException{
         if (neededType.equals("boolean")){
             if (!token.getTokenName().equals("pr_boolean")){
-                throw new SemanticException(token.getLexeme(),"El tipo actual no es el tipo esperado: ",token.getLine());
+                throw new SemanticException(operation.getLexeme(),"El tipo actual no es el tipo esperado: ",operation.getLine());
             }
         } else {
             if (!token.getLexeme().equals(neededType)){
-                throw new SemanticException(token.getLexeme(),"El tipo actual no es el tipo esperado: ",token.getLine());
+                throw new SemanticException(operation.getLexeme(),"El tipo actual no es el tipo esperado: ",operation.getLine());
             }
         }
     }

@@ -20,7 +20,7 @@ public class ReturnNode extends SentenceNode{
     public void check() throws SemanticException {
         Type realType = retValue.check();
         if (retType==null){
-            if (realType.getNameType().equals("Universal")){
+            if (!realType.getNameType().equals("Universal")){
                 throw new SemanticException(mainToken.getLexeme(),"El tipo de retorno esperado por el metodo no coincide con el retorno vacio en ", mainToken.getLine());
             }
         }

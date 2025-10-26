@@ -1,6 +1,8 @@
 // Comparación entre objetos permitida con '=='.
 class C7 {
-    String s() { return "ok"; }
+    String s() {
+        return "ok";
+    }
     boolean eqCheck() {
         var a = new C7();
         var b = new C7();

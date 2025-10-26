@@ -39,7 +39,7 @@ public class AccessVarNode extends ReferenceNode {
         } else {
             throw new SemanticException(varToken.getLexeme(), "La variable a la que se accede no exite: ", varToken.getLine());
         }
-        if (blockNode.getMethod().getModifier() != null && blockNode.getMethod().getModifier().getLexeme().equals("static") && localVar == null) {
+        if (blockNode.getMethod().getModifier() != null && blockNode.getMethod().getModifier().getLexeme().equals("static") && attribute != null) {
             throw new SemanticException(varToken.getLexeme(), "No es posible llamar a la variable en un metodo estatico: ", varToken.getLine());
         }
         Type chainedType = chainedElement.check(retType);

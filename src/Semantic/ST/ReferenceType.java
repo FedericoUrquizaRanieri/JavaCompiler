@@ -28,9 +28,9 @@ public class ReferenceType implements Type{
     }
 
     @Override
-    public void isCompatible(String neededType) throws SemanticException {
+    public void isCompatible(String neededType, Token operation) throws SemanticException {
         if (!token.getLexeme().equals(neededType)){
-            throw new SemanticException(token.getLexeme(),"El tipo actual no es el tipo esperado: ",token.getLine());
+            throw new SemanticException(operation.getLexeme(),"El tipo actual no es el tipo esperado en: ",operation.getLine());
         }
     }
 
@@ -52,16 +52,23 @@ public class ReferenceType implements Type{
 
     @Override
     public void compareTypes(Type type, Token operator) throws SemanticException{
-        if (!token.getLexeme().equals(type.getTokenType().getLexeme())){
-            isSameType(type,operator);
+        if (!(token.getLexeme().equals("String") && type.getTokenType().getTokenName().equals("String"))){
+            if (!token.getLexeme().equals(type.getTokenType().getLexeme())){
+                isSameType(type,operator);
+            }
         }
     }
 
     public void isSameType(Type typeSon, Token operator) throws SemanticException{
-        if (MainSemantic.symbolTable.classes.get(typeSon.getNameType())==null){
-            throw new SemanticException(typeSon.getNameType(),"Operacion fallida por tipo inexistente: ",typeSon.getTokenType().getLine());
+        String className;
+        if (typeSon.getTokenType().getTokenName().equals("String")){
+            className="String";
+        } else
+            className = typeSon.getNameType();
+        if (MainSemantic.symbolTable.classes.get(className)==null){
+            throw new SemanticException(className,"Operacion fallida por tipo inexistente: ",typeSon.getTokenType().getLine());
         }
-        Token currentFather = MainSemantic.symbolTable.classes.get(typeSon.getNameType()).getInheritance();
+        Token currentFather = MainSemantic.symbolTable.classes.get(className).getInheritance();
         while (currentFather!=null){
             if (currentFather.getLexeme().equals(nameType)){
                 return;
