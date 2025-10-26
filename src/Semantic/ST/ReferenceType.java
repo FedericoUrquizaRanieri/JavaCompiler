@@ -42,11 +42,11 @@ public class ReferenceType implements Type{
     @Override
     public void isOperandCompatibleBinary(Token typeToken, Type typeExp) throws SemanticException {
         var listOp = List.of("!=","==");
-        if(!nameType.equals(typeExp.getNameType())){
-            isSameType(typeExp, typeToken);
-        }
         if (!listOp.contains(typeToken.getLexeme())){
             throw new SemanticException(typeToken.getLexeme(),"Tipos actuales incompatibles con operacion ",typeToken.getLine());
+        }
+        if(!token.getTokenName().equals(typeExp.getTokenType().getTokenName())){
+            isSameType(typeExp, typeToken);
         }
     }
 
@@ -58,6 +58,9 @@ public class ReferenceType implements Type{
     }
 
     public void isSameType(Type typeSon, Token operator) throws SemanticException{
+        if (MainSemantic.symbolTable.classes.get(typeSon.getNameType())==null){
+            throw new SemanticException(typeSon.getNameType(),"Operacion fallida por tipo inexistente: ",typeSon.getTokenType().getLine());
+        }
         Token currentFather = MainSemantic.symbolTable.classes.get(typeSon.getNameType()).getInheritance();
         while (currentFather!=null){
             if (currentFather.getLexeme().equals(nameType)){

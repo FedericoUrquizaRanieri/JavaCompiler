@@ -35,7 +35,9 @@ public class AccessMethodNode extends ReferenceNode {
         }
         Type chainedType = chainedElement.check(method.getReturnType());
         if(chainedType.getNameType().equals("Universal")){
-            return method.getReturnType();
+            if (method.getReturnType()==null){
+                return new PrimitiveType(new Token("pr_null","null",0));
+            } else return method.getReturnType();
         } else {
             return chainedType;
         }
@@ -43,7 +45,7 @@ public class AccessMethodNode extends ReferenceNode {
 
     @Override
     public ChainedNode getChainedElement() {
-        return null;
+        return chainedElement;
     }
 
     @Override

@@ -39,11 +39,10 @@ public class AssignExpNode extends ExpressionNode {
         ChainedNode chain = ref.getChainedElement();
         while (!(chain instanceof EmptyChainedNode)) {
             if (chain.getChainedElement() instanceof EmptyChainedNode) {
-                if (chain instanceof ChainedVarNode)
-                    return true;
+                return chain instanceof ChainedVarNode;
             }
             chain = chain.getChainedElement();
         }
-        return false;
+        return ref instanceof AccessVarNode;
     }
 }

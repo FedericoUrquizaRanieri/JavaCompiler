@@ -25,8 +25,8 @@ public class ChainedMethodNode extends ChainedNode{
     @Override
     public Type check(Type lastClass) throws SemanticException {
         if (lastClass != null) {
-            if (lastClass instanceof ReferenceType){
-                throw new SemanticException(lastClass.getNameType(),"La llamada encadenada se hace sobre una variable primitiva: ", lastClass.getTokenType().getLine());
+            if (!(lastClass instanceof ReferenceType)){
+                throw new SemanticException(lastClass.getTokenType().getTokenName(),"La llamada encadenada se hace sobre una variable primitiva: ", lastClass.getTokenType().getLine());
             }
             Class previousClass = MainSemantic.symbolTable.existsClass(lastClass.getTokenType());
             if(previousClass==null){
@@ -42,7 +42,9 @@ public class ChainedMethodNode extends ChainedNode{
             }
             Type chainedType = chainedNode.check(method.getReturnType());
             if(chainedType.getNameType().equals("Universal")){
-                return method.getReturnType();
+                if (method.getReturnType()==null){
+                    return new PrimitiveType(new Token("pr_null","null",0));
+                } else return method.getReturnType();
             } else {
                 return chainedType;
             }

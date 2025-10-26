@@ -1,6 +1,8 @@
 package Semantic.AST.Expressions.TypeNode;
 
+import Lexical.Analyzer.Token;
 import Semantic.AST.Expressions.OperandNode;
+import Semantic.ST.PrimitiveType;
 import Semantic.ST.Type;
 
 public class NullTypeNode extends OperandNode {
@@ -9,6 +11,6 @@ public class NullTypeNode extends OperandNode {
 
     @Override
     public Type check() {
-        return null;
+        return new PrimitiveType(new Token("pr_null","null",0));
     } //TODO revisar operaciones con esto
 }

@@ -22,7 +22,7 @@ public class StringLiteralNode extends ReferenceNode {
     public Type check() throws SemanticException {
         Type chainedType = chainedElement.check(stringType);
         if(chainedType.getNameType().equals("Universal")){
-            return new ReferenceType(string,null);
+            return stringType;
         } else {
             return chainedType;
         }
