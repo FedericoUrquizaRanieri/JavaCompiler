@@ -260,6 +260,7 @@ public class SyntacticAnalyzer {
         Token nom = currentToken;
         match("idClase");
         MainSemantic.symbolTable.currentConstructor = new Constructor(nom);
+        MainSemantic.symbolTable.currentMethod = MainSemantic.symbolTable.currentConstructor;
         List<Parameter> args = formalArgs();
         for (Parameter m : args){
             MainSemantic.symbolTable.currentConstructor.addParam(m);

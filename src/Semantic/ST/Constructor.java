@@ -5,18 +5,20 @@ import Semantic.AST.Sentences.BlockNode;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Objects;
 
-public class Constructor {
-    private final HashMap<String,Parameter> parameters;
+public class Constructor extends Method{
+    private final LinkedHashMap<String,Parameter> parameters;
     private final Token token;
     private BlockNode block;
 
     public Constructor(Token token){
-        parameters = new HashMap<>();
+        super(token);
+        parameters = new LinkedHashMap<>();
         this.token = token;
     }
-
+    
     public void checkStatements(Token classToken) throws SemanticException {
         if (!Objects.equals(token.getLexeme(), classToken.getLexeme())){
             throw new SemanticException(token.getLexeme(),"Nombre incorrecto en constructor ",token.getLine());
@@ -43,7 +45,7 @@ public class Constructor {
         this.block=block;
     }
 
-    public HashMap<String, Parameter> getParameters() {
+    public LinkedHashMap<String, Parameter> getParameters() {
         return parameters;
     }
 }
