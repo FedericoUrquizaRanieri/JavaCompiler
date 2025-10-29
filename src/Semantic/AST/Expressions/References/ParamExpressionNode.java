@@ -35,4 +35,8 @@ public class ParamExpressionNode extends ReferenceNode {
     public void setChainedElement(ChainedNode chainedNode) {
         chainedElement = chainedNode;
     }
+
+    public ExpressionNode getExpression() {
+        return expression;
+    }
 }

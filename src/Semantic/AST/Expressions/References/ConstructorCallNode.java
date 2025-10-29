@@ -30,6 +30,9 @@ public class ConstructorCallNode extends ReferenceNode {
             throw new SemanticException(classElement.getLexeme(),"La clase del constructor referenciado no existe: ",classElement.getLine());
         } else{
             Constructor c = MainSemantic.symbolTable.classes.get(classElement.getLexeme()).getConstructors().get(classElement.getLexeme());
+            if (c==null){
+                throw new SemanticException(classElement.getLexeme(),"No es posible crear un object: ",classElement.getLine());
+            }
             parametersAreEqual(c.getParameters());
         }
         Type chainedType = chainedElement.check(retType);

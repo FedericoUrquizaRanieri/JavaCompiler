@@ -43,7 +43,10 @@ public class Method {
     }
 
     public void checkSentences() throws SemanticException{
-        block.check();
+        if (!block.isChecked()){
+            block.check();
+        }
+
     }
 
     public void addParam(Parameter p) throws SemanticException {

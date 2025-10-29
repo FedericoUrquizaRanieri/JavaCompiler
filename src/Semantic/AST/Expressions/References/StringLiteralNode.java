@@ -15,7 +15,6 @@ public class StringLiteralNode extends ReferenceNode {
         this.string = string;
         chainedElement = new EmptyChainedNode();
         stringType = new ReferenceType(new Token("String",string.getLexeme(), string.getLine()),null);
-        //TODO revisar esto que es horrible
     }
 
     @Override

@@ -1,6 +1,7 @@
 package Semantic.AST.Expressions.References;
 
 import Lexical.Analyzer.Token;
+import Main.MainSemantic;
 import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.AST.Expressions.ExpressionNode;
@@ -28,8 +29,8 @@ public class AccessMethodNode extends ReferenceNode {
         Method method = blockNode.getClassElement().getMethods().get(methodToken.getLexeme());
         if (method == null) {
             throw new SemanticException(methodToken.getLexeme(), "El metodo no existe: ", methodToken.getLine());
-        } else if (blockNode.getMethod().getModifier() != null && blockNode.getMethod().getModifier().getLexeme().equals("static") && method.getModifier() != null && !method.getModifier().getLexeme().equals("static")) {
-                throw new SemanticException(method.getToken().getLexeme(), "No es posible llamar a un metodo normal dentro de uno estatico: ", method.getToken().getLine());
+        } else if (blockNode.getMethod().getModifier() != null && blockNode.getMethod().getModifier().getLexeme().equals("static")) {
+                throw new SemanticException(methodToken.getLexeme(), "No es posible llamar a un metodo normal dentro de uno estatico: ", methodToken.getLine());
         } else{
             parametersAreEqual(method.getParameters());
         }
@@ -58,9 +59,10 @@ public class AccessMethodNode extends ReferenceNode {
             throw new SemanticException(methodToken.getLexeme(),"Los parametros son de cantidad incorrecta en el llamado: ", methodToken.getLine());
         var i = 0;
         for (Parameter p : map1.values()) {
-            Token ct = params.get(i).check().getTokenType();
-            if (!p.getType().getTokenType().getTokenName().equals(ct.getTokenName()))
-                throw new SemanticException(methodToken.getLexeme(),"El parametro es de tipo incorrecto: ",methodToken.getLine());
+            Type ct = params.get(i).check();
+            if (!p.getType().getTokenType().getLexeme().equals(ct.getTokenType().getLexeme())){
+                p.getType().compareTypes(ct,methodToken);
+            }
             i++;
         }
     }

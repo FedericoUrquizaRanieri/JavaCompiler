@@ -421,8 +421,9 @@ public class SyntacticAnalyzer {
 
     private SentenceNode assignCall() throws SyntacticException {
         if (productionsMap.getFirsts("expression").contains(currentToken.getTokenName())) {
+            Token ct = currentToken;
             ExpressionNode exp = expression();
-            return new AssignCallSentNode(exp);
+            return new AssignCallSentNode(exp,ct);
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("assignCall")), analyzer.getLineNumber());
         }
@@ -673,7 +674,7 @@ public class SyntacticAnalyzer {
             }
             case "pr_null" -> {
                 match("pr_null");
-                literal = new NullTypeNode();
+                literal = new NullTypeNode(currentToken);
             }
             default ->
                     throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("primitive")), analyzer.getLineNumber());

@@ -1,7 +1,9 @@
 package Semantic.AST.Sentences;
 
 import Lexical.Analyzer.Token;
+import Semantic.AST.Expressions.AssignExpNode;
 import Semantic.AST.Expressions.ExpressionNode;
+import Semantic.AST.Expressions.References.ParamExpressionNode;
 import Semantic.ST.Attribute;
 import Semantic.ST.Parameter;
 import Semantic.ST.Type;
@@ -31,6 +33,11 @@ public class LocalVarNode extends SentenceNode{
         Attribute attribute = blockNode.getClassElement().getAttributes().get(tokenName.getLexeme());
         if (localVar != null || param != null || attribute != null || fatherVar != null) {
             throw new SemanticException(tokenName.getLexeme(), "La variable ya existe: ", tokenName.getLine());
+        }
+        if (compExpression instanceof ParamExpressionNode paramReference){
+            if (paramReference.getExpression() instanceof AssignExpNode){
+                throw new SemanticException(tokenName.getLexeme(),"Expresion invalida a izquierda de asignacion: ", tokenName.getLine());
+            }
         }
         blockNode.addLocalVar(tokenName.getLexeme(),this);
         checked = true;

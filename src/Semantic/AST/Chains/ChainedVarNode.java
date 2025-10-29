@@ -22,7 +22,7 @@ public class ChainedVarNode extends ChainedNode{
     public Type check(Type lastClass) throws SemanticException {
         if (lastClass != null){
             if (lastClass instanceof PrimitiveType){
-                throw new SemanticException(lastClass.getNameType(), "La llamada encadenada se hace sobre una variable primitiva: ", lastClass.getTokenType().getLine());
+                throw new SemanticException(idToken.getLexeme(), "La llamada encadenada se hace sobre una variable primitiva: ", idToken.getLine());
             }
             Class previousClass = MainSemantic.symbolTable.existsClass(lastClass.getTokenType());
             Attribute attribute = previousClass.getAttributes().get(idToken.getLexeme());

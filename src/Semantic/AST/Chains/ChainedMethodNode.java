@@ -26,7 +26,7 @@ public class ChainedMethodNode extends ChainedNode{
     public Type check(Type lastClass) throws SemanticException {
         if (lastClass != null) {
             if (!(lastClass instanceof ReferenceType)){
-                throw new SemanticException(lastClass.getTokenType().getTokenName(),"La llamada encadenada se hace sobre una variable primitiva: ", lastClass.getTokenType().getLine());
+                throw new SemanticException(idToken.getLexeme(),"La llamada encadenada se hace sobre una variable primitiva: ", idToken.getLine());
             }
             Class previousClass = MainSemantic.symbolTable.existsClass(lastClass.getTokenType());
             if(previousClass==null){

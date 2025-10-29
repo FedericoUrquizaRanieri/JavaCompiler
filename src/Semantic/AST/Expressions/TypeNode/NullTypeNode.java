@@ -6,11 +6,13 @@ import Semantic.ST.PrimitiveType;
 import Semantic.ST.Type;
 
 public class NullTypeNode extends OperandNode {
-    public NullTypeNode(){
+    private final Token currentToken;
+    public NullTypeNode(Token currentToken){
+        this.currentToken = currentToken;
     }
 
     @Override
     public Type check() {
-        return new PrimitiveType(new Token("pr_null","null",0));
-    } //TODO revisar operaciones con esto
+        return new PrimitiveType(new Token("Universal","null", currentToken.getLine()));
+    }
 }

@@ -5,6 +5,7 @@ import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.ChainedVarNode;
 import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.AST.Expressions.References.AccessVarNode;
+import Semantic.AST.Expressions.References.ParamExpressionNode;
 import Semantic.AST.Expressions.References.ReferenceNode;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
@@ -27,14 +28,23 @@ public class AssignExpNode extends ExpressionNode {
                 if(!endsInVariable(referenceNode)){
                     throw new SemanticException(equalToken.getLexeme(),"Expresion invalida a izquierda de asignacion: ", equalToken.getLine());
                 }
+            } else if (!(referenceNode.getChainedElement() instanceof EmptyChainedNode)){
+                if(!endsInVariable(referenceNode)){
+                    throw new SemanticException(equalToken.getLexeme(),"Expresion invalida a izquierda de asignacion: ", equalToken.getLine());
+                }
             }
         } else throw new SemanticException(equalToken.getLexeme(),"Expresion invalida a izquierda de asignacion: ", equalToken.getLine());
+        if (rightExpression instanceof ParamExpressionNode paramReference){
+            if (paramReference.getExpression() instanceof  AssignExpNode){
+                throw new SemanticException(equalToken.getLexeme(),"Expresion invalida a izquierda de asignacion: ", equalToken.getLine());
+            }
+        }
         Type retType = leftExpression.check();
         retType.compareTypes(rightExpression.check(),equalToken);
         checked = true;
         return retType;
     }
-    //TODO preguntar que hago aca con los instaceof
+
     public boolean endsInVariable(ReferenceNode ref) {
         ChainedNode chain = ref.getChainedElement();
         while (!(chain instanceof EmptyChainedNode)) {

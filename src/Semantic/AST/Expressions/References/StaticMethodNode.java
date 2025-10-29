@@ -32,6 +32,8 @@ public class StaticMethodNode extends ReferenceNode {
             throw new SemanticException(classElement.getLexeme(),"La clase llamada no existe:", classElement.getLine());
         } else if (currentClass.getMethods().get(methodElement.getLexeme())==null){
             throw new SemanticException(methodElement.getLexeme(),"El metodo no existe en la clase mencionada", methodElement.getLine());
+        } else if (currentClass.getMethods().get(methodElement.getLexeme()).getModifier() == null || (currentClass.getMethods().get(methodElement.getLexeme()).getModifier() != null && !currentClass.getMethods().get(methodElement.getLexeme()).getModifier().getLexeme().equals("static"))){
+            throw new SemanticException(methodElement.getLexeme(),"El metodo no existe en la clase mencionada", methodElement.getLine());
         } else parametersAreEqual(currentClass.getMethods().get(methodElement.getLexeme()).getParameters());
         Type retType = currentClass.getMethods().get(methodElement.getLexeme()).getReturnType();
         Type chainedType = chainedElement.check(retType);
@@ -59,7 +61,8 @@ public class StaticMethodNode extends ReferenceNode {
         for (Parameter p : map1.values()) {
             Token ct = args.get(i).check().getTokenType();
             if (!p.getType().getTokenType().getTokenName().equals(ct.getTokenName()))
-                throw new SemanticException(ct.getLexeme(),"El parametro es de tipo incorrecto: ",ct.getLine());
+                if (!p.getType().getTokenType().getLexeme().equals(ct.getTokenName()))
+                    throw new SemanticException(ct.getLexeme(),"El parametro es de tipo incorrecto: ",ct.getLine());
             i++;
         }
     }

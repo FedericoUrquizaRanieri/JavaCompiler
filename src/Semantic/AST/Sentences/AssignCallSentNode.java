@@ -1,5 +1,6 @@
 package Semantic.AST.Sentences;
 
+import Lexical.Analyzer.Token;
 import Semantic.AST.Chains.ChainedMethodNode;
 import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.ChainedVarNode;
@@ -13,27 +14,26 @@ import Semantic.AST.Expressions.References.StaticMethodNode;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
 
-import java.util.List;
 
 public class AssignCallSentNode extends SentenceNode{
     private final ExpressionNode innerExpression;
+    private final Token idToken;
 
-    public AssignCallSentNode(ExpressionNode innerExpression) {
+    public AssignCallSentNode(ExpressionNode innerExpression,Token currentToken) {
         this.innerExpression = innerExpression;
+        idToken = currentToken;
     }
 
     @Override
     public void check() throws SemanticException {
         Type t = innerExpression.check();
 
-        //TODO revisar que sea correcto esta llamada extraña y principalmente el retorno de operacion y el control de instancesof
         if (innerExpression instanceof ReferenceNode referenceNode){
             if (!endsInMethod(referenceNode)){
-                throw new SemanticException(t.getNameType(),"Se detecto una expresion invalida en forma de sentencia: ",t.getTokenType().getLine());
+                throw new SemanticException(idToken.getLexeme(), "Se detecto una expresion invalida en forma de sentencia: ",idToken.getLine());
             }
-        }
-        if (!(innerExpression instanceof AssignExpNode) && !(innerExpression instanceof AccessMethodNode) && !(innerExpression instanceof ConstructorCallNode) && !(innerExpression instanceof StaticMethodNode)){
-            throw new SemanticException(t.getNameType(),"Se detecto una expresion invalida en forma de sentencia: ",t.getTokenType().getLine());
+        } else if (!(innerExpression instanceof AssignExpNode)){
+                throw new SemanticException(idToken.getLexeme(), "Se detecto una expresion invalida en forma de sentencia: ",idToken.getLine());
         }
 
         checked = true;
@@ -47,6 +47,6 @@ public class AssignCallSentNode extends SentenceNode{
             }
             chain = chain.getChainedElement();
         }
-        return ref instanceof AccessMethodNode;
+        return (ref instanceof AccessMethodNode || ref instanceof StaticMethodNode);
     }
 }

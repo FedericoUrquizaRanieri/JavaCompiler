@@ -41,20 +41,24 @@ public class ReferenceType implements Type{
 
     @Override
     public void isOperandCompatibleBinary(Token typeToken, Type typeExp) throws SemanticException {
-        var listOp = List.of("!=","==");
-        if (!listOp.contains(typeToken.getLexeme())){
-            throw new SemanticException(typeToken.getLexeme(),"Tipos actuales incompatibles con operacion ",typeToken.getLine());
-        }
-        if(!token.getTokenName().equals(typeExp.getTokenType().getTokenName())){
-            isSameType(typeExp, typeToken);
+        if (!typeExp.getTokenType().getTokenName().equals("Universal") && !token.getTokenName().equals("Universal")){
+            var listOp = List.of("!=","==");
+            if (!listOp.contains(typeToken.getLexeme())){
+                throw new SemanticException(typeToken.getLexeme(),"Tipos actuales incompatibles con operacion ",typeToken.getLine());
+            }
+            if(!token.getLexeme().equals(typeExp.getTokenType().getLexeme())){
+                isSameTypeBinary(typeExp, typeToken);
+            }
         }
     }
 
     @Override
     public void compareTypes(Type type, Token operator) throws SemanticException{
-        if (!(token.getLexeme().equals("String") && type.getTokenType().getTokenName().equals("String"))){
-            if (!token.getLexeme().equals(type.getTokenType().getLexeme())){
-                isSameType(type,operator);
+        if (!type.getTokenType().getTokenName().equals("Universal")){
+            if (!(token.getLexeme().equals("String") && type.getTokenType().getTokenName().equals("String"))){
+                if (!token.getLexeme().equals(type.getTokenType().getLexeme())){
+                    isSameType(type,operator);
+                }
             }
         }
     }
@@ -76,6 +80,41 @@ public class ReferenceType implements Type{
             currentFather = MainSemantic.symbolTable.classes.get(currentFather.getLexeme()).getInheritance();
         }
         throw new SemanticException(operator.getLexeme(),"Operacion fallida por tipo incompatible: ",operator.getLine());
+    }
+
+    public void isSameTypeBinary(Type typeSon, Token operator) throws SemanticException {
+        String className;
+        if (typeSon.getTokenType().getTokenName().equals("String")){
+            className="String";
+        } else
+            className = typeSon.getNameType();
+        if (MainSemantic.symbolTable.classes.get(nameType) == null)
+            throw new SemanticException(nameType, "Operación fallida por tipo inexistente: ", typeSon.getTokenType().getLine());
+        if (MainSemantic.symbolTable.classes.get(className) == null)
+            throw new SemanticException(className, "Operación fallida por tipo inexistente: ", typeSon.getTokenType().getLine());
+        if (nameType.equals(className)) {
+            return;
+        }
+        if (isSubtypeOf(className, nameType)) {
+            return;
+        }
+        if (isSubtypeOf(nameType, className)) {
+            return;
+        }
+        throw new SemanticException(operator.getLexeme(), "Operación fallida por tipo incompatible: ", operator.getLine());
+    }
+
+    private boolean isSubtypeOf(String child, String parent) {
+        Token currentFather = MainSemantic.symbolTable.classes.get(child).getInheritance();
+        while (currentFather != null) {
+            if (currentFather.getLexeme().equals(parent)) {
+                return true;
+            }
+            currentFather = MainSemantic.symbolTable.classes
+                    .get(currentFather.getLexeme())
+                    .getInheritance();
+        }
+        return false;
     }
 
     public Token getOptionalGeneric() {
