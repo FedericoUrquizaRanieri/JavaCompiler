@@ -1,4 +1,4 @@
-//[Error:pr_int|5]
+//[Error:getX|6]
 // Error: intento de encadenar sobre tipo primitivo.
 class E13 {
     int m() {
