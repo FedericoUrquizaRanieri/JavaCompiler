@@ -23,6 +23,10 @@ public class ReturnNode extends SentenceNode{
             if (!realType.getNameType().equals("Universal")){
                 throw new SemanticException(mainToken.getLexeme(),"El tipo de retorno esperado por el metodo no coincide con el retorno vacio en ", mainToken.getLine());
             }
+        } else if (retType.getTokenType().getTokenName().equals("idClase")){
+            if (realType.getNameType().equals("Universal")){
+                throw new SemanticException(mainToken.getLexeme(),"El tipo de retorno esperado por el metodo no coincide con el retorno vacio en ", mainToken.getLine());
+            }
         }
         else retType.compareTypes(retValue.check(),mainToken);
         checked = true;

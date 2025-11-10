@@ -29,8 +29,14 @@ public class AssignCallSentNode extends SentenceNode{
         Type t = innerExpression.check();
 
         if (innerExpression instanceof ReferenceNode referenceNode){
-            if (!endsInMethod(referenceNode)){
-                throw new SemanticException(idToken.getLexeme(), "Se detecto una expresion invalida en forma de sentencia: ",idToken.getLine());
+            if (!(referenceNode instanceof ConstructorCallNode)){
+                if (!endsInMethod(referenceNode)){
+                    throw new SemanticException(idToken.getLexeme(), "Se detecto una expresion invalida en forma de sentencia: ",idToken.getLine());
+                }
+            } else if (!(referenceNode.getChainedElement() instanceof EmptyChainedNode)){
+                if (!endsInMethod(referenceNode)){
+                    throw new SemanticException(idToken.getLexeme(), "Se detecto una expresion invalida en forma de sentencia: ",idToken.getLine());
+                }
             }
         } else if (!(innerExpression instanceof AssignExpNode)){
                 throw new SemanticException(idToken.getLexeme(), "Se detecto una expresion invalida en forma de sentencia: ",idToken.getLine());
