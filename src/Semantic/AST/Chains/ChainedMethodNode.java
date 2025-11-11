@@ -68,4 +68,9 @@ public class ChainedMethodNode extends ChainedNode{
             i++;
         }
     }
+
+    @Override
+    public void generateCode() {
+
+    }
 }

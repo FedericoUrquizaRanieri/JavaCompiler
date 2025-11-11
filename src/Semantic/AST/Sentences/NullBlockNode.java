@@ -36,4 +36,7 @@ public class NullBlockNode extends BlockNode{
     public HashMap<String,LocalVarNode> getLocalVarList() {
         return new HashMap<>();
     }
+
+    @Override
+    public void generateCode() {    }
 }

@@ -55,4 +55,9 @@ public class AssignCallSentNode extends SentenceNode{
         }
         return (ref instanceof AccessMethodNode || ref instanceof StaticMethodNode);
     }
+
+    @Override
+    public void generateCode() {
+        innerExpression.generateCode();
+    }
 }

@@ -44,4 +44,9 @@ public class ThisCallNode extends ReferenceNode {
     public void setChainedElement(ChainedNode chainedNode) {
         chainedElement = chainedNode;
     }
+
+    @Override
+    public void generateCode() {
+        //TODO revisar encadenado?
+    }
 }

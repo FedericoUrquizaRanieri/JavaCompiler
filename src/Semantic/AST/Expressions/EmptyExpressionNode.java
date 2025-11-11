@@ -10,4 +10,7 @@ public class EmptyExpressionNode extends ExpressionNode{
     public Type check() throws SemanticException {
         return new PrimitiveType(new Token("Universal","Universal",0));
     }
+
+    @Override
+    public void generateCode() {}
 }

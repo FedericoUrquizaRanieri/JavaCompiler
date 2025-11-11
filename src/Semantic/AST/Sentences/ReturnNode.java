@@ -31,4 +31,9 @@ public class ReturnNode extends SentenceNode{
         else retType.compareTypes(retValue.check(),mainToken);
         checked = true;
     }
+
+    @Override
+    public void generateCode() {
+        retValue.generateCode();
+    }
 }

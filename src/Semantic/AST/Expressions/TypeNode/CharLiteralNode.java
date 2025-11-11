@@ -16,4 +16,9 @@ public class CharLiteralNode extends OperandNode {
     public Type check() {
         return staticToken;
     }
+
+    @Override
+    public void generateCode() {
+        //TODO apilar?
+    }
 }

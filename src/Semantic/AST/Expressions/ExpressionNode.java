@@ -9,4 +9,5 @@ public abstract class ExpressionNode {
         return checked;
     }
     public abstract Type check() throws SemanticException;
+    public abstract void generateCode();
 }

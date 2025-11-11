@@ -10,4 +10,5 @@ public abstract class ChainedNode {
     public abstract void setChainedNode(ChainedNode chainedNode);
     public abstract Type check(Type lastClass) throws SemanticException;
     public abstract ChainedNode getChainedElement();
+    public abstract void generateCode();
 }

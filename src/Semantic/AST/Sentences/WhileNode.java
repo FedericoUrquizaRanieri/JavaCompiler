@@ -21,4 +21,10 @@ public class WhileNode extends SentenceNode{
         body.check();
         checked = true;
     }
+
+    @Override
+    public void generateCode() {
+        condition.generateCode();
+        body.generateCode();
+    }
 }

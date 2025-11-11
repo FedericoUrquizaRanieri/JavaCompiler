@@ -219,6 +219,18 @@ public class Class {
         }
     }
 
+    public void generateCode(){
+        for(Method m : methods.values()){
+            m.generateCode();
+        }
+        for(Attribute a: attributes.values()){
+            a.generateCode();
+        }
+        for(Constructor c: constructors.values()){
+            c.generateCode();
+        }
+    }
+
     public void addMethod(Method m) throws SemanticException {
         if(methods.putIfAbsent(m.getName(),m)!=null)
             throw new SemanticException(m.getName(),"Se intento agregar un metodo repetido llamado ",m.getToken().getLine());

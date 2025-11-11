@@ -66,4 +66,11 @@ public class AccessMethodNode extends ReferenceNode {
             i++;
         }
     }
+
+    @Override
+    public void generateCode() {
+        for(ExpressionNode e:params){
+            e.generateCode();
+        }
+    }
 }

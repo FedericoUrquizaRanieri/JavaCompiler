@@ -43,6 +43,11 @@ public class LocalVarNode extends SentenceNode{
         checked = true;
     }
 
+    @Override
+    public void generateCode() {
+        compExpression.generateCode();
+    }
+
     public String getTokenName() {
         return tokenName.getLexeme();
     }

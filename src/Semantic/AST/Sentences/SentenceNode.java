@@ -8,4 +8,5 @@ public abstract class SentenceNode {
     public boolean isChecked() {
         return checked;
     }
+    public abstract void generateCode();
 }

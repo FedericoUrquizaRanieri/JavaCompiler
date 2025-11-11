@@ -20,4 +20,9 @@ public class UnaryExpressionNode extends ComposedExpressionNode{
         checked = true;
         return retType;
     }
+
+    @Override
+    public void generateCode() {
+        expression.generateCode();
+    }
 }

@@ -92,4 +92,10 @@ public class BlockNode extends SentenceNode{
             return fatherVar;
         else return fatherOldVar;
     }
+
+    public void generateCode(){
+        for(SentenceNode s : sentenceNodeList){
+            s.generateCode();
+        }
+    }
 }

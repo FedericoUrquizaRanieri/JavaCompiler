@@ -37,6 +37,10 @@ public class Constructor extends Method{
         block.check();
     }
 
+    public void generateCode(){
+        block.generateCode();
+    }
+
     public Token getToken() {
         return token;
     }

@@ -54,6 +54,10 @@ public class Method {
             throw new SemanticException(p.getName(),"Se intento agregar un parametro repetido llamada ",p.getToken().getLine());
     }
 
+    public void generateCode(){
+        block.generateCode();
+    }
+
     public LinkedHashMap<String, Parameter> getParameters() {
         return parameters;
     }

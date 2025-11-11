@@ -36,4 +36,9 @@ public class StringLiteralNode extends ReferenceNode {
     public void setChainedElement(ChainedNode chainedNode) {
         chainedElement = chainedNode;
     }
+
+    @Override
+    public void generateCode() {
+        //TODO apilar y revisar encadenado?
+    }
 }

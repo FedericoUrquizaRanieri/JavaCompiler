@@ -40,6 +40,12 @@ public class SymbolTable {
         }
     }
 
+    public void generateCode(){
+        for (Class c: classes.values()){
+            c.generateCode();
+        }
+    }
+
     public void addClass(String name, Class classElement) throws SemanticException {
         if(classes.putIfAbsent(name,classElement)!=null)
             throw new SemanticException(name,"Se intento agregar una clase repetida llamada ",classElement.getClassToken().getLine());

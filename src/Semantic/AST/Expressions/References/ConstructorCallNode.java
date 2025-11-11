@@ -64,4 +64,11 @@ public class ConstructorCallNode extends ReferenceNode {
             i++;
         }
     }
+
+    @Override
+    public void generateCode() {
+        for(ExpressionNode e:args){
+            e.generateCode();
+        }
+    }
 }

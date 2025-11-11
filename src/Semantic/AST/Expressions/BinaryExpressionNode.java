@@ -31,4 +31,10 @@ public class BinaryExpressionNode extends ComposedExpressionNode{
             //TODO aca se supone que pongo un result???
         } else throw new SemanticException(operator.getLexeme(),"El operador no se puede usar correctamente en una operacion: ", operator.getLine());
     }
+
+    @Override
+    public void generateCode() {
+        leftExpression.generateCode();
+        rightExpression.generateCode();
+    }
 }

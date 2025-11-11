@@ -24,4 +24,11 @@ public class IfNode extends SentenceNode{
         elseSentence.check();
         checked = true;
     }
+
+    @Override
+    public void generateCode() {
+        condition.generateCode();
+        body.generateCode();
+        elseSentence.generateCode();
+    }
 }

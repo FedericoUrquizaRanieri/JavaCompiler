@@ -15,4 +15,9 @@ public class NullTypeNode extends OperandNode {
     public Type check() {
         return new PrimitiveType(new Token("Universal","null", currentToken.getLine()));
     }
+
+    @Override
+    public void generateCode() {
+        //TODO apilar?
+    }
 }

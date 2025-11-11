@@ -23,4 +23,7 @@ public class EmptyChainedNode extends ChainedNode{
     public ChainedNode getChainedElement() {
         return null;
     }
+
+    @Override
+    public void generateCode() {}
 }

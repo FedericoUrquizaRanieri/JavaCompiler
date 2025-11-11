@@ -55,4 +55,10 @@ public class AssignExpNode extends ExpressionNode {
         }
         return ref instanceof AccessVarNode;
     }
+
+    @Override
+    public void generateCode() {
+        leftExpression.generateCode();
+        rightExpression.generateCode();
+    }
 }

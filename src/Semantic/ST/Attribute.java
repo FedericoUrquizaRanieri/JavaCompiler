@@ -25,6 +25,10 @@ public class Attribute {
         }
     }
 
+    public void generateCode(){
+
+    }
+
     public Type getType() {
         return type;
     }

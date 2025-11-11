@@ -59,4 +59,9 @@ public class AccessVarNode extends ReferenceNode {
     public void setChainedElement(ChainedNode chainedNode) {
         chainedElement = chainedNode;
     }
+
+    @Override
+    public void generateCode() {
+        //TODO supongo que aca va un acceso a mem
+    }
 }

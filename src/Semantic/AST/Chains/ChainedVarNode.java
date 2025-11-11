@@ -43,4 +43,9 @@ public class ChainedVarNode extends ChainedNode{
     public ChainedNode getChainedElement() {
         return chainedNode;
     }
+
+    @Override
+    public void generateCode() {
+
+    }
 }

@@ -39,4 +39,9 @@ public class ParamExpressionNode extends ReferenceNode {
     public ExpressionNode getExpression() {
         return expression;
     }
+
+    @Override
+    public void generateCode() {
+        expression.generateCode();
+    }
 }
