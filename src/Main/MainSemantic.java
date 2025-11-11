@@ -3,7 +3,7 @@ package Main;
 import Lexical.Analyzer.LexicalAnalyzer;
 import Lexical.SpecialWordMap.SpecialWordsMap;
 import Semantic.SemExceptions.SemanticException;
-import Semantic.SymbolTable;
+import Semantic.ST.SymbolTable;
 import SourceManager.*;
 
 import java.io.FileNotFoundException;
@@ -53,6 +53,16 @@ public class MainSemantic {
                 noMistakes=false;
             }
         }
+
+        if (noMistakes) {
+            try {
+                symbolTable.checkSentences();
+            } catch (SemanticException e) {
+                e.printError();
+                noMistakes=false;
+            }
+        }
+
         if (noMistakes) {
             System.out.println("Compilacion Exitosa");
             System.out.println();

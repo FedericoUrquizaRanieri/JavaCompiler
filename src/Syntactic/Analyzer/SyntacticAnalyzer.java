@@ -4,14 +4,21 @@ import Lexical.Analyzer.LexicalAnalyzer;
 import Lexical.Analyzer.Token;
 import Lexical.LexExceptions.LexicalException;
 import Main.CompiException;
-import Semantic.*;
-import Semantic.Class;
+import Semantic.AST.Chains.ChainedMethodNode;
+import Semantic.AST.Chains.ChainedNode;
+import Semantic.AST.Chains.ChainedVarNode;
+import Semantic.AST.Chains.EmptyChainedNode;
+import Semantic.AST.Expressions.*;
+import Semantic.AST.Expressions.References.*;
+import Semantic.AST.Expressions.TypeNode.*;
+import Semantic.AST.Sentences.*;
+import Semantic.ST.*;
+import Semantic.ST.Class;
+import Semantic.SemExceptions.SemanticException;
 import Syntactic.SynExceptions.SyntacticException;
 import Main.MainSemantic;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class SyntacticAnalyzer {
     private final LexicalAnalyzer analyzer;
@@ -253,11 +260,12 @@ public class SyntacticAnalyzer {
         Token nom = currentToken;
         match("idClase");
         MainSemantic.symbolTable.currentConstructor = new Constructor(nom);
+        MainSemantic.symbolTable.currentMethod = MainSemantic.symbolTable.currentConstructor;
         List<Parameter> args = formalArgs();
         for (Parameter m : args){
             MainSemantic.symbolTable.currentConstructor.addParam(m);
         }
-        block();
+        MainSemantic.symbolTable.currentConstructor.setBlock(block());
         MainSemantic.symbolTable.currentClass.addConstructor(MainSemantic.symbolTable.currentConstructor);
     }
 
@@ -354,113 +362,128 @@ public class SyntacticAnalyzer {
         return p;
     }
 
-    private boolean optionalBlock() throws SyntacticException {
+    private BlockNode optionalBlock() throws SyntacticException, SemanticException {
         if (productionsMap.getFirsts("block").contains(currentToken.getTokenName())) {
-            block();
-            return true;
+            return block();
         } else if (currentToken.getTokenName().equals("semicolon")){
             match("semicolon");
-            return false;
+            return null;
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("optionalBlock")), analyzer.getLineNumber());
         }
     }
 
-    private void block() throws SyntacticException {
+    private BlockNode block() throws SyntacticException, SemanticException {
+        BlockNode b = new BlockNode(MainSemantic.symbolTable.currentMethod,MainSemantic.symbolTable.currentClass,MainSemantic.symbolTable.currentBlock);
+        MainSemantic.symbolTable.currentBlock = b;
         match("openBrace");
-        sentenceList();
+        sentenceList(b);
         match("closeBrace");
+        MainSemantic.symbolTable.currentBlock = b.getFatherBlock();
+        return b;
     }
 
-    private void sentenceList() throws SyntacticException {
+    private void sentenceList(BlockNode blockNode) throws SyntacticException, SemanticException {
         if (productionsMap.getFirsts("sentence").contains(currentToken.getTokenName())) {
-            sentence();
-            sentenceList();
+            blockNode.addSentence(sentence());
+            sentenceList(blockNode);
         } else if (!productionsMap.getFollow("sentenceList").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("sentenceList")), analyzer.getLineNumber());
         }
     }
 
-    private void sentence() throws SyntacticException {
+    private SentenceNode sentence() throws SyntacticException, SemanticException {
+        SentenceNode sent = new EmptySentenceNode();
         if (currentToken.getTokenName().equals("semicolon")) {
             match("semicolon");
         } else if (productionsMap.getFirsts("assignCall").contains(currentToken.getTokenName())) {
-            assignCall();
+            sent = assignCall();
             match("semicolon");
         } else if (productionsMap.getFirsts("localVar").contains(currentToken.getTokenName())) {
-            localVar();
+            sent = localVar();
             match("semicolon");
         } else if (productionsMap.getFirsts("returnState").contains(currentToken.getTokenName())) {
-            returnState();
+            sent = returnState();
             match("semicolon");
         } else if (productionsMap.getFirsts("ifState").contains(currentToken.getTokenName())) {
-            ifState();
+            sent = ifState();
         } else if (productionsMap.getFirsts("whileState").contains(currentToken.getTokenName())) {
-            whileState();
+            sent = whileState();
         } else if (productionsMap.getFirsts("block").contains(currentToken.getTokenName())) {
-            block();
+            sent = block();
         } else if (currentToken.getTokenName().equals("pr_for")) {
             forState();
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("sentence")), analyzer.getLineNumber());
         }
+        return sent;
     }
 
-    private void assignCall() throws SyntacticException {
+    private SentenceNode assignCall() throws SyntacticException {
         if (productionsMap.getFirsts("expression").contains(currentToken.getTokenName())) {
-            expression();
+            Token ct = currentToken;
+            ExpressionNode exp = expression();
+            return new AssignCallSentNode(exp,ct);
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("assignCall")), analyzer.getLineNumber());
         }
     }
 
-    private void localVar() throws SyntacticException {
+    private SentenceNode localVar() throws SyntacticException {
         match("pr_var");
+        Token ct = currentToken;
         match("idMetVar");
         match("equals");
-        composedExpression();
+        return new LocalVarNode(ct,composedExpression(),MainSemantic.symbolTable.currentBlock);
     }
 
-    private void returnState() throws SyntacticException {
+    private SentenceNode returnState() throws SyntacticException {
+        Token ct = currentToken;
         match("pr_return");
-        optionalExpression();
+        return new ReturnNode(optionalExpression(),MainSemantic.symbolTable.currentMethod.getReturnType(),ct);
     }
 
-    private void optionalExpression() throws SyntacticException {
+    private ExpressionNode optionalExpression() throws SyntacticException {
         if (productionsMap.getFirsts("expression").contains(currentToken.getTokenName())) {
-            expression();
+            return expression();
         } else if (!productionsMap.getFollow("optionalExpression").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalExpression")), analyzer.getLineNumber());
         }
+        return new EmptyExpressionNode();
     }
 
-    private void ifState() throws SyntacticException {
+    private IfNode ifState() throws SyntacticException, SemanticException {
+        Token ct = currentToken;
         match("pr_if");
         match("openParenthesis");
-        expression();
+        ExpressionNode e = expression();
         match("closeParenthesis");
-        sentence();
-        elseSentence();
+        SentenceNode s = sentence();
+        SentenceNode es = elseSentence();
+        return new IfNode(e,s,es,ct);
     }
 
-    private void elseSentence() throws SyntacticException {
+    private SentenceNode elseSentence() throws SyntacticException, SemanticException {
         if (currentToken.getTokenName().equals("pr_else")) {
             match("pr_else");
-            sentence();
+            return sentence();
         } else if (!productionsMap.getFollow("elseSentence").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("elseSentence")), analyzer.getLineNumber());
         }
+        return new EmptySentenceNode();
     }
 
-    private void whileState() throws SyntacticException {
+    private SentenceNode whileState() throws SyntacticException, SemanticException {
+        Token ct = currentToken;
         match("pr_while");
         match("openParenthesis");
-        expression();
+        ExpressionNode e = expression();
         match("closeParenthesis");
-        sentence();
+        SentenceNode s = sentence();
+        return new WhileNode(e,s,ct);
     }
 
-    private void forState() throws SyntacticException {
+    private void forState() throws SyntacticException, SemanticException {
         match("pr_for");
         match("openParenthesis");
         forExpression();
@@ -505,19 +528,22 @@ public class SyntacticAnalyzer {
         expression();
     }
 
-    private void expression() throws SyntacticException {
+    private ExpressionNode expression() throws SyntacticException {
+        ExpressionNode c;
         if (productionsMap.getFirsts("composedExpression").contains(currentToken.getTokenName())) {
-            composedExpression();
-            extraExpression();
+            c = composedExpression();
+            c = extraExpression(c);
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("expression")), analyzer.getLineNumber());
         }
+        return c;
     }
 
-    private void extraExpression() throws SyntacticException {
+    private ExpressionNode extraExpression(ExpressionNode e) throws SyntacticException {
         if (productionsMap.getFirsts("assignOperator").contains(currentToken.getTokenName())) {
-            assignOperator();
-            composedExpression();
+            Token ct = assignOperator();
+            ExpressionNode c = composedExpression();
+            return new AssignExpNode(e,c,ct);
         } else if (currentToken.getTokenName().equals("questionMark")) {
             match("questionMark");
             composedExpression();
@@ -526,26 +552,39 @@ public class SyntacticAnalyzer {
         } else if (!productionsMap.getFollow("extraExpression").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("extraExpression")), analyzer.getLineNumber());
         }
+        return e;
     }
 
-    private void assignOperator() throws SyntacticException {
+    private Token assignOperator() throws SyntacticException {
+        Token ct = currentToken;
         match("equals");
+        return ct;
     }
 
-    private void composedExpression() throws SyntacticException {
+    private ExpressionNode composedExpression() throws SyntacticException {
+        ExpressionNode exp;
+        ExpressionNode basicExp;
         if (productionsMap.getFirsts("basicExpression").contains(currentToken.getTokenName())) {
-            basicExpression();
-            composedExpressionLeft();
+            basicExp = basicExpression();
+            exp = composedExpressionLeft(basicExp);
+            if (exp instanceof EmptyExpressionNode)
+                return basicExp;
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("composedExpression")), analyzer.getLineNumber());
         }
+        return exp;
     }
 
-    private void composedExpressionLeft() throws SyntacticException {
+    private ExpressionNode composedExpressionLeft(ExpressionNode e) throws SyntacticException {
         if (productionsMap.getFirsts("binaryOperator").contains(currentToken.getTokenName())) {
-            binaryOperator();
-            basicExpression();
-            composedExpressionLeft();
+            Token op = binaryOperator();
+            ExpressionNode leftSideExp = basicExpression();
+            ExpressionNode rightSideExp = composedExpressionLeft(leftSideExp);
+            if (rightSideExp instanceof EmptyExpressionNode){
+                return new BinaryExpressionNode(e,op,leftSideExp);
+            } else {
+                return new BinaryExpressionNode(e,op,rightSideExp);
+            }
         } else if (currentToken.getTokenName().equals("questionMark")) {
             match("questionMark");
             composedExpression();
@@ -554,9 +593,11 @@ public class SyntacticAnalyzer {
         } else if (!productionsMap.getFollow("composedExpressionLeft").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("composedExpressionLeft")), analyzer.getLineNumber());
         }
+        return new EmptyExpressionNode();
     }
 
-    private void binaryOperator() throws SyntacticException {
+    private Token binaryOperator() throws SyntacticException {
+        Token ct = currentToken;
         switch (currentToken.getTokenName()) {
             case "or" -> match("or");
             case "and" -> match("and");
@@ -574,20 +615,22 @@ public class SyntacticAnalyzer {
             default ->
                     throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("binaryOperator")), analyzer.getLineNumber());
         }
+        return ct;
     }
 
-    private void basicExpression() throws SyntacticException {
+    private ExpressionNode basicExpression() throws SyntacticException {
         if (productionsMap.getFirsts("unaryOperator").contains(currentToken.getTokenName())) {
-            unaryOperator();
-            operand();
+            Token op = unaryOperator();
+            return new UnaryExpressionNode(operand(),op);
         } else if (productionsMap.getFirsts("operand").contains(currentToken.getTokenName())) {
-            operand();
+            return operand();
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("basicExpression")), analyzer.getLineNumber());
         }
     }
 
-    private void unaryOperator() throws SyntacticException {
+    private Token unaryOperator() throws SyntacticException {
+        Token ct = currentToken;
         switch (currentToken.getTokenName()) {
             case "plus" -> match("plus");
             case "minus" -> match("minus");
@@ -597,79 +640,123 @@ public class SyntacticAnalyzer {
             default ->
                     throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("unaryOperator")), analyzer.getLineNumber());
         }
+        return ct;
     }
 
-    private void operand() throws SyntacticException {
+    private ExpressionNode operand() throws SyntacticException {
         if (productionsMap.getFirsts("primitive").contains(currentToken.getTokenName())) {
-            primitive();
+            return primitive();
         } else if (productionsMap.getFirsts("reference").contains(currentToken.getTokenName())) {
-            reference();
+            return reference();
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("operand")), analyzer.getLineNumber());
         }
     }
 
-    private void primitive() throws SyntacticException {
+    private ExpressionNode primitive() throws SyntacticException {
+        ExpressionNode literal;
         switch (currentToken.getTokenName()) {
-            case "pr_true" -> match("pr_true");
-            case "pr_false" -> match("pr_false");
-            case "intLiteral" -> match("intLiteral");
-            case "charLiteral" -> match("charLiteral");
-            case "pr_null" -> match("pr_null");
+            case "pr_true" -> {
+                literal = new BooleanLiteralNode(new PrimitiveType(currentToken));
+                match("pr_true");
+            }
+            case "pr_false" -> {
+                literal = new BooleanLiteralNode(new PrimitiveType(currentToken));
+                match("pr_false");
+            }
+            case "intLiteral" -> {
+                literal = new IntLiteralNode(new PrimitiveType(currentToken));
+                match("intLiteral");
+            }
+            case "charLiteral" -> {
+                literal = new CharLiteralNode(new PrimitiveType(currentToken));
+                match("charLiteral");
+            }
+            case "pr_null" -> {
+                match("pr_null");
+                literal = new NullTypeNode(currentToken);
+            }
             default ->
                     throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("primitive")), analyzer.getLineNumber());
         }
+        return literal;
     }
 
-    private void reference() throws SyntacticException {
+    private ExpressionNode reference() throws SyntacticException {
+        ReferenceNode e;
         if (productionsMap.getFirsts("primary").contains(currentToken.getTokenName())) {
-            primary();
-            chainReference();
+            e = primary();
+            ChainedNode chainedExp = chainReference();
+            e.setChainedElement(chainedExp);
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("reference")), analyzer.getLineNumber());
         }
+        return e;
     }
 
-    private void chainReference() throws SyntacticException {
+    private ChainedNode chainReference() throws SyntacticException {
+        ChainedNode newNode;
         if (currentToken.getTokenName().equals("dot")) {
             match("dot");
+            Token ct = currentToken;
             match("idMetVar");
-            chainElement();
-            chainReference();
+            List<ExpressionNode> params = chainElement();
+            if (params==null){
+                newNode = new ChainedVarNode(ct);
+            } else {
+                newNode = new ChainedMethodNode(params,ct);
+            }
+            newNode.setChainedNode(chainReference());
         } else if (!productionsMap.getFollow("chainReference").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("chainReference")), analyzer.getLineNumber());
-        }
+        } else
+            newNode = new EmptyChainedNode();
+        return newNode;
     }
 
-    private void primary() throws SyntacticException {
+    private ReferenceNode primary() throws SyntacticException {
+        ReferenceNode p;
         if (currentToken.getTokenName().equals("pr_this")) {
+            p = new ThisCallNode(currentToken,MainSemantic.symbolTable.currentClass,MainSemantic.symbolTable.currentBlock);
             match("pr_this");
         } else if (currentToken.getTokenName().equals("stringLiteral")) {
+            p = new StringLiteralNode(currentToken);
             match("stringLiteral");
         } else if (productionsMap.getFirsts("varMethodAccess").contains(currentToken.getTokenName())) {
-            varMethodAccess();
+            p = varMethodAccess();
         } else if (productionsMap.getFirsts("constructorCall").contains(currentToken.getTokenName())) {
-            constructorCall();
+            p = constructorCall();
         } else if (productionsMap.getFirsts("staticCall").contains(currentToken.getTokenName())) {
-            staticCall();
+            p = staticCall();
         } else if (productionsMap.getFirsts("parenthesisExpression").contains(currentToken.getTokenName())) {
-            parenthesisExpression();
+            p = parenthesisExpression();
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("primary")), analyzer.getLineNumber());
         }
+        return p;
     }
 
-    private void varMethodAccess() throws SyntacticException {
+    private ReferenceNode varMethodAccess() throws SyntacticException {
+        Token ct = currentToken;
         match("idMetVar");
-        possibleArgs();
+        List<ExpressionNode> l = possibleArgs();
+        BlockNode blockNode = MainSemantic.symbolTable.currentBlock;
+        if (l==null)
+            return new AccessVarNode(ct,blockNode);
+        else
+            return new AccessMethodNode(l,ct,blockNode);
     }
 
-    private void possibleArgs() throws SyntacticException {
+    private List<ExpressionNode> possibleArgs() throws SyntacticException {
+        List<ExpressionNode> l;
         if (productionsMap.getFirsts("currentArgs").contains(currentToken.getTokenName())) {
-            currentArgs();
+            l = currentArgs();
         } else if (!productionsMap.getFollow("possibleArgs").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("possibleArgs")), analyzer.getLineNumber());
+        } else {
+            l = null;
         }
+        return l;
     }
 
     private void optionalGenericsConstructor() throws SyntacticException {
@@ -692,56 +779,71 @@ public class SyntacticAnalyzer {
         }
     }
 
-    private void constructorCall() throws SyntacticException {
+    private ReferenceNode constructorCall() throws SyntacticException {
         match("pr_new");
+        Token ct = currentToken;
         match("idClase");
         optionalGenericsConstructor();
-        currentArgs();
+        List<ExpressionNode> params = currentArgs();
+        return new ConstructorCallNode(ct,params);
     }
 
-    private void parenthesisExpression() throws SyntacticException {
+    private ReferenceNode parenthesisExpression() throws SyntacticException {
         match("openParenthesis");
-        expression();
+        ExpressionNode e = expression();
         match("closeParenthesis");
+        return new ParamExpressionNode(e);
     }
 
-    private void staticCall() throws SyntacticException {
+    private ReferenceNode staticCall() throws SyntacticException {
+        Token ctClass = currentToken;
         match("idClase");
         match("dot");
+        Token ctMethod = currentToken;
         match("idMetVar");
-        currentArgs();
+        List<ExpressionNode> params = currentArgs();
+        return new StaticMethodNode(ctClass,ctMethod,params);
     }
 
-    private void currentArgs() throws SyntacticException {
+    private List<ExpressionNode> currentArgs() throws SyntacticException {
         match("openParenthesis");
-        optionalExpressionList();
+        List<ExpressionNode> l = optionalExpressionList();
         match("closeParenthesis");
+        return l;
     }
 
-    private void optionalExpressionList() throws SyntacticException {
+    private List<ExpressionNode> optionalExpressionList() throws SyntacticException {
+        List<ExpressionNode> retList = new ArrayList<>();
         if (productionsMap.getFirsts("expression").contains(currentToken.getTokenName())) {
-            expression();
-            expressionList();
+            retList.add(expression());
+            retList.addAll(expressionList());
         } else if (!productionsMap.getFollow("optionalExpressionList").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("optionalExpressionList")), analyzer.getLineNumber());
         }
+        return retList;
     }
 
-    private void expressionList() throws SyntacticException {
+    private List<ExpressionNode> expressionList() throws SyntacticException {
+        List<ExpressionNode> retList = new ArrayList<>();
         if (currentToken.getTokenName().equals("comma")) {
             match("comma");
-            expression();
-            expressionList();
+            retList.add(expression());
+            retList.addAll(expressionList());
         } else if (!productionsMap.getFollow("expressionList").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("expressionList")), analyzer.getLineNumber());
         }
+        return retList;
     }
 
-    private void chainElement() throws SyntacticException {
+    private List<ExpressionNode> chainElement() throws SyntacticException {
+        List<ExpressionNode> retList;
         if (productionsMap.getFirsts("currentArgs").contains(currentToken.getTokenName())) {
-            currentArgs();
+            retList = currentArgs();
         } else if (!productionsMap.getFollow("chainElement").contains(currentToken.getTokenName())) {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFollow("chainElement")), analyzer.getLineNumber());
+        } else {
+            retList = null;
         }
+        return retList;
     }
 }
