@@ -5,8 +5,9 @@ import Semantic.AST.Sentences.BlockNode;
 import Semantic.AST.Sentences.NullBlockNode;
 import Semantic.SemExceptions.SemanticException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Stack;
+import java.util.List;
 
 public class SymbolTable {
     public HashMap<String,Class> classes;
@@ -14,11 +15,13 @@ public class SymbolTable {
     public Class currentClass;
     public Constructor currentConstructor;
     public BlockNode currentBlock;
+    public List<String> instructionsList;
 
     public SymbolTable(){
         classes = new HashMap<>();
         currentBlock = new NullBlockNode();
         putPredefinedClasses();
+        instructionsList = new ArrayList<>();
     }
 
     public void checkStatements() throws SemanticException{
@@ -40,10 +43,46 @@ public class SymbolTable {
         }
     }
 
+    public void setOffsets(){
+
+    }
+
     public void generateCode(){
+        initCode();
+        heapCodeGenerator();
         for (Class c: classes.values()){
             c.generateCode();
         }
+    }
+
+    public void initCode(){
+        instructionsList.add(".CODE");
+        instructionsList.add("PUSH simple_heap_init");
+        instructionsList.add("CALL");
+
+        instructionsList.add("PUSH main");
+        instructionsList.add("CALL");
+        instructionsList.add("HALT");
+    }
+
+    public void heapCodeGenerator(){
+        instructionsList.add("simple_heap_init:");
+        instructionsList.add("RET 0");
+
+        instructionsList.add("simple_malloc:");
+        instructionsList.add("LOADFP");
+        instructionsList.add("LOADSP");
+        instructionsList.add("STOREFP");
+        instructionsList.add("LOADHL");
+        instructionsList.add("DUP");
+        instructionsList.add("PUSH 1");
+        instructionsList.add("ADD");
+        instructionsList.add("STORE 4");
+        instructionsList.add("LOAD 3");
+        instructionsList.add("ADD");
+        instructionsList.add("STOREHL");
+        instructionsList.add("STOREFP");
+        instructionsList.add("RET 1");
     }
 
     public void addClass(String name, Class classElement) throws SemanticException {

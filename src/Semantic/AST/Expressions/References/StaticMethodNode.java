@@ -1,7 +1,7 @@
 package Semantic.AST.Expressions.References;
 
 import Lexical.Analyzer.Token;
-import Main.MainSemantic;
+import Main.MainGen;
 import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.AST.Expressions.ExpressionNode;
@@ -27,7 +27,7 @@ public class StaticMethodNode extends ReferenceNode {
 
     @Override
     public Type check() throws SemanticException {
-        Class currentClass = MainSemantic.symbolTable.classes.get(classElement.getLexeme());
+        Class currentClass = MainGen.symbolTable.classes.get(classElement.getLexeme());
         if (currentClass==null){
             throw new SemanticException(classElement.getLexeme(),"La clase llamada no existe:", classElement.getLine());
         } else if (currentClass.getMethods().get(methodElement.getLexeme())==null){

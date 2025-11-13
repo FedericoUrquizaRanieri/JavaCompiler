@@ -6,8 +6,10 @@ import Semantic.SemExceptions.SemanticException;
 import Semantic.ST.SymbolTable;
 import SourceManager.*;
 
-        import java.io.FileNotFoundException;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import Syntactic.Analyzer.ProductionsMap;
 import Syntactic.Analyzer.SyntacticAnalyzer;
@@ -64,7 +66,18 @@ public class MainGen {
         }
 
         if (noMistakes){
+            symbolTable.setOffsets();
             symbolTable.generateCode();
+
+            String nombreSolo = args[0].substring(Math.max(args[0].lastIndexOf('/'), args[0].lastIndexOf('\\')) + 1);
+            String nombreOut = "[" + nombreSolo + "].out";
+            try (PrintWriter writer = new PrintWriter(new FileWriter(nombreOut))) {
+                for (String linea : symbolTable.instructionsList) {
+                    writer.println(linea);
+                }
+            } catch (IOException e) {
+                System.err.println("Error al escribir el archivo de salida: " + e.getMessage());
+            }
         }
 
         if (noMistakes) {

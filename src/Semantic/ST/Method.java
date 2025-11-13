@@ -1,9 +1,8 @@
 package Semantic.ST;
 
 import Lexical.Analyzer.Token;
-import Main.MainSemantic;
+import Main.MainGen;
 import Semantic.AST.Sentences.BlockNode;
-import Semantic.AST.Sentences.NullBlockNode;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.LinkedHashMap;
@@ -26,7 +25,7 @@ public class Method {
     public void checkStatements() throws SemanticException {
         if(returnType!=null){
             if(Objects.equals(returnType.getTokenType().getTokenName(), "idClase")){
-                if (MainSemantic.symbolTable.existsClass(returnType.getTokenType())==null){
+                if (MainGen.symbolTable.existsClass(returnType.getTokenType())==null){
                     throw new SemanticException(returnType.getTokenType().getLexeme(),"Se intento agregar un tipo de retorno inexistente ",returnType.getTokenType().getLine());
                 }
             }

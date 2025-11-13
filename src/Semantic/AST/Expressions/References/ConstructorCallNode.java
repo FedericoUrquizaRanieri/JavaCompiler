@@ -1,7 +1,7 @@
 package Semantic.AST.Expressions.References;
 
 import Lexical.Analyzer.Token;
-import Main.MainSemantic;
+import Main.MainGen;
 import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.AST.Expressions.ExpressionNode;
@@ -24,12 +24,12 @@ public class ConstructorCallNode extends ReferenceNode {
 
     @Override
     public Type check() throws SemanticException {
-        Class currentClass = MainSemantic.symbolTable.existsClass(classElement);
+        Class currentClass = MainGen.symbolTable.existsClass(classElement);
         Type retType = new ReferenceType(classElement,null);
         if(currentClass == null){
             throw new SemanticException(classElement.getLexeme(),"La clase del constructor referenciado no existe: ",classElement.getLine());
         } else{
-            Constructor c = MainSemantic.symbolTable.classes.get(classElement.getLexeme()).getConstructors().get(classElement.getLexeme());
+            Constructor c = MainGen.symbolTable.classes.get(classElement.getLexeme()).getConstructors().get(classElement.getLexeme());
             if (c==null){
                 throw new SemanticException(classElement.getLexeme(),"No es posible crear un object: ",classElement.getLine());
             }

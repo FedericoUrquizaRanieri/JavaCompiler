@@ -1,7 +1,7 @@
 package Semantic.ST;
 
 import Lexical.Analyzer.Token;
-import Main.MainSemantic;
+import Main.MainGen;
 import Semantic.AST.Sentences.NullBlockNode;
 import Semantic.SemExceptions.SemanticException;
 
@@ -31,7 +31,7 @@ public class Class {
 
     public void checkStatements() throws SemanticException {
         if (inheritance!=null) {
-            Class confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
+            Class confirmedFather = MainGen.symbolTable.existsClass(inheritance);
             if (confirmedFather != null) {
                 if (this == confirmedFather)
                     throw new SemanticException(inheritance.getLexeme(), "La clase actual es igual a la clase padre ", inheritance.getLine());
@@ -92,9 +92,9 @@ public class Class {
     public void consolidate() throws SemanticException{
         Class confirmedFather;
         if(inheritance!=null)
-            confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
+            confirmedFather = MainGen.symbolTable.existsClass(inheritance);
         else {
-            confirmedFather = MainSemantic.symbolTable.classes.get("Object");
+            confirmedFather = MainGen.symbolTable.classes.get("Object");
             if(!Objects.equals(this.className, "Object")){
                 this.inheritance=confirmedFather.classToken;
             }
@@ -117,7 +117,7 @@ public class Class {
 
     private void consolidateAttributes() throws SemanticException {
         if (inheritance!=null){
-            Class confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
+            Class confirmedFather = MainGen.symbolTable.existsClass(inheritance);
             HashMap<String, Attribute> newAttributes = new HashMap<>(confirmedFather.attributes);
             for(Attribute a:attributes.values()){
                 if(newAttributes.putIfAbsent(a.getName(),a)!=null)
@@ -129,7 +129,7 @@ public class Class {
 
     private void consolidateMethods() throws SemanticException {
         if (inheritance!=null){
-            Class confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
+            Class confirmedFather = MainGen.symbolTable.existsClass(inheritance);
             HashMap<String, Method> newMethods = new HashMap<>(confirmedFather.methods);
             for(Method m : methods.values()){
                 Method fatherMethod = newMethods.put(m.getName(),m);
@@ -189,7 +189,7 @@ public class Class {
 
     public boolean circularInheritance(List<Class> ancestors, Class element){
         if (element.inheritance!=null) {
-            Class father = MainSemantic.symbolTable.existsClass(element.inheritance);
+            Class father = MainGen.symbolTable.existsClass(element.inheritance);
             if (father == null)
                 return false;
             else if (ancestors.contains(father)) {
@@ -220,6 +220,11 @@ public class Class {
     }
 
     public void generateCode(){
+        //TODO aca revisar
+        MainGen.symbolTable.instructionsList.add(".DATA");
+        MainGen.symbolTable.instructionsList.add(".lblVTInit");
+        MainGen.symbolTable.instructionsList.add("NOP");
+        MainGen.symbolTable.instructionsList.add(".CODE");
         for(Method m : methods.values()){
             m.generateCode();
         }

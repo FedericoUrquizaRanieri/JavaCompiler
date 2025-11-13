@@ -1,7 +1,6 @@
 package Semantic.AST.Expressions.References;
 
 import Lexical.Analyzer.Token;
-import Main.MainSemantic;
 import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.AST.Expressions.ExpressionNode;
@@ -29,9 +28,7 @@ public class AccessMethodNode extends ReferenceNode {
         Method method = blockNode.getClassElement().getMethods().get(methodToken.getLexeme());
         if (method == null) {
             throw new SemanticException(methodToken.getLexeme(), "El metodo no existe: ", methodToken.getLine());
-        } else if (blockNode.getMethod().getModifier() != null && blockNode.getMethod().getModifier().getLexeme().equals("static")) {
-                throw new SemanticException(methodToken.getLexeme(), "No es posible llamar a un metodo normal dentro de uno estatico: ", methodToken.getLine());
-        } else{
+        }  else{
             parametersAreEqual(method.getParameters());
         }
         Type chainedType = chainedElement.check(method.getReturnType());

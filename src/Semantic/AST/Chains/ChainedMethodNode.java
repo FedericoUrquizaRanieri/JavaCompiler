@@ -1,7 +1,7 @@
 package Semantic.AST.Chains;
 
 import Lexical.Analyzer.Token;
-import Main.MainSemantic;
+import Main.MainGen;
 import Semantic.AST.Expressions.ExpressionNode;
 import Semantic.ST.*;
 import Semantic.ST.Class;
@@ -28,7 +28,7 @@ public class ChainedMethodNode extends ChainedNode{
             if (!(lastClass instanceof ReferenceType)){
                 throw new SemanticException(idToken.getLexeme(),"La llamada encadenada se hace sobre una variable primitiva: ", idToken.getLine());
             }
-            Class previousClass = MainSemantic.symbolTable.existsClass(lastClass.getTokenType());
+            Class previousClass = MainGen.symbolTable.existsClass(lastClass.getTokenType());
             if(previousClass==null){
                 throw new SemanticException(idToken.getLexeme(),"La clase encadenada previa no existe: ", idToken.getLine());
             }

@@ -1,7 +1,7 @@
 package Semantic.AST.Chains;
 
 import Lexical.Analyzer.Token;
-import Main.MainSemantic;
+import Main.MainGen;
 import Semantic.ST.Attribute;
 import Semantic.ST.Class;
 import Semantic.ST.PrimitiveType;
@@ -24,7 +24,7 @@ public class ChainedVarNode extends ChainedNode{
             if (lastClass instanceof PrimitiveType){
                 throw new SemanticException(idToken.getLexeme(), "La llamada encadenada se hace sobre una variable primitiva: ", idToken.getLine());
             }
-            Class previousClass = MainSemantic.symbolTable.existsClass(lastClass.getTokenType());
+            Class previousClass = MainGen.symbolTable.existsClass(lastClass.getTokenType());
             Attribute attribute = previousClass.getAttributes().get(idToken.getLexeme());
             if(attribute==null){
                 throw new SemanticException(idToken.getLexeme(),"La variable a la que se accede no exite: ", idToken.getLine());

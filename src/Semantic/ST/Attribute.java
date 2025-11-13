@@ -1,7 +1,7 @@
 package Semantic.ST;
 
 import Lexical.Analyzer.Token;
-import Main.MainSemantic;
+import Main.MainGen;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.Objects;
@@ -19,7 +19,7 @@ public class Attribute {
 
     public void checkStatements() throws SemanticException {
         if(Objects.equals(type.getTokenType().getTokenName(), "idClase")){
-            if (MainSemantic.symbolTable.existsClass(type.getTokenType())==null){
+            if (MainGen.symbolTable.existsClass(type.getTokenType())==null){
                 throw new SemanticException(type.getNameType(),"Se intento agregar un atributo de tipo inexistente ", type.getTokenType().getLine());
             }
         }
