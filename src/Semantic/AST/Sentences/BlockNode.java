@@ -16,6 +16,7 @@ public class BlockNode extends SentenceNode{
     private final Method method;
     private final Class classElement;
     private final BlockNode fatherBlock;
+    private int lastOffsetValue;
 
     public BlockNode(Method method,Class classElement, BlockNode fatherBlock){
         sentenceNodeList = new ArrayList<>();
@@ -24,6 +25,7 @@ public class BlockNode extends SentenceNode{
         this.method = method;
         this.classElement = classElement;
         this.fatherBlock = fatherBlock;
+        lastOffsetValue = 0;
     }
 
     @Override
@@ -97,5 +99,14 @@ public class BlockNode extends SentenceNode{
         for(SentenceNode s : sentenceNodeList){
             s.generateCode();
         }
+    }
+
+    public int getLastOffsetValue() {
+
+        return lastOffsetValue;
+    }
+
+    public void addLastOffsetValue() {
+        lastOffsetValue++;
     }
 }

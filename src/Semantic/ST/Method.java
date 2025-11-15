@@ -15,6 +15,7 @@ public class Method {
     private Token modifier;
     private final LinkedHashMap<String,Parameter> parameters;
     private BlockNode block;
+    private int offset;
 
     public Method(Token token){
         parameters = new LinkedHashMap<>();
@@ -53,8 +54,16 @@ public class Method {
             throw new SemanticException(p.getName(),"Se intento agregar un parametro repetido llamada ",p.getToken().getLine());
     }
 
-    public void generateCode(){
-        block.generateCode();
+    public void generateCode(String className){
+        if (modifier == null || !modifier.getLexeme().equals("static") || name.equals("main")){
+            MainGen.symbolTable.instructionsList.add("lblMet"+name+"@"+className+": LOADFP");
+            MainGen.symbolTable.instructionsList.add("LOADSP");
+            MainGen.symbolTable.instructionsList.add("STOREFP");
+            block.generateCode();
+            MainGen.symbolTable.instructionsList.add("FMEM 0");
+            MainGen.symbolTable.instructionsList.add("STOREFP");
+            MainGen.symbolTable.instructionsList.add("RET 0");
+        }
     }
 
     public LinkedHashMap<String, Parameter> getParameters() {
@@ -97,4 +106,11 @@ public class Method {
         this.returnType = returnType;
     }
 
+    public int getOffset() {
+        return offset;
+    }
+
+    public void setOffset(int offset) {
+        this.offset = offset;
+    }
 }

@@ -18,6 +18,11 @@ public class Class {
     private HashMap<String, Method> methods;
     private final HashMap<String, Constructor> constructors;
     private boolean isConsolidated = false;
+    private boolean attributesNumbered = false;
+    private boolean methodsNumbered = false;
+    private int lastAttributeOffset;
+    private int lastMethodOffset;
+
 
     public Class(Token token){
         attributes = new HashMap<>();
@@ -27,6 +32,8 @@ public class Class {
         this.classToken = token;
         if(Objects.equals(className, "Object"))
             isConsolidated = true;
+        lastMethodOffset = 0;
+        lastAttributeOffset = 0;
     }
 
     public void checkStatements() throws SemanticException {
@@ -220,19 +227,73 @@ public class Class {
     }
 
     public void generateCode(){
-        //TODO aca revisar
-        MainGen.symbolTable.instructionsList.add(".DATA");
-        MainGen.symbolTable.instructionsList.add(".lblVTInit");
-        MainGen.symbolTable.instructionsList.add("NOP");
+        generateVT();
         MainGen.symbolTable.instructionsList.add(".CODE");
-        for(Method m : methods.values()){
-            m.generateCode();
-        }
-        for(Attribute a: attributes.values()){
-            a.generateCode();
-        }
         for(Constructor c: constructors.values()){
             c.generateCode();
+        }
+        for(Method m : methods.values()){
+            m.generateCode(className);
+        }
+    }
+
+    public void generateVT(){
+        HashMap<Integer, String> methodsLabelByOffset = new HashMap<>();
+        for (Method m : methods.values()) {
+            if (m.getModifier() != null && !m.getModifier().getLexeme().equals("static"))
+                methodsLabelByOffset.put(m.getOffset(), m.getName());
+        }
+
+        if (!methodsLabelByOffset.isEmpty()){
+            MainGen.symbolTable.instructionsList.add(".DATA");
+            StringBuilder methodsLabels = new StringBuilder();
+            for (int i = 0; i < getLastMethodOffset(); i++) {
+                if (methodsLabelByOffset.get(i) != null)
+                    methodsLabels.append(methodsLabelByOffset.get(i));
+                else methodsLabels.append("0");
+                if (i != getLastMethodOffset()-1)
+                    methodsLabels.append(",");
+            }
+            MainGen.symbolTable.instructionsList.add("lblVT"+classToken.getLexeme()+": DW "+methodsLabels);
+        } else {
+            MainGen.symbolTable.instructionsList.add(".DATA");
+            MainGen.symbolTable.instructionsList.add("lblVT"+classToken.getLexeme()+": NOP");
+        }
+        MainGen.symbolTable.instructionsList.add("");
+    }
+
+    public void setAttributeOffsets(){
+        if (!attributesNumbered){
+            Class fatherClass = MainGen.symbolTable.classes.get(inheritance.getLexeme());
+            if (!inheritance.getLexeme().equals("Object")){
+                fatherClass.setAttributeOffsets();
+            }
+            lastAttributeOffset = fatherClass.getLastAttributeOffset();
+            for (Attribute a: attributes.values())
+                if (fatherClass.attributes.get(a.getName())==null){
+                    a.setOffset(lastAttributeOffset++);
+                } else {
+                    a.setOffset(fatherClass.attributes.get(a.getName()).getOffset());
+                }
+            attributesNumbered = true;
+        }
+    }
+
+    public void setMethodOffsets(){
+        if (!methodsNumbered){
+            Class fatherClass = MainGen.symbolTable.classes.get(inheritance.getLexeme());
+            if (!inheritance.getLexeme().equals("Object")){
+                fatherClass.setMethodOffsets();
+            }
+            lastMethodOffset = fatherClass.getLastMethodOffset();
+            for (Method m: methods.values())
+                if (m.getModifier() != null && !m.getModifier().getLexeme().equals("static"))
+                    if (fatherClass.methods.get(m.getName())==null){
+                       m.setOffset(lastMethodOffset++);
+                    } else {
+                        m.setOffset(fatherClass.methods.get(m.getName()).getOffset());
+                    }
+            methodsNumbered = true;
         }
     }
 
@@ -284,5 +345,20 @@ public class Class {
 
     public HashMap<String, Attribute> getAttributes() {
         return attributes;
+    }
+
+    public int getLastAttributeOffset() {
+        return lastAttributeOffset;
+    }
+
+    public int getLastMethodOffset() {
+        return lastMethodOffset;
+    }
+
+    public void attributesNumbered() {
+        attributesNumbered = true;
+    }
+    public void methodsNumbered() {
+        methodsNumbered = true;
     }
 }

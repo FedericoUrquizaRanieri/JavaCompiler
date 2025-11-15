@@ -44,14 +44,21 @@ public class SymbolTable {
     }
 
     public void setOffsets(){
-
+        for (Class c : classes.values()) {
+            c.setAttributeOffsets();
+        }
+        for (Class c : classes.values()) {
+            c.setMethodOffsets();
+        }
     }
 
     public void generateCode(){
         initCode();
         heapCodeGenerator();
+        generateDefaultClasses();
         for (Class c: classes.values()){
-            c.generateCode();
+            if (!c.getClassName().equals("Object") && !c.getClassName().equals("System") && !c.getClassName().equals("String"))
+                c.generateCode();
         }
     }
 
@@ -59,30 +66,28 @@ public class SymbolTable {
         instructionsList.add(".CODE");
         instructionsList.add("PUSH simple_heap_init");
         instructionsList.add("CALL");
-
-        instructionsList.add("PUSH main");
+        instructionsList.add("PUSH lblMetmain@Init");
         instructionsList.add("CALL");
         instructionsList.add("HALT");
+        instructionsList.add("");
     }
 
     public void heapCodeGenerator(){
-        instructionsList.add("simple_heap_init:");
-        instructionsList.add("RET 0");
-
-        instructionsList.add("simple_malloc:");
-        instructionsList.add("LOADFP");
+        instructionsList.add("simple_heap_init: RET 0 ; Retorna inmediatamente");
+        instructionsList.add("simple_malloc: LOADFP     ; Inicializacion unidad");
         instructionsList.add("LOADSP");
-        instructionsList.add("STOREFP");
-        instructionsList.add("LOADHL");
-        instructionsList.add("DUP");
-        instructionsList.add("PUSH 1");
+        instructionsList.add("STOREFP ; Finaliza inicializacion del RA");
+        instructionsList.add("LOADHL ; hl");
+        instructionsList.add("DUP ; hl");
+        instructionsList.add("PUSH 1 ; 1");
+        instructionsList.add("ADD ; hl+1");
+        instructionsList.add("STORE 4 ; Guarda el resultado (un puntero a la primer celda de la region de memoria)");
+        instructionsList.add("LOAD 3 ; Carga la cantidad de celdas a alojar (parametro que debe ser positivo)");
         instructionsList.add("ADD");
-        instructionsList.add("STORE 4");
-        instructionsList.add("LOAD 3");
-        instructionsList.add("ADD");
-        instructionsList.add("STOREHL");
+        instructionsList.add("STOREHL ; Mueve el heap limit (hl). Expande el heap");
         instructionsList.add("STOREFP");
-        instructionsList.add("RET 1");
+        instructionsList.add("RET 1     ; Retorna eliminando el parametro");
+        instructionsList.add("");
     }
 
     public void addClass(String name, Class classElement) throws SemanticException {
@@ -100,10 +105,16 @@ public class SymbolTable {
     private void putPredefinedClasses(){
         Class object = new Class(new Token("idClase","Object",0));
         classes.put("Object",object);
+        object.attributesNumbered();
+        object.methodsNumbered();
         Class string = new Class(new Token("idClase","String",0));
         classes.put("String",string);
+        string.attributesNumbered();
+        string.methodsNumbered();
         Class system = new Class(new Token("idClase","System",0));
         classes.put("System",system);
+        system.attributesNumbered();
+        system.methodsNumbered();
 
         Method debugPrint = new Method(new Token("idMetVar","debugPrint",0));
         debugPrint.setBlock(new NullBlockNode());
@@ -179,5 +190,9 @@ public class SymbolTable {
         printSln.setModifier(new Token("pr_static","static",0));
         printSln.getParameters().put("s",new Parameter(new PrimitiveType(new Token("idClase","String",0)),new Token("idMetVar","s",0)));
         system.getMethods().put("printSln",printSln);
+    }
+
+    public void generateDefaultClasses(){
+        DefaultGenerator.generateDefaults();
     }
 }

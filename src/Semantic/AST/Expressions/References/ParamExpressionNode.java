@@ -43,5 +43,7 @@ public class ParamExpressionNode extends ReferenceNode {
     @Override
     public void generateCode() {
         expression.generateCode();
+        if (chainedElement != null)
+            chainedElement.generateCode();
     }
 }

@@ -1,6 +1,7 @@
 package Semantic.AST.Expressions.References;
 
 import Lexical.Analyzer.Token;
+import Main.MainGen;
 import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.AST.Sentences.BlockNode;
@@ -47,6 +48,8 @@ public class ThisCallNode extends ReferenceNode {
 
     @Override
     public void generateCode() {
-        //TODO revisar encadenado?
+        MainGen.symbolTable.instructionsList.add("LOAD 3 ; se accede a this");
+        if (chainedElement != null)
+            chainedElement.generateCode();
     }
 }

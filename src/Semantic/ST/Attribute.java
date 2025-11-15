@@ -11,6 +11,7 @@ public class Attribute {
     private Type type;
     private final Token token;
     private Token genericType;
+    private int offset;
 
     public Attribute(Token token){
         this.name = token.getLexeme();
@@ -47,5 +48,13 @@ public class Attribute {
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public void setOffset(int offset) {
+        this.offset = offset;
+    }
+
+    public int getOffset() {
+        return offset;
     }
 }

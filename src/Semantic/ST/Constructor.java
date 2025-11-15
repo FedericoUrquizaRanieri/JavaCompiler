@@ -1,6 +1,7 @@
 package Semantic.ST;
 
 import Lexical.Analyzer.Token;
+import Main.MainGen;
 import Semantic.AST.Sentences.BlockNode;
 import Semantic.SemExceptions.SemanticException;
 
@@ -38,7 +39,12 @@ public class Constructor extends Method{
     }
 
     public void generateCode(){
+        MainGen.symbolTable.instructionsList.add("lblConstructor@"+token.getLexeme()+":LOADFP ; Apila el valor del registro fp");
+        MainGen.symbolTable.instructionsList.add("LOADSP ; Apila el valor del registro sp");
+        MainGen.symbolTable.instructionsList.add("STOREFP ; Almacena el tope de la pila en el registro fp");
         block.generateCode();
+        MainGen.symbolTable.instructionsList.add("STOREFP ; Almacena el tope de la pila en el registro fp");
+        MainGen.symbolTable.instructionsList.add("RET "+parameters.size() + 1+" ; Libera los parametros y retorna de la unidad");
     }
 
     public Token getToken() {

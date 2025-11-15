@@ -1,5 +1,6 @@
 package Semantic.AST.Sentences;
 
+import Main.MainGen;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.ArrayList;
@@ -38,5 +39,7 @@ public class NullBlockNode extends BlockNode{
     }
 
     @Override
-    public void generateCode() {    }
+    public void generateCode() {
+        MainGen.symbolTable.instructionsList.add("FMEM 0");
+    }
 }

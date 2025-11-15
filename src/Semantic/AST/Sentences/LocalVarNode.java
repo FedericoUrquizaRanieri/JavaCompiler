@@ -14,6 +14,7 @@ public class LocalVarNode extends SentenceNode{
     private final ExpressionNode compExpression;
     private Type varType;
     private final BlockNode blockNode;
+    private int offset;
 
     public LocalVarNode(Token name, ExpressionNode e, BlockNode blockNode){
         compExpression=e;
@@ -45,6 +46,8 @@ public class LocalVarNode extends SentenceNode{
 
     @Override
     public void generateCode() {
+        offset = blockNode.getLastOffsetValue();
+        blockNode.addLastOffsetValue();
         compExpression.generateCode();
     }
 

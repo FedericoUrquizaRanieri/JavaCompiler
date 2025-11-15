@@ -1,6 +1,7 @@
 package Semantic.AST.Expressions;
 
 import Lexical.Analyzer.Token;
+import Main.MainGen;
 import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.ChainedVarNode;
 import Semantic.AST.Chains.EmptyChainedNode;
@@ -60,5 +61,7 @@ public class AssignExpNode extends ExpressionNode {
     public void generateCode() {
         leftExpression.generateCode();
         rightExpression.generateCode();
+        MainGen.symbolTable.instructionsList.add("EQ");
+        //TODO esta mal esto
     }
 }

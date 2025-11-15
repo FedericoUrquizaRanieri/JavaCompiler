@@ -1,6 +1,7 @@
 package Semantic.AST.Expressions.TypeNode;
 
 import Lexical.Analyzer.Token;
+import Main.MainGen;
 import Semantic.AST.Expressions.OperandNode;
 import Semantic.ST.PrimitiveType;
 import Semantic.ST.Type;
@@ -19,6 +20,6 @@ public class CharLiteralNode extends OperandNode {
 
     @Override
     public void generateCode() {
-        //TODO apilar?
+        MainGen.symbolTable.instructionsList.add("PUSH "+type.getTokenType().getLexeme());
     }
 }

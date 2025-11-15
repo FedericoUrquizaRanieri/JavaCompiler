@@ -10,6 +10,7 @@ public class Parameter {
     private final String name;
     private final Type type;
     private final Token token;
+    private int offset;
 
     public Parameter(Type type, Token token){
         this.name = token.getLexeme();
