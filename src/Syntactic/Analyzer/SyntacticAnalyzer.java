@@ -180,7 +180,7 @@ public class SyntacticAnalyzer {
             Type t = typeMethod();
             Token name = currentToken;
             match("idMetVar");
-            MainGen.symbolTable.currentMethod = new Method(name);
+            MainGen.symbolTable.currentMethod = new Method(name,MainGen.symbolTable.currentClass);
             MainGen.symbolTable.currentMethod.setReturnType(t);
             MainGen.symbolTable.currentMethod.setModifier(mod);
             List<Parameter> args = formalArgs();
@@ -198,7 +198,7 @@ public class SyntacticAnalyzer {
             match("pr_void");
             Token name = currentToken;
             match("idMetVar");
-            MainGen.symbolTable.currentMethod = new Method(name);
+            MainGen.symbolTable.currentMethod = new Method(name,MainGen.symbolTable.currentClass);
             MainGen.symbolTable.currentMethod.setReturnType(null);
             List<Parameter> args = formalArgs();
             for (Parameter m : args){
@@ -236,7 +236,7 @@ public class SyntacticAnalyzer {
 
     private void memberMethod(Type t , Token name) throws CompiException {
         if (productionsMap.getFirsts("formalArgs").contains(currentToken.getTokenName())) {
-            Method m = new Method(name);
+            Method m = new Method(name,MainGen.symbolTable.currentClass);
             m.setReturnType(t);
             MainGen.symbolTable.currentMethod = m;
             List<Parameter> args = formalArgs();

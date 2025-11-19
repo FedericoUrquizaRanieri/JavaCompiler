@@ -20,6 +20,7 @@ public class LocalVarNode extends SentenceNode{
         compExpression=e;
         tokenName = name;
         this.blockNode = blockNode;
+        offset = blockNode.getMethod().getLocalVarOffset();
     }
 
     @Override
@@ -61,5 +62,9 @@ public class LocalVarNode extends SentenceNode{
 
     public Type getVarType() {
         return varType;
+    }
+
+    public int getOffset() {
+        return offset;
     }
 }

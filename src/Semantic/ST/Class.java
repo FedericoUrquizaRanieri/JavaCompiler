@@ -240,8 +240,8 @@ public class Class {
     public void generateVT(){
         HashMap<Integer, String> methodsLabelByOffset = new HashMap<>();
         for (Method m : methods.values()) {
-            if (m.getModifier() != null && !m.getModifier().getLexeme().equals("static"))
-                methodsLabelByOffset.put(m.getOffset(), m.getName());
+            if (m.getModifier()==null || m.getModifier() != null && !m.getModifier().getLexeme().equals("static"))
+                methodsLabelByOffset.put(m.getOffset(), "lblMet"+m.getName()+"@"+m.getOriginalClass().getClassName());
         }
 
         if (!methodsLabelByOffset.isEmpty()){
@@ -287,13 +287,19 @@ public class Class {
             }
             lastMethodOffset = fatherClass.getLastMethodOffset();
             for (Method m: methods.values())
-                if (m.getModifier() != null && !m.getModifier().getLexeme().equals("static"))
+                if (m.getModifier()== null || m.getModifier() != null && !m.getModifier().getLexeme().equals("static"))
                     if (fatherClass.methods.get(m.getName())==null){
                        m.setOffset(lastMethodOffset++);
                     } else {
                         m.setOffset(fatherClass.methods.get(m.getName()).getOffset());
                     }
             methodsNumbered = true;
+        }
+    }
+
+    public void setConstructorOffset(){
+        for(Constructor c:constructors.values()){
+            c.setParamsOffsets();
         }
     }
 

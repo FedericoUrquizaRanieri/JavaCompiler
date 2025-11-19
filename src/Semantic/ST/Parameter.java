@@ -37,4 +37,8 @@ public class Parameter {
     public Token getToken() {
         return token;
     }
+
+    public int getOffset() {
+        return offset;
+    }
 }

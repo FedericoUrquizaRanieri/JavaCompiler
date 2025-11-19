@@ -15,7 +15,7 @@ public class Constructor extends Method{
     private BlockNode block;
 
     public Constructor(Token token){
-        super(token);
+        super(token,MainGen.symbolTable.currentClass);
         parameters = new LinkedHashMap<>();
         this.token = token;
     }
@@ -57,5 +57,9 @@ public class Constructor extends Method{
 
     public LinkedHashMap<String, Parameter> getParameters() {
         return parameters;
+    }
+
+    public void setParamsOffsets(){
+
     }
 }

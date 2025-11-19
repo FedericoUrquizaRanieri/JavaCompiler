@@ -16,11 +16,14 @@ public class Method {
     private final LinkedHashMap<String,Parameter> parameters;
     private BlockNode block;
     private int offset;
+    private int localVarOffset = 0;
+    private Class originalClass;
 
-    public Method(Token token){
+    public Method(Token token, Class orig){
         parameters = new LinkedHashMap<>();
         this.name = token.getLexeme();
         this.token = token;
+        this.originalClass = orig;
     }
 
     public void checkStatements() throws SemanticException {
@@ -56,6 +59,7 @@ public class Method {
 
     public void generateCode(String className){
         if (modifier == null || !modifier.getLexeme().equals("static") || name.equals("main")){
+            MainGen.symbolTable.instructionsList.add("");
             MainGen.symbolTable.instructionsList.add("lblMet"+name+"@"+className+": LOADFP");
             MainGen.symbolTable.instructionsList.add("LOADSP");
             MainGen.symbolTable.instructionsList.add("STOREFP");
@@ -112,5 +116,13 @@ public class Method {
 
     public void setOffset(int offset) {
         this.offset = offset;
+    }
+
+    public int getLocalVarOffset() {
+        return localVarOffset++;
+    }
+
+    public Class getOriginalClass() {
+        return originalClass;
     }
 }

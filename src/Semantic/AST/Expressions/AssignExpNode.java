@@ -59,9 +59,10 @@ public class AssignExpNode extends ExpressionNode {
 
     @Override
     public void generateCode() {
-        leftExpression.generateCode();
+        if (leftExpression instanceof ReferenceNode referenceNode) {
+            referenceNode.setLeftSided();
+        }
         rightExpression.generateCode();
-        MainGen.symbolTable.instructionsList.add("EQ");
-        //TODO esta mal esto
+        leftExpression.generateCode();
     }
 }
