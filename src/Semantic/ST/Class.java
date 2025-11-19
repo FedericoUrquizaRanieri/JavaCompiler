@@ -14,8 +14,8 @@ public class Class {
     private Token generics;
     private Token inheritanceGenerics;
     private Token modifierClass;
-    private HashMap<String, Attribute> attributes;
-    private HashMap<String, Method> methods;
+    private LinkedHashMap<String, Attribute> attributes;
+    private LinkedHashMap<String, Method> methods;
     private final HashMap<String, Constructor> constructors;
     private boolean isConsolidated = false;
     private boolean attributesNumbered = false;
@@ -25,15 +25,15 @@ public class Class {
 
 
     public Class(Token token){
-        attributes = new HashMap<>();
-        methods = new HashMap<>();
+        attributes = new LinkedHashMap<>();
+        methods = new LinkedHashMap<>();
         constructors = new HashMap<>();
         this.className = token.getLexeme();
         this.classToken = token;
         if(Objects.equals(className, "Object"))
             isConsolidated = true;
         lastMethodOffset = 0;
-        lastAttributeOffset = 0;
+        lastAttributeOffset = 1;
     }
 
     public void checkStatements() throws SemanticException {
@@ -125,7 +125,7 @@ public class Class {
     private void consolidateAttributes() throws SemanticException {
         if (inheritance!=null){
             Class confirmedFather = MainGen.symbolTable.existsClass(inheritance);
-            HashMap<String, Attribute> newAttributes = new HashMap<>(confirmedFather.attributes);
+            LinkedHashMap<String, Attribute> newAttributes = new LinkedHashMap<>(confirmedFather.attributes);
             for(Attribute a:attributes.values()){
                 if(newAttributes.putIfAbsent(a.getName(),a)!=null)
                     throw new SemanticException(a.getName(),"Se intento cambiar un atributo del padre en ",a.getToken().getLine());
@@ -137,7 +137,7 @@ public class Class {
     private void consolidateMethods() throws SemanticException {
         if (inheritance!=null){
             Class confirmedFather = MainGen.symbolTable.existsClass(inheritance);
-            HashMap<String, Method> newMethods = new HashMap<>(confirmedFather.methods);
+            LinkedHashMap<String, Method> newMethods = new LinkedHashMap<>(confirmedFather.methods);
             for(Method m : methods.values()){
                 Method fatherMethod = newMethods.put(m.getName(),m);
                 if(fatherMethod!=null){
@@ -286,13 +286,15 @@ public class Class {
                 fatherClass.setMethodOffsets();
             }
             lastMethodOffset = fatherClass.getLastMethodOffset();
-            for (Method m: methods.values())
-                if (m.getModifier()== null || m.getModifier() != null && !m.getModifier().getLexeme().equals("static"))
-                    if (fatherClass.methods.get(m.getName())==null){
-                       m.setOffset(lastMethodOffset++);
+            for (Method m: methods.values()) {
+                m.setParamsOffsets();
+                if (m.getModifier() == null || m.getModifier() != null && !m.getModifier().getLexeme().equals("static"))
+                    if (fatherClass.methods.get(m.getName()) == null) {
+                        m.setOffset(lastMethodOffset++);
                     } else {
                         m.setOffset(fatherClass.methods.get(m.getName()).getOffset());
                     }
+            }
             methodsNumbered = true;
         }
     }

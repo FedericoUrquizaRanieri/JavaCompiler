@@ -16,8 +16,7 @@ public class Method {
     private final LinkedHashMap<String,Parameter> parameters;
     private BlockNode block;
     private int offset;
-    private int localVarOffset = 0;
-    private Class originalClass;
+    private final Class originalClass;
 
     public Method(Token token, Class orig){
         parameters = new LinkedHashMap<>();
@@ -64,9 +63,24 @@ public class Method {
             MainGen.symbolTable.instructionsList.add("LOADSP");
             MainGen.symbolTable.instructionsList.add("STOREFP");
             block.generateCode();
-            MainGen.symbolTable.instructionsList.add("FMEM 0");
+            MainGen.symbolTable.instructionsList.add("FMEM "+block.getLocalVarList().size());
             MainGen.symbolTable.instructionsList.add("STOREFP");
-            MainGen.symbolTable.instructionsList.add("RET 0");
+            if (modifier != null && modifier.getLexeme().equals("static")){
+                MainGen.symbolTable.instructionsList.add("RET "+parameters.size()+" ; Libera los parametros y retorna de la unidad");
+            } else
+                MainGen.symbolTable.instructionsList.add("RET "+(parameters.size() + 1)+" ; Libera los parametros y retorna de la unidad");
+        }
+    }
+
+    public void setParamsOffsets(){
+        int i;
+        if (modifier != null && modifier.getLexeme().equals("static"))
+            i = 3;
+        else
+            i = 4;
+        for(Parameter p : parameters.values()){
+            p.setOffset(i);
+            i++;
         }
     }
 
@@ -116,10 +130,6 @@ public class Method {
 
     public void setOffset(int offset) {
         this.offset = offset;
-    }
-
-    public int getLocalVarOffset() {
-        return localVarOffset++;
     }
 
     public Class getOriginalClass() {

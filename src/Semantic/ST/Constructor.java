@@ -60,6 +60,10 @@ public class Constructor extends Method{
     }
 
     public void setParamsOffsets(){
-
+        int i = 4;
+        for(Parameter p : parameters.values()){
+            p.setOffset(i);
+            i++;
+        }
     }
 }

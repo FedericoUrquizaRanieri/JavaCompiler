@@ -11,6 +11,7 @@ public class NullBlockNode extends BlockNode{
     public NullBlockNode(){
         super(null,null,null);
         checked = false;
+        lastOffsetValue = -1;
     }
 
     @Override

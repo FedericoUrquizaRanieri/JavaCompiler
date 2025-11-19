@@ -1,6 +1,7 @@
 package Semantic.AST.Chains;
 
 import Lexical.Analyzer.Token;
+import Semantic.ST.Class;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
 

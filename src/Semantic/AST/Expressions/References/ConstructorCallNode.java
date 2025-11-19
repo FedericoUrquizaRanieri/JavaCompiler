@@ -67,8 +67,23 @@ public class ConstructorCallNode extends ReferenceNode {
 
     @Override
     public void generateCode() {
-        for(ExpressionNode e:args){
+        MainGen.symbolTable.instructionsList.add("RMEM 1");
+        MainGen.symbolTable.instructionsList.add("PUSH "+MainGen.symbolTable.classes.get(classElement.getLexeme()).getLastAttributeOffset()+" ; atributos y VT");
+        MainGen.symbolTable.instructionsList.add("PUSH simple_malloc ; reservar heap");
+        MainGen.symbolTable.instructionsList.add("CALL");
+        MainGen.symbolTable.instructionsList.add("DUP");
+        MainGen.symbolTable.instructionsList.add("PUSH lblVT"+classElement.getLexeme()+" ; Etiqueta de la VT");
+        MainGen.symbolTable.instructionsList.add("STOREREF 0");
+        MainGen.symbolTable.instructionsList.add("DUP");
+
+        for (ExpressionNode e : args) {
             e.generateCode();
+            MainGen.symbolTable.instructionsList.add("SWAP");
         }
+        MainGen.symbolTable.instructionsList.add("PUSH lblConstructor@"+classElement.getLexeme());
+        MainGen.symbolTable.instructionsList.add("CALL");
+
+        if (chainedElement != null)
+            chainedElement.generateCode();
     }
 }

@@ -9,6 +9,7 @@ import Semantic.ST.Class;
 import Semantic.ST.Parameter;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
+import com.sun.tools.javac.Main;
 
 import java.util.HashMap;
 import java.util.List;
@@ -72,5 +73,9 @@ public class StaticMethodNode extends ReferenceNode {
         for (ExpressionNode e :args){
             e.generateCode();
         }
+        //TODO aca creo que el class element seria el this asi que no es necesario ahcer esta parafernalia
+        String originalClass = MainGen.symbolTable.classes.get(classElement.getLexeme()).getMethods().get(methodElement.getLexeme()).getOriginalClass().getClassName();
+        MainGen.symbolTable.instructionsList.add("PUSH lblMet"+methodElement.getLexeme()+"@"+originalClass);
+        MainGen.symbolTable.instructionsList.add("CALL");
     }
 }

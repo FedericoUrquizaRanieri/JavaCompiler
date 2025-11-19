@@ -66,7 +66,7 @@ public class AccessVarNode extends ReferenceNode {
         Attribute atr = MainGen.symbolTable.classes.get(blockNode.getClassElement().getClassName()).getAttributes().get(varToken.getLexeme());
         if (atr!=null){
             MainGen.symbolTable.instructionsList.add("LOAD 3 ; Acceso a atributo");
-            if (!isLeftSided || chainedElement != null){
+            if (!isLeftSided || !(chainedElement instanceof EmptyChainedNode)){
                 MainGen.symbolTable.instructionsList.add("LOADREF "+atr.getOffset()+" ; Cargo direccion de atributo");
             } else {
                 MainGen.symbolTable.instructionsList.add("SWAP ; Muevo this a SP - 1");
@@ -80,11 +80,11 @@ public class AccessVarNode extends ReferenceNode {
                 localOrParamOffset =blockNode.getMethod().getParameters().get(varToken.getLexeme()).getOffset();
             }
 
-            if (!isLeftSided || chainedElement != null)
+            if (!isLeftSided || !(chainedElement instanceof EmptyChainedNode))
                 MainGen.symbolTable.instructionsList.add("LOAD "+localOrParamOffset+" ; Cargo la direccion de var");
             else MainGen.symbolTable.instructionsList.add("STORE "+localOrParamOffset+" ; Guardo valor en var");
         }
-        if (chainedElement != null)
+        if (!(chainedElement instanceof EmptyChainedNode))
             chainedElement.generateCode();
     }
 }
