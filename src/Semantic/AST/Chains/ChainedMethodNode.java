@@ -73,7 +73,7 @@ public class ChainedMethodNode extends ChainedNode{
     @Override
     public void generateCode() {
         Method method = previousClass.getMethods().get(idToken.getLexeme());
-        if (method.getModifier() != null && !method.getModifier().getLexeme().equals("static")){
+        if (method.getModifier() != null && method.getModifier().getLexeme().equals("static")){
             MainGen.symbolTable.instructionsList.add("POP ; Borro la referencia al objeto");
             if (!method.getReturnType().getTokenType().getLexeme().equals("void")){
                 MainGen.symbolTable.instructionsList.add("RMEM 1 ; Reservo lugar para el retorno");
@@ -84,7 +84,7 @@ public class ChainedMethodNode extends ChainedNode{
             MainGen.symbolTable.instructionsList.add("PUSH lblMet"+method.getName()+"@"+method.getOriginalClass().getClassName());
             MainGen.symbolTable.instructionsList.add("CALL");
         } else {
-            if (method.getReturnType() !=null){
+            if (method.getReturnType() != null){
                 MainGen.symbolTable.instructionsList.add("RMEM 1 ; Reservo lugar para el retorno");
                 MainGen.symbolTable.instructionsList.add("SWAP");
             }

@@ -67,12 +67,36 @@ public class AccessMethodNode extends ReferenceNode {
 
     @Override
     public void generateCode() {
-        for(ExpressionNode e:params){
-            e.generateCode();
+        Method method = blockNode.getClassElement().getMethods().get(methodToken.getLexeme());
+        if (method.getModifier() != null && method.getModifier().getLexeme().equals("static")) {
+            if (!method.getReturnType().getTokenType().getLexeme().equals("void")){
+                MainGen.symbolTable.instructionsList.add("RMEM 1 ; Reservo lugar para el retorno");
+            }
+            for (ExpressionNode p : params){
+                p.generateCode();
+            }
+            MainGen.symbolTable.instructionsList.add("PUSH lblMet"+method.getName()+"@"+method.getOriginalClass().getClassName());
+            MainGen.symbolTable.instructionsList.add("CALL");
+        } else {
+            MainGen.symbolTable.instructionsList.add("LOAD 3 ; Cargo this");
+            if (method.getReturnType() !=null){
+                MainGen.symbolTable.instructionsList.add("RMEM 1 ; Reservo lugar para el retorno");
+                MainGen.symbolTable.instructionsList.add("SWAP");
+            }
+            for (ExpressionNode p : params){
+                p.generateCode();
+                MainGen.symbolTable.instructionsList.add("SWAP ; Muevo this");
+            }
+            MainGen.symbolTable.instructionsList.add("DUP ; Duplico this");
+            MainGen.symbolTable.instructionsList.add("LOADREF 0 ; Cargo VT");
+            MainGen.symbolTable.instructionsList.add("LOADREF "+method.getOffset()+" ; Cargo metodo");
+            MainGen.symbolTable.instructionsList.add("CALL ; Llamo metodo");
         }
-
+        if (chainedElement != null)
+            chainedElement.generateCode();
         //String originalClass = blockNode.getClassElement().getMethods().get(methodToken.getLexeme()).getOriginalClass().getClassName();
         //MainGen.symbolTable.instructionsList.add("PUSH lblMet"+methodToken.getLexeme()+"@"+originalClass);
         //MainGen.symbolTable.instructionsList.add("CALL");
+        //TODO borrar
     }
 }

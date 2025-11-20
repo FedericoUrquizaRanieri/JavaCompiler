@@ -9,6 +9,7 @@ import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
 
 public class ChainedVarNode extends ChainedNode{
+    private Class previousClass;
     public ChainedVarNode(Token mainToken) {
         idToken = mainToken;
     }
@@ -24,7 +25,7 @@ public class ChainedVarNode extends ChainedNode{
             if (lastClass instanceof PrimitiveType){
                 throw new SemanticException(idToken.getLexeme(), "La llamada encadenada se hace sobre una variable primitiva: ", idToken.getLine());
             }
-            Class previousClass = MainGen.symbolTable.existsClass(lastClass.getTokenType());
+            previousClass = MainGen.symbolTable.existsClass(lastClass.getTokenType());
             Attribute attribute = previousClass.getAttributes().get(idToken.getLexeme());
             if(attribute==null){
                 throw new SemanticException(idToken.getLexeme(),"La variable a la que se accede no exite: ", idToken.getLine());
@@ -46,6 +47,14 @@ public class ChainedVarNode extends ChainedNode{
 
     @Override
     public void generateCode() {
-
+        Attribute atr = previousClass.getAttributes().get(idToken.getLexeme());
+        if (!isLeftSided || !(chainedNode instanceof EmptyChainedNode)){
+            MainGen.symbolTable.instructionsList.add("LOADREF "+atr.getOffset()+" ; Cargo direccion de atributo");
+        } else {
+            MainGen.symbolTable.instructionsList.add("SWAP ; Pongo this en SP - 1");
+            MainGen.symbolTable.instructionsList.add("STOREREF "+atr.getOffset()+" ; Guardo valor en la direccion del atributo");
+        }
+        if (chainedNode != null)
+            chainedNode.generateCode();
     }
 }
