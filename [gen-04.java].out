@@ -1,0 +1,294 @@
+.CODE
+PUSH simple_heap_init
+CALL
+PUSH lblMetmain@Init
+CALL
+HALT
+
+simple_heap_init: RET 0 ; Retorna inmediatamente
+
+simple_malloc: LOADFP     ; Inicializacion unidad
+LOADSP
+STOREFP ; Finaliza inicializacion del RA
+LOADHL ; hl
+DUP ; hl
+PUSH 1 ; 1
+ADD ; hl+1
+STORE 4 ; Guarda el resultado (un puntero a la primer celda de la region de memoria)
+LOAD 3 ; Carga la cantidad de celdas a alojar (parametro que debe ser positivo)
+ADD
+STOREHL ; Mueve el heap limit (hl). Expande el heap
+STOREFP
+RET 1     ; Retorna eliminando el parametro
+
+.DATA
+lblVTObject: NOP
+
+.CODE
+lblConstructor@Object: LOADFP ; Apila el valor del registro fp
+LOADSP ; Apila el valor del registro sp
+STOREFP ; Almacena el tope de la pila en el registro fp
+FMEM 0
+STOREFP ; Almacena el tope de la pila en el registro fp
+RET 1 ; Libera los parametros y retorna de la unidad
+
+lblMetdebugPrint@Object: LOADFP ; Apila el valor del registro fp
+LOADSP
+STOREFP
+LOAD 3 ; Lee i
+IPRINT ; Imprime i
+STOREFP
+RET 1
+
+.DATA
+lblVTString: NOP
+
+.CODE
+lblConstructor@String: LOADFP ; Apila el valor del registro fp
+LOADSP ; Apila el valor del registro sp
+STOREFP ; Almacena el tope de la pila en el registro fp
+FMEM 0
+STOREFP ; Almacena el tope de la pila en el registro fp
+RET 1 ; Libera los parametros y retorna de la unidad
+
+.DATA
+lblVTSystem: NOP
+
+.CODE
+lblConstructor@System: LOADFP ; Apila el valor del registro fp
+LOADSP ; Apila el valor del registro sp
+STOREFP ; Almacena el tope de la pila en el registro fp
+FMEM 0
+STOREFP ; Almacena el tope de la pila en el registro fp
+RET 1 ; Libera los parametros y retorna de la unidad
+
+lblMetread@System: LOADFP
+LOADSP
+STOREFP
+READ ; Lee tope de la pila
+PUSH 48 ; Por ASCII
+SUB
+STORE 3 ; Guarda en retorno el tope
+STOREFP
+RET 0
+
+lblMetprintB@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+BPRINT 
+STOREFP
+RET 1
+
+lblMetprintC@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+CPRINT 
+STOREFP
+RET 1
+
+lblMetprintI@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+IPRINT 
+STOREFP
+RET 1
+
+lblMetprintS@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+SPRINT 
+STOREFP
+RET 1
+
+lblMetprintln@System: LOADFP
+LOADSP
+STOREFP
+PRNLN
+STOREFP
+RET 0
+
+lblMetprintBln@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+BPRINT 
+PRNLN
+STOREFP
+RET 1
+
+lblMetprintCln@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+CPRINT 
+PRNLN
+STOREFP
+RET 1
+
+lblMetprintIln@System:LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+IPRINT 
+PRNLN
+STOREFP
+RET 1
+
+lblMetprintSln@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+SPRINT 
+PRNLN
+STOREFP
+RET 1
+
+.DATA
+lblVTA: DW lblMetsetall@A,lblMetm1@A
+
+.CODE
+lblConstructor@A:LOADFP ; Apila el valor del registro fp
+LOADSP ; Apila el valor del registro sp
+STOREFP ; Almacena el tope de la pila en el registro fp
+FMEM 0
+STOREFP ; Almacena el tope de la pila en el registro fp
+RET 1 ; Libera los parametros y retorna de la unidad
+
+lblMetsetall@A: LOADFP
+LOADSP
+STOREFP
+LOAD 4 ; Cargo la direccion de var
+LOAD 3 ; Acceso a atributo
+SWAP ; Muevo this a SP - 1
+STOREREF 1 ; Guardo valor en atributo
+LOAD 3 ; Acceso a atributo
+LOADREF 1 ; Cargo direccion de atributo
+PUSH 2
+MUL
+LOAD 3 ; Acceso a atributo
+SWAP ; Muevo this a SP - 1
+STOREREF 2 ; Guardo valor en atributo
+.DATA
+lbl_string0: DW "hola", 0
+.CODE
+PUSH lbl_string0
+LOAD 3 ; Acceso a atributo
+SWAP ; Muevo this a SP - 1
+STOREREF 3 ; Guardo valor en atributo
+FMEM 0
+STOREFP
+RET 2 ; Libera los parametros y retorna de la unidad
+
+lblMetm1@A: LOADFP
+LOADSP
+STOREFP
+LOAD 3 ; Acceso a atributo
+LOADREF 1 ; Cargo direccion de atributo
+PUSH lblMetdebugPrint@Object
+CALL
+LOAD 3 ; Acceso a atributo
+LOADREF 2 ; Cargo direccion de atributo
+PUSH lblMetdebugPrint@Object
+CALL
+LOAD 3 ; Acceso a atributo
+LOADREF 3 ; Cargo direccion de atributo
+PUSH lblMetprintSln@System
+CALL
+FMEM 0
+STOREFP
+RET 1 ; Libera los parametros y retorna de la unidad
+.DATA
+lblVTB: DW lblMetsetall@A,lblMetm1@A,lblMetseta4@B,lblMetm2@B
+
+.CODE
+lblConstructor@B:LOADFP ; Apila el valor del registro fp
+LOADSP ; Apila el valor del registro sp
+STOREFP ; Almacena el tope de la pila en el registro fp
+FMEM 0
+STOREFP ; Almacena el tope de la pila en el registro fp
+RET 1 ; Libera los parametros y retorna de la unidad
+
+lblMetseta4@B: LOADFP
+LOADSP
+STOREFP
+PUSH 4000
+LOAD 3 ; Acceso a atributo
+SWAP ; Muevo this a SP - 1
+STOREREF 4 ; Guardo valor en atributo
+PUSH 55
+LOAD 3 ; Acceso a atributo
+SWAP ; Muevo this a SP - 1
+STOREREF 5 ; Guardo valor en atributo
+FMEM 0
+STOREFP
+RET 1 ; Libera los parametros y retorna de la unidad
+
+lblMetm2@B: LOADFP
+LOADSP
+STOREFP
+LOAD 3 ; Acceso a atributo
+LOADREF 4 ; Cargo direccion de atributo
+PUSH lblMetdebugPrint@Object
+CALL
+LOAD 3 ; Acceso a atributo
+LOADREF 5 ; Cargo direccion de atributo
+PUSH lblMetdebugPrint@Object
+CALL
+FMEM 0
+STOREFP
+RET 1 ; Libera los parametros y retorna de la unidad
+.DATA
+lblVTInit: NOP
+
+.CODE
+lblConstructor@Init:LOADFP ; Apila el valor del registro fp
+LOADSP ; Apila el valor del registro sp
+STOREFP ; Almacena el tope de la pila en el registro fp
+FMEM 0
+STOREFP ; Almacena el tope de la pila en el registro fp
+RET 1 ; Libera los parametros y retorna de la unidad
+
+lblMetmain@Init: LOADFP
+LOADSP
+STOREFP
+RMEM 1
+RMEM 1
+PUSH 6 ; atributos y VT
+PUSH simple_malloc ; reservar heap
+CALL
+DUP
+PUSH lblVTB ; Etiqueta de la VT
+STOREREF 0
+DUP
+PUSH lblConstructor@B
+CALL
+STORE 0
+LOAD 0 ; Cargo la direccion de var
+DUP ; Duplico this
+LOADREF 0 ; Cargo VT
+LOADREF 2 ; Cargo metodo seta4
+CALL ; Llamo metodo
+LOAD 0 ; Cargo la direccion de var
+PUSH 1234
+SWAP ; Muevo this
+DUP ; Duplico this
+LOADREF 0 ; Cargo VT
+LOADREF 0 ; Cargo metodo setall
+CALL ; Llamo metodo
+LOAD 0 ; Cargo la direccion de var
+DUP ; Duplico this
+LOADREF 0 ; Cargo VT
+LOADREF 1 ; Cargo metodo m1
+CALL ; Llamo metodo
+LOAD 0 ; Cargo la direccion de var
+DUP ; Duplico this
+LOADREF 0 ; Cargo VT
+LOADREF 3 ; Cargo metodo m2
+CALL ; Llamo metodo
+FMEM 1
+STOREFP
+RET 0 ; Libera los parametros y retorna de la unidad
