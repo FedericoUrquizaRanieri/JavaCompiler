@@ -16,12 +16,14 @@ public class SymbolTable {
     public Constructor currentConstructor;
     public BlockNode currentBlock;
     public List<String> instructionsList;
+    public int stringMark;
 
     public SymbolTable(){
         classes = new HashMap<>();
         currentBlock = new NullBlockNode();
         putPredefinedClasses();
         instructionsList = new ArrayList<>();
+        stringMark = 0;
     }
 
     public void checkStatements() throws SemanticException{
@@ -198,5 +200,9 @@ public class SymbolTable {
 
     public void generateDefaultClasses(){
         DefaultGenerator.generateDefaults();
+    }
+
+    public int getStringMark(){
+        return stringMark++;
     }
 }

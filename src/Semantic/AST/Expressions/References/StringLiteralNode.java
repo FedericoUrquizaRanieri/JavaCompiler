@@ -1,6 +1,7 @@
 package Semantic.AST.Expressions.References;
 
 import Lexical.Analyzer.Token;
+import Main.MainGen;
 import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.ST.ReferenceType;
@@ -39,6 +40,10 @@ public class StringLiteralNode extends ReferenceNode {
 
     @Override
     public void generateCode() {
-        //TODO apilar y revisar encadenado?
+        int stringMark = MainGen.symbolTable.getStringMark();
+        MainGen.symbolTable.instructionsList.add(".DATA");
+        MainGen.symbolTable.instructionsList.add("lbl_string" + stringMark+": DW "+string.getLexeme()+", 0");
+        MainGen.symbolTable.instructionsList.add(".CODE");
+        MainGen.symbolTable.instructionsList.add("PUSH "+"lbl_string" + stringMark);
     }
 }

@@ -1,6 +1,7 @@
 package Semantic.AST.Sentences;
 
 import Lexical.Analyzer.Token;
+import Main.MainGen;
 import Semantic.AST.Chains.ChainedMethodNode;
 import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.ChainedVarNode;
@@ -18,6 +19,7 @@ import Semantic.SemExceptions.SemanticException;
 public class AssignCallSentNode extends SentenceNode{
     private final ExpressionNode innerExpression;
     private final Token idToken;
+    private Type expressionType;
 
     public AssignCallSentNode(ExpressionNode innerExpression,Token currentToken) {
         this.innerExpression = innerExpression;
@@ -26,7 +28,7 @@ public class AssignCallSentNode extends SentenceNode{
 
     @Override
     public void check() throws SemanticException {
-        Type t = innerExpression.check();
+        expressionType = innerExpression.check();
 
         if (innerExpression instanceof ReferenceNode referenceNode){
             if (!(referenceNode instanceof ConstructorCallNode)){
@@ -59,5 +61,8 @@ public class AssignCallSentNode extends SentenceNode{
     @Override
     public void generateCode() {
         innerExpression.generateCode();
+        if(!(innerExpression instanceof AssignExpNode) && (expressionType != null && !expressionType.getNameType().equals("null"))){
+            MainGen.symbolTable.instructionsList.add("POP");
+        }
     }
 }

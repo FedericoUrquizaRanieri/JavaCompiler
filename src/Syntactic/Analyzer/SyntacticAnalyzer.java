@@ -440,7 +440,7 @@ public class SyntacticAnalyzer {
     private SentenceNode returnState() throws SyntacticException {
         Token ct = currentToken;
         match("pr_return");
-        return new ReturnNode(optionalExpression(), MainGen.symbolTable.currentMethod.getReturnType(),ct);
+        return new ReturnNode(optionalExpression(), MainGen.symbolTable.currentMethod.getReturnType(), ct, MainGen.symbolTable.currentMethod);
     }
 
     private ExpressionNode optionalExpression() throws SyntacticException {

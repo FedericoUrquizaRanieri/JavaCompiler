@@ -44,7 +44,7 @@ public class Constructor extends Method{
         MainGen.symbolTable.instructionsList.add("STOREFP ; Almacena el tope de la pila en el registro fp");
         block.generateCode();
         MainGen.symbolTable.instructionsList.add("STOREFP ; Almacena el tope de la pila en el registro fp");
-        MainGen.symbolTable.instructionsList.add("RET "+parameters.size() + 1+" ; Libera los parametros y retorna de la unidad");
+        MainGen.symbolTable.instructionsList.add("RET "+(parameters.size() + 1)+" ; Libera los parametros y retorna de la unidad");
     }
 
     public Token getToken() {

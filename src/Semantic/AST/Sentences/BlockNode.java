@@ -56,9 +56,8 @@ public class BlockNode extends SentenceNode{
             throw new SemanticException(sentenceNode.getTokenName(), "Se intento crear una var local con nombre de atributo: ", sentenceNode.getTokenLine());
         }
         if (lastOffsetValue == 0 ){
-            if (fatherBlock != null){
+            if (fatherBlock != null)
                 lastOffsetValue = fatherBlock.getLastOffsetValue();
-            } else lastOffsetValue = -1;
         }
         sentenceNode.setOffset(lastOffsetValue);
         addLastOffsetValue();
