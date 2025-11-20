@@ -69,7 +69,7 @@ public class AccessMethodNode extends ReferenceNode {
     public void generateCode() {
         Method method = blockNode.getClassElement().getMethods().get(methodToken.getLexeme());
         if (method.getModifier() != null && method.getModifier().getLexeme().equals("static")) {
-            if (!method.getReturnType().getTokenType().getLexeme().equals("void")){
+            if (method.getReturnType()!=null && !method.getReturnType().getTokenType().getLexeme().equals("void")){
                 MainGen.symbolTable.instructionsList.add("RMEM 1 ; Reservo lugar para el retorno");
             }
             for (ExpressionNode p : params){

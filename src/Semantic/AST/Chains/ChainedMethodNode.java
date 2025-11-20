@@ -75,7 +75,7 @@ public class ChainedMethodNode extends ChainedNode{
         Method method = previousClass.getMethods().get(idToken.getLexeme());
         if (method.getModifier() != null && method.getModifier().getLexeme().equals("static")){
             MainGen.symbolTable.instructionsList.add("POP ; Borro la referencia al objeto");
-            if (!method.getReturnType().getTokenType().getLexeme().equals("void")){
+            if (method.getReturnType()!=null && !method.getReturnType().getTokenType().getLexeme().equals("void")){
                 MainGen.symbolTable.instructionsList.add("RMEM 1 ; Reservo lugar para el retorno");
             }
             for (ExpressionNode p : parameters){
