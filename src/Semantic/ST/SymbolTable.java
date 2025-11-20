@@ -17,6 +17,7 @@ public class SymbolTable {
     public BlockNode currentBlock;
     public List<String> instructionsList;
     public int stringMark;
+    public int conditionalsMark;
 
     public SymbolTable(){
         classes = new HashMap<>();
@@ -24,6 +25,7 @@ public class SymbolTable {
         putPredefinedClasses();
         instructionsList = new ArrayList<>();
         stringMark = 0;
+        conditionalsMark = 0;
     }
 
     public void checkStatements() throws SemanticException{
@@ -203,6 +205,10 @@ public class SymbolTable {
     }
 
     public int getStringMark(){
+        return stringMark++;
+    }
+
+    public int getConditionalsMark(){
         return stringMark++;
     }
 }

@@ -47,8 +47,8 @@ public class ReturnNode extends SentenceNode{
             MainGen.symbolTable.instructionsList.add("STORE " + returnOffset + "; Guardo retorno");
         }
         int memFree;
-        if(method.getBlock().getLastOffsetValue() > 0) {
-            MainGen.symbolTable.instructionsList.add("FMEM " + method.getBlock().getLastOffsetValue());
+        if(!method.getBlock().getLocalVarList().isEmpty()) {
+            MainGen.symbolTable.instructionsList.add("FMEM " + method.getBlock().getLocalVarList().size());
         }
         MainGen.symbolTable.instructionsList.add("STOREFP ; Usa ED para volver a RA llamador");
         if (method.getModifier() != null && method.getModifier().getLexeme().equals("static"))
