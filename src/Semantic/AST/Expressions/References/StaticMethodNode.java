@@ -6,6 +6,7 @@ import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.AST.Expressions.ExpressionNode;
 import Semantic.ST.Class;
+import Semantic.ST.Method;
 import Semantic.ST.Parameter;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
@@ -70,11 +71,15 @@ public class StaticMethodNode extends ReferenceNode {
 
     @Override
     public void generateCode() {
+        Method method = MainGen.symbolTable.classes.get(classElement.getLexeme()).getMethods().get(methodElement.getLexeme());
+        if (method.getReturnType()!=null && !method.getReturnType().getTokenType().getLexeme().equals("void")){
+            MainGen.symbolTable.instructionsList.add("RMEM 1 ; Reservo lugar para el retorno");
+        }
         for (ExpressionNode e :args){
             e.generateCode();
         }
         //TODO aca creo que el class element seria el this asi que no es necesario ahcer esta parafernalia
-        String originalClass = MainGen.symbolTable.classes.get(classElement.getLexeme()).getMethods().get(methodElement.getLexeme()).getOriginalClass().getClassName();
+        String originalClass = method.getOriginalClass().getClassName();
         MainGen.symbolTable.instructionsList.add("PUSH lblMet"+methodElement.getLexeme()+"@"+originalClass);
         MainGen.symbolTable.instructionsList.add("CALL");
     }

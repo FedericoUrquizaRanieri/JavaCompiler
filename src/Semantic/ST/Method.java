@@ -57,19 +57,17 @@ public class Method {
     }
 
     public void generateCode(String className){
-        if (modifier == null || !modifier.getLexeme().equals("static") || name.equals("main")){
-            MainGen.symbolTable.instructionsList.add("");
-            MainGen.symbolTable.instructionsList.add("lblMet"+name+"@"+className+": LOADFP");
-            MainGen.symbolTable.instructionsList.add("LOADSP");
-            MainGen.symbolTable.instructionsList.add("STOREFP");
-            block.generateCode();
-            MainGen.symbolTable.instructionsList.add("FMEM "+block.getLocalVarList().size());
-            MainGen.symbolTable.instructionsList.add("STOREFP");
-            if (modifier != null && modifier.getLexeme().equals("static")){
-                MainGen.symbolTable.instructionsList.add("RET "+parameters.size()+" ; Libera los parametros y retorna de la unidad");
-            } else
-                MainGen.symbolTable.instructionsList.add("RET "+(parameters.size() + 1)+" ; Libera los parametros y retorna de la unidad");
-        }
+        MainGen.symbolTable.instructionsList.add("");
+        MainGen.symbolTable.instructionsList.add("lblMet"+name+"@"+className+": LOADFP");
+        MainGen.symbolTable.instructionsList.add("LOADSP");
+        MainGen.symbolTable.instructionsList.add("STOREFP");
+        block.generateCode();
+        MainGen.symbolTable.instructionsList.add("FMEM "+block.getLocalVarList().size());
+        MainGen.symbolTable.instructionsList.add("STOREFP");
+        if (modifier != null && modifier.getLexeme().equals("static")){
+            MainGen.symbolTable.instructionsList.add("RET "+parameters.size()+" ; Libera los parametros y retorna de la unidad");
+        } else
+            MainGen.symbolTable.instructionsList.add("RET "+(parameters.size() + 1)+" ; Libera los parametros y retorna de la unidad");
     }
 
     public void setParamsOffsets(){

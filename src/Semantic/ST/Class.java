@@ -233,7 +233,8 @@ public class Class {
             c.generateCode();
         }
         for(Method m : methods.values()){
-            m.generateCode(className);
+            if (m.getOriginalClass().getClassName().equals(className))
+                m.generateCode(className);
         }
     }
 

@@ -64,7 +64,7 @@ public class AccessVarNode extends ReferenceNode {
     @Override
     public void generateCode() {
         Attribute atr = MainGen.symbolTable.classes.get(blockNode.getClassElement().getClassName()).getAttributes().get(varToken.getLexeme());
-        if (atr!=null){
+        if (atr!=null && blockNode.getLocalVarList().get(varToken.getLexeme())==null && blockNode.getMethod().getParameters().get(varToken.getLexeme()) == null){
             MainGen.symbolTable.instructionsList.add("LOAD 3 ; Acceso a atributo");
             if (!isLeftSided || !(chainedElement instanceof EmptyChainedNode)){
                 MainGen.symbolTable.instructionsList.add("LOADREF "+atr.getOffset()+" ; Cargo direccion de atributo");
