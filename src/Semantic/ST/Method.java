@@ -73,14 +73,15 @@ public class Method {
     }
 
     public void setParamsOffsets(){
-        int i;
+        int initialOffset;
+        int index = 1;
         if (modifier != null && modifier.getLexeme().equals("static"))
-            i = 3;
+            initialOffset = 3;
         else
-            i = 4;
+            initialOffset = 4;
         for(Parameter p : parameters.values()){
-            p.setOffset(i);
-            i++;
+            p.setOffset(parameters.size() + initialOffset - index);
+            index++;
         }
     }
 
