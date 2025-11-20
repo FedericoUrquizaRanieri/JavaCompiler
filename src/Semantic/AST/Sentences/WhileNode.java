@@ -25,8 +25,8 @@ public class WhileNode extends SentenceNode{
 
     @Override
     public void generateCode() {
-        int whileMark = MainGen.symbolTable.conditionalsMark;
-        int whileEndMark = MainGen.symbolTable.conditionalsMark;
+        int whileMark = MainGen.symbolTable.getStringMark();
+        int whileEndMark = MainGen.symbolTable.getConditionalsMark();
         MainGen.symbolTable.instructionsList.add("while"+ whileMark + ": NOP");
         condition.generateCode();
         MainGen.symbolTable.instructionsList.add("BF whilefin" + whileEndMark);
