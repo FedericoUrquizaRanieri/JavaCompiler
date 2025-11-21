@@ -48,7 +48,7 @@ public class ThisCallNode extends ReferenceNode {
 
     @Override
     public void generateCode() {
-        MainGen.symbolTable.instructionsList.add("LOAD 3 ; se accede a this");
+        MainGen.symbolTable.instructionsList.add("LOAD 3 ; this");
         if (chainedElement != null)
             chainedElement.generateCode();
     }

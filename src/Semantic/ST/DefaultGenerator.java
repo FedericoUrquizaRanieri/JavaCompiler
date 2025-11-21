@@ -22,15 +22,15 @@ public class DefaultGenerator {
     }
 
     private static void generateObjectMethod() {
-        MainGen.symbolTable.instructionsList.add("lblConstructor@Object: LOADFP ; Apila el valor del registro fp");
-        MainGen.symbolTable.instructionsList.add("LOADSP ; Apila el valor del registro sp");
-        MainGen.symbolTable.instructionsList.add("STOREFP ; Almacena el tope de la pila en el registro fp");
+        MainGen.symbolTable.instructionsList.add("lblConstructor@Object: LOADFP");
+        MainGen.symbolTable.instructionsList.add("LOADSP");
+        MainGen.symbolTable.instructionsList.add("STOREFP");
         MainGen.symbolTable.instructionsList.add("FMEM 0");
-        MainGen.symbolTable.instructionsList.add("STOREFP ; Almacena el tope de la pila en el registro fp");
-        MainGen.symbolTable.instructionsList.add("RET "+ 1 +" ; Libera los parametros y retorna de la unidad");
+        MainGen.symbolTable.instructionsList.add("STOREFP");
+        MainGen.symbolTable.instructionsList.add("RET "+ 1 );
         MainGen.symbolTable.instructionsList.add("");
 
-        MainGen.symbolTable.instructionsList.add("lblMetdebugPrint@Object: LOADFP ; Apila el valor del registro fp");
+        MainGen.symbolTable.instructionsList.add("lblMetdebugPrint@Object: LOADFP");
         MainGen.symbolTable.instructionsList.add("LOADSP");
         MainGen.symbolTable.instructionsList.add("STOREFP");
         MainGen.symbolTable.instructionsList.add("LOAD 3 ; Lee i");
@@ -41,12 +41,12 @@ public class DefaultGenerator {
     }
 
     private static void generateSystemMethod() {
-        MainGen.symbolTable.instructionsList.add("lblConstructor@System: LOADFP ; Apila el valor del registro fp");
-        MainGen.symbolTable.instructionsList.add("LOADSP ; Apila el valor del registro sp");
-        MainGen.symbolTable.instructionsList.add("STOREFP ; Almacena el tope de la pila en el registro fp");
+        MainGen.symbolTable.instructionsList.add("lblConstructor@System: LOADFP");
+        MainGen.symbolTable.instructionsList.add("LOADSP");
+        MainGen.symbolTable.instructionsList.add("STOREFP");
         MainGen.symbolTable.instructionsList.add("FMEM 0");
-        MainGen.symbolTable.instructionsList.add("STOREFP ; Almacena el tope de la pila en el registro fp");
-        MainGen.symbolTable.instructionsList.add("RET "+ 1 +" ; Libera los parametros y retorna de la unidad");
+        MainGen.symbolTable.instructionsList.add("STOREFP");
+        MainGen.symbolTable.instructionsList.add("RET "+ 1 );
         MainGen.symbolTable.instructionsList.add("");
 
         MainGen.symbolTable.instructionsList.add("lblMetread@System: LOADFP");
@@ -146,12 +146,12 @@ public class DefaultGenerator {
     }
 
     private static void generateStringMethod(){
-        MainGen.symbolTable.instructionsList.add("lblConstructor@String: LOADFP ; Apila el valor del registro fp");
-        MainGen.symbolTable.instructionsList.add("LOADSP ; Apila el valor del registro sp");
-        MainGen.symbolTable.instructionsList.add("STOREFP ; Almacena el tope de la pila en el registro fp");
+        MainGen.symbolTable.instructionsList.add("lblConstructor@String: LOADFP");
+        MainGen.symbolTable.instructionsList.add("LOADSP");
+        MainGen.symbolTable.instructionsList.add("STOREFP");
         MainGen.symbolTable.instructionsList.add("FMEM 0");
-        MainGen.symbolTable.instructionsList.add("STOREFP ; Almacena el tope de la pila en el registro fp");
-        MainGen.symbolTable.instructionsList.add("RET "+ 1 +" ; Libera los parametros y retorna de la unidad");
+        MainGen.symbolTable.instructionsList.add("STOREFP");
+        MainGen.symbolTable.instructionsList.add("RET "+ 1 );
         MainGen.symbolTable.instructionsList.add("");
     }
 }

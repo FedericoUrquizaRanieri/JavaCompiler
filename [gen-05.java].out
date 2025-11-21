@@ -25,14 +25,14 @@ RET 1     ; Retorna eliminando el parametro
 lblVTObject: NOP
 
 .CODE
-lblConstructor@Object: LOADFP ; Apila el valor del registro fp
-LOADSP ; Apila el valor del registro sp
-STOREFP ; Almacena el tope de la pila en el registro fp
+lblConstructor@Object: LOADFP
+LOADSP
+STOREFP
 FMEM 0
-STOREFP ; Almacena el tope de la pila en el registro fp
-RET 1 ; Libera los parametros y retorna de la unidad
+STOREFP
+RET 1
 
-lblMetdebugPrint@Object: LOADFP ; Apila el valor del registro fp
+lblMetdebugPrint@Object: LOADFP
 LOADSP
 STOREFP
 LOAD 3 ; Lee i
@@ -44,23 +44,23 @@ RET 1
 lblVTString: NOP
 
 .CODE
-lblConstructor@String: LOADFP ; Apila el valor del registro fp
-LOADSP ; Apila el valor del registro sp
-STOREFP ; Almacena el tope de la pila en el registro fp
+lblConstructor@String: LOADFP
+LOADSP
+STOREFP
 FMEM 0
-STOREFP ; Almacena el tope de la pila en el registro fp
-RET 1 ; Libera los parametros y retorna de la unidad
+STOREFP
+RET 1
 
 .DATA
 lblVTSystem: NOP
 
 .CODE
-lblConstructor@System: LOADFP ; Apila el valor del registro fp
-LOADSP ; Apila el valor del registro sp
-STOREFP ; Almacena el tope de la pila en el registro fp
+lblConstructor@System: LOADFP
+LOADSP
+STOREFP
 FMEM 0
-STOREFP ; Almacena el tope de la pila en el registro fp
-RET 1 ; Libera los parametros y retorna de la unidad
+STOREFP
+RET 1
 
 lblMetread@System: LOADFP
 LOADSP
@@ -151,12 +151,12 @@ RET 1
 lblVTInit: NOP
 
 .CODE
-lblConstructor@Init:LOADFP ; Apila el valor del registro fp
-LOADSP ; Apila el valor del registro sp
-STOREFP ; Almacena el tope de la pila en el registro fp
+lblConstructor@Init:LOADFP
+LOADSP
+STOREFP
 FMEM 0
-STOREFP ; Almacena el tope de la pila en el registro fp
-RET 1 ; Libera los parametros y retorna de la unidad
+STOREFP
+RET 1
 
 lblMetmain@Init: LOADFP
 LOADSP
@@ -173,55 +173,55 @@ DUP
 PUSH lblConstructor@StorageTest
 CALL
 STORE 0
-LOAD 0 ; Cargo la direccion de var
+LOAD 0 ; Cargo var
 PUSH 77
 SWAP ; Muevo this
 DUP ; Duplico this
 LOADREF 0 ; Cargo VT
 LOADREF 0 ; Cargo metodo setValue
-CALL ; Llamo metodo
-LOAD 0 ; Cargo la direccion de var
-RMEM 1 ; Reservo lugar para el retorno
+CALL
+LOAD 0 ; Cargo var
+RMEM 1 ; Reservo retorno
 SWAP
 DUP ; Duplico this
 LOADREF 0 ; Cargo VT
 LOADREF 1 ; Cargo metodo getValue
-CALL ; Llamo metodo
+CALL
 PUSH lblMetdebugPrint@Object
 CALL
 FMEM 1
 STOREFP
-RET 0 ; Libera los parametros y retorna de la unidad
+RET 0
 .DATA
 lblVTStorageTest: DW lblMetsetValue@StorageTest,lblMetgetValue@StorageTest
 
 .CODE
-lblConstructor@StorageTest:LOADFP ; Apila el valor del registro fp
-LOADSP ; Apila el valor del registro sp
-STOREFP ; Almacena el tope de la pila en el registro fp
+lblConstructor@StorageTest:LOADFP
+LOADSP
+STOREFP
 FMEM 0
-STOREFP ; Almacena el tope de la pila en el registro fp
-RET 1 ; Libera los parametros y retorna de la unidad
+STOREFP
+RET 1
 
 lblMetsetValue@StorageTest: LOADFP
 LOADSP
 STOREFP
-LOAD 4 ; Cargo la direccion de var
-LOAD 3 ; Acceso a atributo
-SWAP ; Muevo this a SP - 1
-STOREREF 1 ; Guardo valor en atributo
+LOAD 4 ; Cargo var
+LOAD 3 ; Acceso atributo
+SWAP
+STOREREF 1 ; Guardo en atributo
 FMEM 0
 STOREFP
-RET 2 ; Libera los parametros y retorna de la unidad
+RET 2
 
 lblMetgetValue@StorageTest: LOADFP
 LOADSP
 STOREFP
-LOAD 3 ; Acceso a atributo
-LOADREF 1 ; Cargo direccion de atributo
+LOAD 3 ; Acceso atributo
+LOADREF 1 ; Cargo atributo
 STORE 4; Guardo retorno
 STOREFP ; Usa ED para volver a RA llamador
 RET 1 ; Libera los parametros y retorna de la unidad
 FMEM 0
 STOREFP
-RET 1 ; Libera los parametros y retorna de la unidad
+RET 1

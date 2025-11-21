@@ -73,7 +73,7 @@ public class StaticMethodNode extends ReferenceNode {
     public void generateCode() {
         Method method = MainGen.symbolTable.classes.get(classElement.getLexeme()).getMethods().get(methodElement.getLexeme());
         if (method.getReturnType()!=null && !method.getReturnType().getTokenType().getLexeme().equals("void")){
-            MainGen.symbolTable.instructionsList.add("RMEM 1 ; Reservo lugar para el retorno");
+            MainGen.symbolTable.instructionsList.add("RMEM 1 ; Reservo retorno");
         }
         for (ExpressionNode e :args){
             e.generateCode();

@@ -49,10 +49,10 @@ public class ChainedVarNode extends ChainedNode{
     public void generateCode() {
         Attribute atr = previousClass.getAttributes().get(idToken.getLexeme());
         if (!isLeftSided || !(chainedNode instanceof EmptyChainedNode)){
-            MainGen.symbolTable.instructionsList.add("LOADREF "+atr.getOffset()+" ; Cargo direccion de atributo");
+            MainGen.symbolTable.instructionsList.add("LOADREF "+atr.getOffset()+" ; Cargo atributo");
         } else {
-            MainGen.symbolTable.instructionsList.add("SWAP ; Pongo this en SP - 1");
-            MainGen.symbolTable.instructionsList.add("STOREREF "+atr.getOffset()+" ; Guardo valor en la direccion del atributo");
+            MainGen.symbolTable.instructionsList.add("SWAP");
+            MainGen.symbolTable.instructionsList.add("STOREREF "+atr.getOffset()+" ; Guardo en atributo");
         }
         if (chainedNode != null)
             chainedNode.generateCode();

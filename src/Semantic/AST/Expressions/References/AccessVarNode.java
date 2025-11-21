@@ -65,12 +65,12 @@ public class AccessVarNode extends ReferenceNode {
     public void generateCode() {
         Attribute atr = MainGen.symbolTable.classes.get(blockNode.getClassElement().getClassName()).getAttributes().get(varToken.getLexeme());
         if (atr!=null && blockNode.getLocalVarList().get(varToken.getLexeme())==null && blockNode.getMethod().getParameters().get(varToken.getLexeme()) == null){
-            MainGen.symbolTable.instructionsList.add("LOAD 3 ; Acceso a atributo");
+            MainGen.symbolTable.instructionsList.add("LOAD 3 ; Acceso atributo");
             if (!isLeftSided || !(chainedElement instanceof EmptyChainedNode)){
-                MainGen.symbolTable.instructionsList.add("LOADREF "+atr.getOffset()+" ; Cargo direccion de atributo");
+                MainGen.symbolTable.instructionsList.add("LOADREF "+atr.getOffset()+" ; Cargo atributo");
             } else {
-                MainGen.symbolTable.instructionsList.add("SWAP ; Muevo this a SP - 1");
-                MainGen.symbolTable.instructionsList.add("STOREREF "+atr.getOffset()+" ; Guardo valor en atributo");
+                MainGen.symbolTable.instructionsList.add("SWAP");
+                MainGen.symbolTable.instructionsList.add("STOREREF "+atr.getOffset()+" ; Guardo en atributo");
             }
         } else {
             var localOrParamOffset = 0;
@@ -79,10 +79,9 @@ public class AccessVarNode extends ReferenceNode {
             } else if (blockNode.getMethod().getParameters().get(varToken.getLexeme()) != null) {
                 localOrParamOffset =blockNode.getMethod().getParameters().get(varToken.getLexeme()).getOffset();
             }
-
             if (!isLeftSided || !(chainedElement instanceof EmptyChainedNode))
-                MainGen.symbolTable.instructionsList.add("LOAD "+localOrParamOffset+" ; Cargo la direccion de var");
-            else MainGen.symbolTable.instructionsList.add("STORE "+localOrParamOffset+" ; Guardo valor en var");
+                MainGen.symbolTable.instructionsList.add("LOAD "+localOrParamOffset+" ; Cargo var");
+            else MainGen.symbolTable.instructionsList.add("STORE "+localOrParamOffset+" ; Guardo en var");
         }
         if (!(chainedElement instanceof EmptyChainedNode))
             chainedElement.generateCode();

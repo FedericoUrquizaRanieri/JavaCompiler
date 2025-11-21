@@ -74,9 +74,9 @@ public class ChainedMethodNode extends ChainedNode{
     public void generateCode() {
         Method method = previousClass.getMethods().get(idToken.getLexeme());
         if (method.getModifier() != null && method.getModifier().getLexeme().equals("static")){
-            MainGen.symbolTable.instructionsList.add("POP ; Borro la referencia al objeto");
+            MainGen.symbolTable.instructionsList.add("POP ; Borro objeto");
             if (method.getReturnType()!=null && !method.getReturnType().getTokenType().getLexeme().equals("void")){
-                MainGen.symbolTable.instructionsList.add("RMEM 1 ; Reservo lugar para el retorno");
+                MainGen.symbolTable.instructionsList.add("RMEM 1 ; Reservo retorno");
             }
             for (ExpressionNode p : parameters){
                 p.generateCode();
@@ -85,7 +85,7 @@ public class ChainedMethodNode extends ChainedNode{
             MainGen.symbolTable.instructionsList.add("CALL");
         } else {
             if (method.getReturnType() != null){
-                MainGen.symbolTable.instructionsList.add("RMEM 1 ; Reservo lugar para el retorno");
+                MainGen.symbolTable.instructionsList.add("RMEM 1 ; Reservo retorno");
                 MainGen.symbolTable.instructionsList.add("SWAP");
             }
             for (ExpressionNode p : parameters){
@@ -95,9 +95,8 @@ public class ChainedMethodNode extends ChainedNode{
             MainGen.symbolTable.instructionsList.add("DUP ; Duplico this");
             MainGen.symbolTable.instructionsList.add("LOADREF 0 ; Cargo VT");
             MainGen.symbolTable.instructionsList.add("LOADREF "+method.getOffset()+" ; Cargo metodo "+method.getName());
-            MainGen.symbolTable.instructionsList.add("CALL ; Llamo metodo");
+            MainGen.symbolTable.instructionsList.add("CALL");
         }
-
         if (chainedNode != null)
             chainedNode.generateCode();
     }

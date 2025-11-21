@@ -65,9 +65,9 @@ public class Method {
         MainGen.symbolTable.instructionsList.add("FMEM "+block.getLocalVarList().size());
         MainGen.symbolTable.instructionsList.add("STOREFP");
         if (modifier != null && modifier.getLexeme().equals("static")){
-            MainGen.symbolTable.instructionsList.add("RET "+parameters.size()+" ; Libera los parametros y retorna de la unidad");
+            MainGen.symbolTable.instructionsList.add("RET "+parameters.size());
         } else
-            MainGen.symbolTable.instructionsList.add("RET "+(parameters.size() + 1)+" ; Libera los parametros y retorna de la unidad");
+            MainGen.symbolTable.instructionsList.add("RET "+(parameters.size() + 1));
     }
 
     public void setParamsOffsets(){

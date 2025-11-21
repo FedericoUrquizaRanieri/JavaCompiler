@@ -39,12 +39,12 @@ public class Constructor extends Method{
     }
 
     public void generateCode(){
-        MainGen.symbolTable.instructionsList.add("lblConstructor@"+token.getLexeme()+":LOADFP ; Apila el valor del registro fp");
-        MainGen.symbolTable.instructionsList.add("LOADSP ; Apila el valor del registro sp");
-        MainGen.symbolTable.instructionsList.add("STOREFP ; Almacena el tope de la pila en el registro fp");
+        MainGen.symbolTable.instructionsList.add("lblConstructor@"+token.getLexeme()+":LOADFP");
+        MainGen.symbolTable.instructionsList.add("LOADSP");
+        MainGen.symbolTable.instructionsList.add("STOREFP");
         block.generateCode();
-        MainGen.symbolTable.instructionsList.add("STOREFP ; Almacena el tope de la pila en el registro fp");
-        MainGen.symbolTable.instructionsList.add("RET "+(parameters.size() + 1)+" ; Libera los parametros y retorna de la unidad");
+        MainGen.symbolTable.instructionsList.add("STOREFP");
+        MainGen.symbolTable.instructionsList.add("RET "+(parameters.size() + 1));
     }
 
     public Token getToken() {
