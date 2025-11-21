@@ -18,6 +18,7 @@ public class SymbolTable {
     public List<String> instructionsList;
     public int stringMark;
     public int conditionalsMark;
+    public String mainLabel;
 
     public SymbolTable(){
         classes = new HashMap<>();
@@ -55,6 +56,10 @@ public class SymbolTable {
             c.setConstructorOffset();
         }
         for (Class c : classes.values()) {
+            if(c.getMethods().get("main") != null){
+                mainLabel = "lblMetmain@"+c.getClassName();
+                System.out.println(mainLabel);
+            }
             c.setMethodOffsets();
         }
     }
@@ -73,7 +78,7 @@ public class SymbolTable {
         instructionsList.add(".CODE");
         instructionsList.add("PUSH simple_heap_init");
         instructionsList.add("CALL");
-        instructionsList.add("PUSH lblMetmain@Init");
+        instructionsList.add("PUSH "+mainLabel);
         instructionsList.add("CALL");
         instructionsList.add("HALT");
         instructionsList.add("");
