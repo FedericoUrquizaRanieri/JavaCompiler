@@ -94,9 +94,5 @@ public class AccessMethodNode extends ReferenceNode {
         }
         if (chainedElement != null)
             chainedElement.generateCode();
-        //String originalClass = blockNode.getClassElement().getMethods().get(methodToken.getLexeme()).getOriginalClass().getClassName();
-        //MainGen.symbolTable.instructionsList.add("PUSH lblMet"+methodToken.getLexeme()+"@"+originalClass);
-        //MainGen.symbolTable.instructionsList.add("CALL");
-        //TODO borrar
     }
 }

@@ -78,7 +78,6 @@ public class StaticMethodNode extends ReferenceNode {
         for (ExpressionNode e :args){
             e.generateCode();
         }
-        //TODO aca creo que el class element seria el this asi que no es necesario ahcer esta parafernalia
         String originalClass = method.getOriginalClass().getClassName();
         MainGen.symbolTable.instructionsList.add("PUSH lblMet"+methodElement.getLexeme()+"@"+originalClass);
         MainGen.symbolTable.instructionsList.add("CALL");
