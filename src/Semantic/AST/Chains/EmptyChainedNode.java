@@ -1,6 +1,7 @@
 package Semantic.AST.Chains;
 
 import Lexical.Analyzer.Token;
+import Semantic.ST.Class;
 import Semantic.ST.PrimitiveType;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
@@ -23,4 +24,7 @@ public class EmptyChainedNode extends ChainedNode{
     public ChainedNode getChainedElement() {
         return null;
     }
+
+    @Override
+    public void generateCode() {}
 }

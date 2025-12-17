@@ -1,0 +1,294 @@
+.CODE
+PUSH simple_heap_init
+CALL
+PUSH lblMetmain@Init
+CALL
+HALT
+
+simple_heap_init: RET 0 ; Retorna inmediatamente
+
+simple_malloc: LOADFP     ; Inicializacion unidad
+LOADSP
+STOREFP ; Finaliza inicializacion del RA
+LOADHL ; hl
+DUP ; hl
+PUSH 1 ; 1
+ADD ; hl+1
+STORE 4 ; Guarda el resultado (un puntero a la primer celda de la region de memoria)
+LOAD 3 ; Carga la cantidad de celdas a alojar (parametro que debe ser positivo)
+ADD
+STOREHL ; Mueve el heap limit (hl). Expande el heap
+STOREFP
+RET 1     ; Retorna eliminando el parametro
+
+.DATA
+lblVTObject: NOP
+
+.CODE
+lblConstructor@Object: LOADFP
+LOADSP
+STOREFP
+FMEM 0
+STOREFP
+RET 1
+
+lblMetdebugPrint@Object: LOADFP
+LOADSP
+STOREFP
+LOAD 3 ; Lee i
+IPRINT ; Imprime i
+STOREFP
+RET 1
+
+.DATA
+lblVTString: NOP
+
+.CODE
+lblConstructor@String: LOADFP
+LOADSP
+STOREFP
+FMEM 0
+STOREFP
+RET 1
+
+.DATA
+lblVTSystem: NOP
+
+.CODE
+lblConstructor@System: LOADFP
+LOADSP
+STOREFP
+FMEM 0
+STOREFP
+RET 1
+
+lblMetread@System: LOADFP
+LOADSP
+STOREFP
+READ ; Lee tope de la pila
+PUSH 48 ; Por ASCII
+SUB
+STORE 3 ; Guarda en retorno el tope
+STOREFP
+RET 0
+
+lblMetprintB@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+BPRINT 
+STOREFP
+RET 1
+
+lblMetprintC@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+CPRINT 
+STOREFP
+RET 1
+
+lblMetprintI@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+IPRINT 
+STOREFP
+RET 1
+
+lblMetprintS@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+SPRINT 
+STOREFP
+RET 1
+
+lblMetprintln@System: LOADFP
+LOADSP
+STOREFP
+PRNLN
+STOREFP
+RET 0
+
+lblMetprintBln@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+BPRINT 
+PRNLN
+STOREFP
+RET 1
+
+lblMetprintCln@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+CPRINT 
+PRNLN
+STOREFP
+RET 1
+
+lblMetprintIln@System:LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+IPRINT 
+PRNLN
+STOREFP
+RET 1
+
+lblMetprintSln@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+SPRINT 
+PRNLN
+STOREFP
+RET 1
+
+.DATA
+lblVTA: DW lblMetsetall@A,lblMetm1@A
+
+.CODE
+lblConstructor@A:LOADFP
+LOADSP
+STOREFP
+FMEM 0
+STOREFP
+RET 1
+
+lblMetsetall@A: LOADFP
+LOADSP
+STOREFP
+LOAD 4 ; Cargo var
+LOAD 3 ; Acceso atributo
+SWAP
+STOREREF 1 ; Guardo en atributo
+LOAD 3 ; Acceso atributo
+LOADREF 1 ; Cargo atributo
+PUSH 2
+MUL
+LOAD 3 ; Acceso atributo
+SWAP
+STOREREF 2 ; Guardo en atributo
+.DATA
+lbl_string0: DW "hola", 0
+.CODE
+PUSH lbl_string0
+LOAD 3 ; Acceso atributo
+SWAP
+STOREREF 3 ; Guardo en atributo
+FMEM 0
+STOREFP
+RET 2
+
+lblMetm1@A: LOADFP
+LOADSP
+STOREFP
+LOAD 3 ; Acceso atributo
+LOADREF 1 ; Cargo atributo
+PUSH lblMetdebugPrint@Object
+CALL
+LOAD 3 ; Acceso atributo
+LOADREF 2 ; Cargo atributo
+PUSH lblMetdebugPrint@Object
+CALL
+LOAD 3 ; Acceso atributo
+LOADREF 3 ; Cargo atributo
+PUSH lblMetprintSln@System
+CALL
+FMEM 0
+STOREFP
+RET 1
+.DATA
+lblVTB: DW lblMetsetall@A,lblMetm1@A,lblMetseta4@B,lblMetm2@B
+
+.CODE
+lblConstructor@B:LOADFP
+LOADSP
+STOREFP
+FMEM 0
+STOREFP
+RET 1
+
+lblMetseta4@B: LOADFP
+LOADSP
+STOREFP
+PUSH 4000
+LOAD 3 ; Acceso atributo
+SWAP
+STOREREF 4 ; Guardo en atributo
+PUSH 55
+LOAD 3 ; Acceso atributo
+SWAP
+STOREREF 5 ; Guardo en atributo
+FMEM 0
+STOREFP
+RET 1
+
+lblMetm2@B: LOADFP
+LOADSP
+STOREFP
+LOAD 3 ; Acceso atributo
+LOADREF 4 ; Cargo atributo
+PUSH lblMetdebugPrint@Object
+CALL
+LOAD 3 ; Acceso atributo
+LOADREF 5 ; Cargo atributo
+PUSH lblMetdebugPrint@Object
+CALL
+FMEM 0
+STOREFP
+RET 1
+.DATA
+lblVTInit: NOP
+
+.CODE
+lblConstructor@Init:LOADFP
+LOADSP
+STOREFP
+FMEM 0
+STOREFP
+RET 1
+
+lblMetmain@Init: LOADFP
+LOADSP
+STOREFP
+RMEM 1
+RMEM 1
+PUSH 6 ; atributos y VT
+PUSH simple_malloc ; reservar heap
+CALL
+DUP
+PUSH lblVTB ; Etiqueta de la VT
+STOREREF 0
+DUP
+PUSH lblConstructor@B
+CALL
+STORE 0
+LOAD 0 ; Cargo var
+DUP ; Duplico this
+LOADREF 0 ; Cargo VT
+LOADREF 2 ; Cargo metodo seta4
+CALL
+LOAD 0 ; Cargo var
+PUSH 1234
+SWAP ; Muevo this
+DUP ; Duplico this
+LOADREF 0 ; Cargo VT
+LOADREF 0 ; Cargo metodo setall
+CALL
+LOAD 0 ; Cargo var
+DUP ; Duplico this
+LOADREF 0 ; Cargo VT
+LOADREF 1 ; Cargo metodo m1
+CALL
+LOAD 0 ; Cargo var
+DUP ; Duplico this
+LOADREF 0 ; Cargo VT
+LOADREF 3 ; Cargo metodo m2
+CALL
+FMEM 1
+STOREFP
+RET 0

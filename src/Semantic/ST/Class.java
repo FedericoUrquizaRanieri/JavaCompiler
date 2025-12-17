@@ -1,7 +1,7 @@
 package Semantic.ST;
 
 import Lexical.Analyzer.Token;
-import Main.MainSemantic;
+import Main.MainGen;
 import Semantic.AST.Sentences.NullBlockNode;
 import Semantic.SemExceptions.SemanticException;
 
@@ -14,24 +14,31 @@ public class Class {
     private Token generics;
     private Token inheritanceGenerics;
     private Token modifierClass;
-    private HashMap<String, Attribute> attributes;
-    private HashMap<String, Method> methods;
+    private LinkedHashMap<String, Attribute> attributes;
+    private LinkedHashMap<String, Method> methods;
     private final HashMap<String, Constructor> constructors;
     private boolean isConsolidated = false;
+    private boolean attributesNumbered = false;
+    private boolean methodsNumbered = false;
+    private int lastAttributeOffset;
+    private int lastMethodOffset;
+
 
     public Class(Token token){
-        attributes = new HashMap<>();
-        methods = new HashMap<>();
+        attributes = new LinkedHashMap<>();
+        methods = new LinkedHashMap<>();
         constructors = new HashMap<>();
         this.className = token.getLexeme();
         this.classToken = token;
         if(Objects.equals(className, "Object"))
             isConsolidated = true;
+        lastMethodOffset = 0;
+        lastAttributeOffset = 1;
     }
 
     public void checkStatements() throws SemanticException {
         if (inheritance!=null) {
-            Class confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
+            Class confirmedFather = MainGen.symbolTable.existsClass(inheritance);
             if (confirmedFather != null) {
                 if (this == confirmedFather)
                     throw new SemanticException(inheritance.getLexeme(), "La clase actual es igual a la clase padre ", inheritance.getLine());
@@ -92,9 +99,9 @@ public class Class {
     public void consolidate() throws SemanticException{
         Class confirmedFather;
         if(inheritance!=null)
-            confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
+            confirmedFather = MainGen.symbolTable.existsClass(inheritance);
         else {
-            confirmedFather = MainSemantic.symbolTable.classes.get("Object");
+            confirmedFather = MainGen.symbolTable.classes.get("Object");
             if(!Objects.equals(this.className, "Object")){
                 this.inheritance=confirmedFather.classToken;
             }
@@ -117,8 +124,8 @@ public class Class {
 
     private void consolidateAttributes() throws SemanticException {
         if (inheritance!=null){
-            Class confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
-            HashMap<String, Attribute> newAttributes = new HashMap<>(confirmedFather.attributes);
+            Class confirmedFather = MainGen.symbolTable.existsClass(inheritance);
+            LinkedHashMap<String, Attribute> newAttributes = new LinkedHashMap<>(confirmedFather.attributes);
             for(Attribute a:attributes.values()){
                 if(newAttributes.putIfAbsent(a.getName(),a)!=null)
                     throw new SemanticException(a.getName(),"Se intento cambiar un atributo del padre en ",a.getToken().getLine());
@@ -129,8 +136,8 @@ public class Class {
 
     private void consolidateMethods() throws SemanticException {
         if (inheritance!=null){
-            Class confirmedFather = MainSemantic.symbolTable.existsClass(inheritance);
-            HashMap<String, Method> newMethods = new HashMap<>(confirmedFather.methods);
+            Class confirmedFather = MainGen.symbolTable.existsClass(inheritance);
+            LinkedHashMap<String, Method> newMethods = new LinkedHashMap<>(confirmedFather.methods);
             for(Method m : methods.values()){
                 Method fatherMethod = newMethods.put(m.getName(),m);
                 if(fatherMethod!=null){
@@ -189,7 +196,7 @@ public class Class {
 
     public boolean circularInheritance(List<Class> ancestors, Class element){
         if (element.inheritance!=null) {
-            Class father = MainSemantic.symbolTable.existsClass(element.inheritance);
+            Class father = MainGen.symbolTable.existsClass(element.inheritance);
             if (father == null)
                 return false;
             else if (ancestors.contains(father)) {
@@ -216,6 +223,86 @@ public class Class {
                 throw new SemanticException(c.getToken().getLexeme(),"Se intento agregar un constructor repetido llamado ",c.getToken().getLine());
         } else {
             throw new SemanticException(c.getToken().getLexeme(),"Se intento agregar un constructor repetido llamado ",c.getToken().getLine());
+        }
+    }
+
+    public void generateCode(){
+        generateVT();
+        MainGen.symbolTable.instructionsList.add(".CODE");
+        for(Constructor c: constructors.values()){
+            c.generateCode();
+        }
+        for(Method m : methods.values()){
+            if (m.getOriginalClass().getClassName().equals(className))
+                m.generateCode(className);
+        }
+    }
+
+    public void generateVT(){
+        HashMap<Integer, String> methodsLabelByOffset = new HashMap<>();
+        for (Method m : methods.values()) {
+            if (m.getModifier()==null || m.getModifier() != null && !m.getModifier().getLexeme().equals("static"))
+                methodsLabelByOffset.put(m.getOffset(), "lblMet"+m.getName()+"@"+m.getOriginalClass().getClassName());
+        }
+
+        if (!methodsLabelByOffset.isEmpty()){
+            MainGen.symbolTable.instructionsList.add(".DATA");
+            StringBuilder methodsLabels = new StringBuilder();
+            for (int i = 0; i < getLastMethodOffset(); i++) {
+                if (methodsLabelByOffset.get(i) != null)
+                    methodsLabels.append(methodsLabelByOffset.get(i));
+                else methodsLabels.append("0");
+                if (i != getLastMethodOffset()-1)
+                    methodsLabels.append(",");
+            }
+            MainGen.symbolTable.instructionsList.add("lblVT"+classToken.getLexeme()+": DW "+methodsLabels);
+        } else {
+            MainGen.symbolTable.instructionsList.add(".DATA");
+            MainGen.symbolTable.instructionsList.add("lblVT"+classToken.getLexeme()+": NOP");
+        }
+        MainGen.symbolTable.instructionsList.add("");
+    }
+
+    public void setAttributeOffsets(){
+        if (!attributesNumbered){
+            Class fatherClass = MainGen.symbolTable.classes.get(inheritance.getLexeme());
+            if (!inheritance.getLexeme().equals("Object")){
+                fatherClass.setAttributeOffsets();
+            }
+            lastAttributeOffset = fatherClass.getLastAttributeOffset();
+            for (Attribute a: attributes.values())
+                if (fatherClass.attributes.get(a.getName())==null){
+                    a.setOffset(lastAttributeOffset++);
+                } else {
+                    a.setOffset(fatherClass.attributes.get(a.getName()).getOffset());
+                }
+            attributesNumbered = true;
+        }
+    }
+
+    public void setMethodOffsets(){
+        if (!methodsNumbered){
+            Class fatherClass = MainGen.symbolTable.classes.get(inheritance.getLexeme());
+            if (!inheritance.getLexeme().equals("Object")){
+                fatherClass.setMethodOffsets();
+            }
+            lastMethodOffset = fatherClass.getLastMethodOffset();
+            for (Method m: methods.values()) {
+                m.setParamsOffsets();
+                if (m.getModifier() == null || m.getModifier() != null && !m.getModifier().getLexeme().equals("static"))
+                    if (fatherClass.methods.get(m.getName()) == null) {
+                        m.setOffset(lastMethodOffset++);
+                    } else {
+                        m.setOffset(fatherClass.methods.get(m.getName()).getOffset());
+                    }
+            }
+            methodsNumbered = true;
+        }
+    }
+
+    public void setConstructorOffset(){
+        for(Constructor c:constructors.values()){
+            c.setParamsOffsets();
         }
     }
 
@@ -267,5 +354,20 @@ public class Class {
 
     public HashMap<String, Attribute> getAttributes() {
         return attributes;
+    }
+
+    public int getLastAttributeOffset() {
+        return lastAttributeOffset;
+    }
+
+    public int getLastMethodOffset() {
+        return lastMethodOffset;
+    }
+
+    public void attributesNumbered() {
+        attributesNumbered = true;
+    }
+    public void methodsNumbered() {
+        methodsNumbered = true;
     }
 }

@@ -1,6 +1,7 @@
 package Semantic.ST;
 
 import Lexical.Analyzer.Token;
+import Main.MainGen;
 import Semantic.AST.Sentences.BlockNode;
 import Semantic.SemExceptions.SemanticException;
 
@@ -14,7 +15,7 @@ public class Constructor extends Method{
     private BlockNode block;
 
     public Constructor(Token token){
-        super(token);
+        super(token,MainGen.symbolTable.currentClass);
         parameters = new LinkedHashMap<>();
         this.token = token;
     }
@@ -37,6 +38,15 @@ public class Constructor extends Method{
         block.check();
     }
 
+    public void generateCode(){
+        MainGen.symbolTable.instructionsList.add("lblConstructor@"+token.getLexeme()+":LOADFP");
+        MainGen.symbolTable.instructionsList.add("LOADSP");
+        MainGen.symbolTable.instructionsList.add("STOREFP");
+        block.generateCode();
+        MainGen.symbolTable.instructionsList.add("STOREFP");
+        MainGen.symbolTable.instructionsList.add("RET "+(parameters.size() + 1));
+    }
+
     public Token getToken() {
         return token;
     }
@@ -47,5 +57,14 @@ public class Constructor extends Method{
 
     public LinkedHashMap<String, Parameter> getParameters() {
         return parameters;
+    }
+
+    public void setParamsOffsets(){
+        int initialOffset = 4;
+        int valuePos = 1;
+        for(Parameter p : parameters.values()){
+            p.setOffset(initialOffset + parameters.size() - valuePos);
+            valuePos++;
+        }
     }
 }

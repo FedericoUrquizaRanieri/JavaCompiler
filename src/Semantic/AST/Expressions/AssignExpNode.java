@@ -1,6 +1,7 @@
 package Semantic.AST.Expressions;
 
 import Lexical.Analyzer.Token;
+import Main.MainGen;
 import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.ChainedVarNode;
 import Semantic.AST.Chains.EmptyChainedNode;
@@ -54,5 +55,14 @@ public class AssignExpNode extends ExpressionNode {
             chain = chain.getChainedElement();
         }
         return ref instanceof AccessVarNode;
+    }
+
+    @Override
+    public void generateCode() {
+        if (leftExpression instanceof ReferenceNode referenceNode) {
+            referenceNode.setLeftSided();
+        }
+        rightExpression.generateCode();
+        leftExpression.generateCode();
     }
 }

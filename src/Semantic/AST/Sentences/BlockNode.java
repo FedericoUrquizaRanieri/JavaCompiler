@@ -7,23 +7,26 @@ import Semantic.SemExceptions.SemanticException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class BlockNode extends SentenceNode{
     private final List<SentenceNode> sentenceNodeList;
-    private final HashMap<String,LocalVarNode> localVarList;
+    private final LinkedHashMap<String,LocalVarNode> localVarList;
     protected boolean checked;
     private final Method method;
     private final Class classElement;
     private final BlockNode fatherBlock;
+    protected int lastOffsetValue;
 
     public BlockNode(Method method,Class classElement, BlockNode fatherBlock){
         sentenceNodeList = new ArrayList<>();
-        localVarList = new HashMap<>();
+        localVarList = new LinkedHashMap<>();
         checked = false;
         this.method = method;
         this.classElement = classElement;
         this.fatherBlock = fatherBlock;
+        lastOffsetValue = 0;
     }
 
     @Override
@@ -52,6 +55,12 @@ public class BlockNode extends SentenceNode{
         if (classElement.getAttributes().containsKey(name)){
             throw new SemanticException(sentenceNode.getTokenName(), "Se intento crear una var local con nombre de atributo: ", sentenceNode.getTokenLine());
         }
+        if (lastOffsetValue == 0 ){
+            if (fatherBlock != null)
+                lastOffsetValue = fatherBlock.getLastOffsetValue();
+        }
+        sentenceNode.setOffset(lastOffsetValue);
+        addLastOffsetValue();
     }
 
     public HashMap<String,LocalVarNode> getLocalVarList() {
@@ -91,5 +100,19 @@ public class BlockNode extends SentenceNode{
         if (fatherOldVar==null)
             return fatherVar;
         else return fatherOldVar;
+    }
+
+    public void generateCode(){
+        for(SentenceNode s : sentenceNodeList){
+            s.generateCode();
+        }
+    }
+
+    public int getLastOffsetValue() {
+        return lastOffsetValue;
+    }
+
+    public void addLastOffsetValue() {
+        lastOffsetValue--;
     }
 }

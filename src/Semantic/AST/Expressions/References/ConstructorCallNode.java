@@ -1,7 +1,7 @@
 package Semantic.AST.Expressions.References;
 
 import Lexical.Analyzer.Token;
-import Main.MainSemantic;
+import Main.MainGen;
 import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.AST.Expressions.ExpressionNode;
@@ -24,12 +24,12 @@ public class ConstructorCallNode extends ReferenceNode {
 
     @Override
     public Type check() throws SemanticException {
-        Class currentClass = MainSemantic.symbolTable.existsClass(classElement);
+        Class currentClass = MainGen.symbolTable.existsClass(classElement);
         Type retType = new ReferenceType(classElement,null);
         if(currentClass == null){
             throw new SemanticException(classElement.getLexeme(),"La clase del constructor referenciado no existe: ",classElement.getLine());
         } else{
-            Constructor c = MainSemantic.symbolTable.classes.get(classElement.getLexeme()).getConstructors().get(classElement.getLexeme());
+            Constructor c = MainGen.symbolTable.classes.get(classElement.getLexeme()).getConstructors().get(classElement.getLexeme());
             if (c==null){
                 throw new SemanticException(classElement.getLexeme(),"No es posible crear un object: ",classElement.getLine());
             }
@@ -63,5 +63,25 @@ public class ConstructorCallNode extends ReferenceNode {
                 throw new SemanticException(ct.getLexeme(),"El parametro es de tipo incorrecto: ",ct.getLine());
             i++;
         }
+    }
+
+    @Override
+    public void generateCode() {
+        MainGen.symbolTable.instructionsList.add("RMEM 1");
+        MainGen.symbolTable.instructionsList.add("PUSH "+MainGen.symbolTable.classes.get(classElement.getLexeme()).getLastAttributeOffset()+" ; atributos y VT");
+        MainGen.symbolTable.instructionsList.add("PUSH simple_malloc ; reservar heap");
+        MainGen.symbolTable.instructionsList.add("CALL");
+        MainGen.symbolTable.instructionsList.add("DUP");
+        MainGen.symbolTable.instructionsList.add("PUSH lblVT"+classElement.getLexeme()+" ; Etiqueta de la VT");
+        MainGen.symbolTable.instructionsList.add("STOREREF 0");
+        MainGen.symbolTable.instructionsList.add("DUP");
+        for (ExpressionNode e : args) {
+            e.generateCode();
+            MainGen.symbolTable.instructionsList.add("SWAP");
+        }
+        MainGen.symbolTable.instructionsList.add("PUSH lblConstructor@"+classElement.getLexeme());
+        MainGen.symbolTable.instructionsList.add("CALL");
+        if (chainedElement != null)
+            chainedElement.generateCode();
     }
 }

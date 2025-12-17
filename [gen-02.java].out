@@ -1,0 +1,211 @@
+.CODE
+PUSH simple_heap_init
+CALL
+PUSH lblMetmain@Init
+CALL
+HALT
+
+simple_heap_init: RET 0 ; Retorna inmediatamente
+
+simple_malloc: LOADFP     ; Inicializacion unidad
+LOADSP
+STOREFP ; Finaliza inicializacion del RA
+LOADHL ; hl
+DUP ; hl
+PUSH 1 ; 1
+ADD ; hl+1
+STORE 4 ; Guarda el resultado (un puntero a la primer celda de la region de memoria)
+LOAD 3 ; Carga la cantidad de celdas a alojar (parametro que debe ser positivo)
+ADD
+STOREHL ; Mueve el heap limit (hl). Expande el heap
+STOREFP
+RET 1     ; Retorna eliminando el parametro
+
+.DATA
+lblVTObject: NOP
+
+.CODE
+lblConstructor@Object: LOADFP
+LOADSP
+STOREFP
+FMEM 0
+STOREFP
+RET 1
+
+lblMetdebugPrint@Object: LOADFP
+LOADSP
+STOREFP
+LOAD 3 ; Lee i
+IPRINT ; Imprime i
+STOREFP
+RET 1
+
+.DATA
+lblVTString: NOP
+
+.CODE
+lblConstructor@String: LOADFP
+LOADSP
+STOREFP
+FMEM 0
+STOREFP
+RET 1
+
+.DATA
+lblVTSystem: NOP
+
+.CODE
+lblConstructor@System: LOADFP
+LOADSP
+STOREFP
+FMEM 0
+STOREFP
+RET 1
+
+lblMetread@System: LOADFP
+LOADSP
+STOREFP
+READ ; Lee tope de la pila
+PUSH 48 ; Por ASCII
+SUB
+STORE 3 ; Guarda en retorno el tope
+STOREFP
+RET 0
+
+lblMetprintB@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+BPRINT 
+STOREFP
+RET 1
+
+lblMetprintC@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+CPRINT 
+STOREFP
+RET 1
+
+lblMetprintI@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+IPRINT 
+STOREFP
+RET 1
+
+lblMetprintS@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+SPRINT 
+STOREFP
+RET 1
+
+lblMetprintln@System: LOADFP
+LOADSP
+STOREFP
+PRNLN
+STOREFP
+RET 0
+
+lblMetprintBln@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+BPRINT 
+PRNLN
+STOREFP
+RET 1
+
+lblMetprintCln@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+CPRINT 
+PRNLN
+STOREFP
+RET 1
+
+lblMetprintIln@System:LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+IPRINT 
+PRNLN
+STOREFP
+RET 1
+
+lblMetprintSln@System: LOADFP
+LOADSP
+STOREFP
+LOAD 3 
+SPRINT 
+PRNLN
+STOREFP
+RET 1
+
+.DATA
+lblVTA: DW lblMetmc@A
+
+.CODE
+lblConstructor@A:LOADFP
+LOADSP
+STOREFP
+FMEM 0
+STOREFP
+RET 1
+
+lblMetmc@A: LOADFP
+LOADSP
+STOREFP
+PUSH 1234
+PUSH lblMetdebugPrint@Object
+CALL
+PUSH 33
+LOAD 3 ; Acceso atributo
+SWAP
+STOREREF 1 ; Guardo en atributo
+LOAD 3 ; Acceso atributo
+LOADREF 1 ; Cargo atributo
+PUSH lblMetdebugPrint@Object
+CALL
+FMEM 0
+STOREFP
+RET 1
+.DATA
+lblVTInit: NOP
+
+.CODE
+lblConstructor@Init:LOADFP
+LOADSP
+STOREFP
+FMEM 0
+STOREFP
+RET 1
+
+lblMetmain@Init: LOADFP
+LOADSP
+STOREFP
+RMEM 1
+RMEM 1
+PUSH 2 ; atributos y VT
+PUSH simple_malloc ; reservar heap
+CALL
+DUP
+PUSH lblVTA ; Etiqueta de la VT
+STOREREF 0
+DUP
+PUSH lblConstructor@A
+CALL
+STORE 0
+LOAD 0 ; Cargo var
+DUP ; Duplico this
+LOADREF 0 ; Cargo VT
+LOADREF 0 ; Cargo metodo mc
+CALL
+FMEM 1
+STOREFP
+RET 0

@@ -1,6 +1,7 @@
 package Semantic.AST.Sentences;
 
 import Lexical.Analyzer.Token;
+import Main.MainGen;
 import Semantic.AST.Expressions.ExpressionNode;
 import Semantic.SemExceptions.SemanticException;
 
@@ -23,5 +24,24 @@ public class IfNode extends SentenceNode{
         body.check();
         elseSentence.check();
         checked = true;
+    }
+
+    @Override
+    public void generateCode() {
+        int ifIndex = MainGen.symbolTable.getConditionalsMark();
+        condition.generateCode();
+        if (elseSentence == null){
+            MainGen.symbolTable.instructionsList.add("BF finif"+ifIndex+" ; salto segun cond");
+            body.generateCode();
+            MainGen.symbolTable.instructionsList.add("finif"+ifIndex+": NOP ; final if");
+        } else {
+            int elseIndex = MainGen.symbolTable.getConditionalsMark();
+            MainGen.symbolTable.instructionsList.add("BF else"+elseIndex+" ; salto segun cond");
+            body.generateCode();
+            MainGen.symbolTable.instructionsList.add("JUMP finif"+ifIndex);
+            MainGen.symbolTable.instructionsList.add("else"+elseIndex+": NOP ; tag else");
+            elseSentence.generateCode();
+            MainGen.symbolTable.instructionsList.add("finif"+ifIndex+": NOP ; final if");
+        }
     }
 }

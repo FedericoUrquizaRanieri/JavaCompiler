@@ -8,4 +8,6 @@ public class EmptySentenceNode extends SentenceNode{
     }
 
     public void check() throws SemanticException {}
+
+    public void generateCode(){}
 }

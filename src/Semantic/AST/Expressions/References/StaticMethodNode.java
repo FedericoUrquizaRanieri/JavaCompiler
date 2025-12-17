@@ -1,14 +1,16 @@
 package Semantic.AST.Expressions.References;
 
 import Lexical.Analyzer.Token;
-import Main.MainSemantic;
+import Main.MainGen;
 import Semantic.AST.Chains.ChainedNode;
 import Semantic.AST.Chains.EmptyChainedNode;
 import Semantic.AST.Expressions.ExpressionNode;
 import Semantic.ST.Class;
+import Semantic.ST.Method;
 import Semantic.ST.Parameter;
 import Semantic.ST.Type;
 import Semantic.SemExceptions.SemanticException;
+import com.sun.tools.javac.Main;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +29,7 @@ public class StaticMethodNode extends ReferenceNode {
 
     @Override
     public Type check() throws SemanticException {
-        Class currentClass = MainSemantic.symbolTable.classes.get(classElement.getLexeme());
+        Class currentClass = MainGen.symbolTable.classes.get(classElement.getLexeme());
         if (currentClass==null){
             throw new SemanticException(classElement.getLexeme(),"La clase llamada no existe:", classElement.getLine());
         } else if (currentClass.getMethods().get(methodElement.getLexeme())==null){
@@ -65,5 +67,19 @@ public class StaticMethodNode extends ReferenceNode {
                     throw new SemanticException(ct.getLexeme(),"El parametro es de tipo incorrecto: ",ct.getLine());
             i++;
         }
+    }
+
+    @Override
+    public void generateCode() {
+        Method method = MainGen.symbolTable.classes.get(classElement.getLexeme()).getMethods().get(methodElement.getLexeme());
+        if (method.getReturnType()!=null && !method.getReturnType().getTokenType().getLexeme().equals("void")){
+            MainGen.symbolTable.instructionsList.add("RMEM 1 ; Reservo retorno");
+        }
+        for (ExpressionNode e :args){
+            e.generateCode();
+        }
+        String originalClass = method.getOriginalClass().getClassName();
+        MainGen.symbolTable.instructionsList.add("PUSH lblMet"+methodElement.getLexeme()+"@"+originalClass);
+        MainGen.symbolTable.instructionsList.add("CALL");
     }
 }

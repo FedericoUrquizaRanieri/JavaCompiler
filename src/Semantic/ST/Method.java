@@ -1,9 +1,8 @@
 package Semantic.ST;
 
 import Lexical.Analyzer.Token;
-import Main.MainSemantic;
+import Main.MainGen;
 import Semantic.AST.Sentences.BlockNode;
-import Semantic.AST.Sentences.NullBlockNode;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.LinkedHashMap;
@@ -16,17 +15,20 @@ public class Method {
     private Token modifier;
     private final LinkedHashMap<String,Parameter> parameters;
     private BlockNode block;
+    private int offset;
+    private final Class originalClass;
 
-    public Method(Token token){
+    public Method(Token token, Class orig){
         parameters = new LinkedHashMap<>();
         this.name = token.getLexeme();
         this.token = token;
+        this.originalClass = orig;
     }
 
     public void checkStatements() throws SemanticException {
         if(returnType!=null){
             if(Objects.equals(returnType.getTokenType().getTokenName(), "idClase")){
-                if (MainSemantic.symbolTable.existsClass(returnType.getTokenType())==null){
+                if (MainGen.symbolTable.existsClass(returnType.getTokenType())==null){
                     throw new SemanticException(returnType.getTokenType().getLexeme(),"Se intento agregar un tipo de retorno inexistente ",returnType.getTokenType().getLine());
                 }
             }
@@ -52,6 +54,33 @@ public class Method {
     public void addParam(Parameter p) throws SemanticException {
         if( parameters.putIfAbsent(p.getName(),p)!=null)
             throw new SemanticException(p.getName(),"Se intento agregar un parametro repetido llamada ",p.getToken().getLine());
+    }
+
+    public void generateCode(String className){
+        MainGen.symbolTable.instructionsList.add("");
+        MainGen.symbolTable.instructionsList.add("lblMet"+name+"@"+className+": LOADFP");
+        MainGen.symbolTable.instructionsList.add("LOADSP");
+        MainGen.symbolTable.instructionsList.add("STOREFP");
+        block.generateCode();
+        MainGen.symbolTable.instructionsList.add("FMEM "+block.getLocalVarList().size());
+        MainGen.symbolTable.instructionsList.add("STOREFP");
+        if (modifier != null && modifier.getLexeme().equals("static")){
+            MainGen.symbolTable.instructionsList.add("RET "+parameters.size());
+        } else
+            MainGen.symbolTable.instructionsList.add("RET "+(parameters.size() + 1));
+    }
+
+    public void setParamsOffsets(){
+        int initialOffset;
+        int index = 1;
+        if (modifier != null && modifier.getLexeme().equals("static"))
+            initialOffset = 3;
+        else
+            initialOffset = 4;
+        for(Parameter p : parameters.values()){
+            p.setOffset(parameters.size() + initialOffset - index);
+            index++;
+        }
     }
 
     public LinkedHashMap<String, Parameter> getParameters() {
@@ -94,4 +123,15 @@ public class Method {
         this.returnType = returnType;
     }
 
+    public int getOffset() {
+        return offset;
+    }
+
+    public void setOffset(int offset) {
+        this.offset = offset;
+    }
+
+    public Class getOriginalClass() {
+        return originalClass;
+    }
 }

@@ -16,7 +16,7 @@ import Semantic.ST.*;
 import Semantic.ST.Class;
 import Semantic.SemExceptions.SemanticException;
 import Syntactic.SynExceptions.SyntacticException;
-import Main.MainSemantic;
+import Main.MainGen;
 
 import java.util.*;
 
@@ -79,15 +79,15 @@ public class SyntacticAnalyzer {
             match("pr_class");
             Token name = currentToken;
             match("idClase");
-            MainSemantic.symbolTable.currentClass = new Class(name);
+            MainGen.symbolTable.currentClass = new Class(name);
             Token generic = optionalGenerics();
-            MainSemantic.symbolTable.currentClass.setInheritance(optionalInheritance());
-            MainSemantic.symbolTable.currentClass.setModifierClass(modify);
-            MainSemantic.symbolTable.currentClass.setGenerics(generic);
+            MainGen.symbolTable.currentClass.setInheritance(optionalInheritance());
+            MainGen.symbolTable.currentClass.setModifierClass(modify);
+            MainGen.symbolTable.currentClass.setGenerics(generic);
             match("openBrace");
             membersList();
             match("closeBrace");
-            MainSemantic.symbolTable.addClass(name.getLexeme(),MainSemantic.symbolTable.currentClass);
+            MainGen.symbolTable.addClass(name.getLexeme(), MainGen.symbolTable.currentClass);
         }
     }
 
@@ -180,15 +180,15 @@ public class SyntacticAnalyzer {
             Type t = typeMethod();
             Token name = currentToken;
             match("idMetVar");
-            MainSemantic.symbolTable.currentMethod = new Method(name);
-            MainSemantic.symbolTable.currentMethod.setReturnType(t);
-            MainSemantic.symbolTable.currentMethod.setModifier(mod);
+            MainGen.symbolTable.currentMethod = new Method(name,MainGen.symbolTable.currentClass);
+            MainGen.symbolTable.currentMethod.setReturnType(t);
+            MainGen.symbolTable.currentMethod.setModifier(mod);
             List<Parameter> args = formalArgs();
             for (Parameter m : args){
-                MainSemantic.symbolTable.currentMethod.addParam(m);
+                MainGen.symbolTable.currentMethod.addParam(m);
             }
-            MainSemantic.symbolTable.currentMethod.setBlock(optionalBlock());
-            MainSemantic.symbolTable.currentClass.addMethod(MainSemantic.symbolTable.currentMethod);
+            MainGen.symbolTable.currentMethod.setBlock(optionalBlock());
+            MainGen.symbolTable.currentClass.addMethod(MainGen.symbolTable.currentMethod);
         } else if (productionsMap.getFirsts("type").contains(currentToken.getTokenName())) {
             Type t = type();
             Token name = currentToken;
@@ -198,14 +198,14 @@ public class SyntacticAnalyzer {
             match("pr_void");
             Token name = currentToken;
             match("idMetVar");
-            MainSemantic.symbolTable.currentMethod = new Method(name);
-            MainSemantic.symbolTable.currentMethod.setReturnType(null);
+            MainGen.symbolTable.currentMethod = new Method(name,MainGen.symbolTable.currentClass);
+            MainGen.symbolTable.currentMethod.setReturnType(null);
             List<Parameter> args = formalArgs();
             for (Parameter m : args){
-                MainSemantic.symbolTable.currentMethod.addParam(m);
+                MainGen.symbolTable.currentMethod.addParam(m);
             }
-            MainSemantic.symbolTable.currentMethod.setBlock(optionalBlock());
-            MainSemantic.symbolTable.currentClass.addMethod(MainSemantic.symbolTable.currentMethod);
+            MainGen.symbolTable.currentMethod.setBlock(optionalBlock());
+            MainGen.symbolTable.currentClass.addMethod(MainGen.symbolTable.currentMethod);
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("member")), analyzer.getLineNumber());
         }
@@ -219,7 +219,7 @@ public class SyntacticAnalyzer {
             a.setType(t);
             optionalDeclaration();
             match("semicolon");
-            MainSemantic.symbolTable.currentClass.addAttribute(a);
+            MainGen.symbolTable.currentClass.addAttribute(a);
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("memberMethod")), analyzer.getLineNumber());
         }
@@ -236,20 +236,20 @@ public class SyntacticAnalyzer {
 
     private void memberMethod(Type t , Token name) throws CompiException {
         if (productionsMap.getFirsts("formalArgs").contains(currentToken.getTokenName())) {
-            Method m = new Method(name);
+            Method m = new Method(name,MainGen.symbolTable.currentClass);
             m.setReturnType(t);
-            MainSemantic.symbolTable.currentMethod = m;
+            MainGen.symbolTable.currentMethod = m;
             List<Parameter> args = formalArgs();
             for (Parameter p : args){
-                MainSemantic.symbolTable.currentMethod.addParam(p);
+                MainGen.symbolTable.currentMethod.addParam(p);
             }
-            MainSemantic.symbolTable.currentMethod.setBlock(optionalBlock());
-            MainSemantic.symbolTable.currentClass.addMethod(MainSemantic.symbolTable.currentMethod);
+            MainGen.symbolTable.currentMethod.setBlock(optionalBlock());
+            MainGen.symbolTable.currentClass.addMethod(MainGen.symbolTable.currentMethod);
         } else if (currentToken.getTokenName().equals("semicolon")) {
             Attribute a = new Attribute(name);
             a.setType(t);
             match("semicolon");
-            MainSemantic.symbolTable.currentClass.addAttribute(a);
+            MainGen.symbolTable.currentClass.addAttribute(a);
         } else {
             throw new SyntacticException(currentToken.getLexeme(), String.join(", ", productionsMap.getFirsts("memberMethod")), analyzer.getLineNumber());
         }
@@ -259,14 +259,14 @@ public class SyntacticAnalyzer {
         match("pr_public");
         Token nom = currentToken;
         match("idClase");
-        MainSemantic.symbolTable.currentConstructor = new Constructor(nom);
-        MainSemantic.symbolTable.currentMethod = MainSemantic.symbolTable.currentConstructor;
+        MainGen.symbolTable.currentConstructor = new Constructor(nom);
+        MainGen.symbolTable.currentMethod = MainGen.symbolTable.currentConstructor;
         List<Parameter> args = formalArgs();
         for (Parameter m : args){
-            MainSemantic.symbolTable.currentConstructor.addParam(m);
+            MainGen.symbolTable.currentConstructor.addParam(m);
         }
-        MainSemantic.symbolTable.currentConstructor.setBlock(block());
-        MainSemantic.symbolTable.currentClass.addConstructor(MainSemantic.symbolTable.currentConstructor);
+        MainGen.symbolTable.currentConstructor.setBlock(block());
+        MainGen.symbolTable.currentClass.addConstructor(MainGen.symbolTable.currentConstructor);
     }
 
     private Type typeMethod() throws SyntacticException {
@@ -374,12 +374,12 @@ public class SyntacticAnalyzer {
     }
 
     private BlockNode block() throws SyntacticException, SemanticException {
-        BlockNode b = new BlockNode(MainSemantic.symbolTable.currentMethod,MainSemantic.symbolTable.currentClass,MainSemantic.symbolTable.currentBlock);
-        MainSemantic.symbolTable.currentBlock = b;
+        BlockNode b = new BlockNode(MainGen.symbolTable.currentMethod, MainGen.symbolTable.currentClass, MainGen.symbolTable.currentBlock);
+        MainGen.symbolTable.currentBlock = b;
         match("openBrace");
         sentenceList(b);
         match("closeBrace");
-        MainSemantic.symbolTable.currentBlock = b.getFatherBlock();
+        MainGen.symbolTable.currentBlock = b.getFatherBlock();
         return b;
     }
 
@@ -434,13 +434,13 @@ public class SyntacticAnalyzer {
         Token ct = currentToken;
         match("idMetVar");
         match("equals");
-        return new LocalVarNode(ct,composedExpression(),MainSemantic.symbolTable.currentBlock);
+        return new LocalVarNode(ct,composedExpression(), MainGen.symbolTable.currentBlock);
     }
 
     private SentenceNode returnState() throws SyntacticException {
         Token ct = currentToken;
         match("pr_return");
-        return new ReturnNode(optionalExpression(),MainSemantic.symbolTable.currentMethod.getReturnType(),ct);
+        return new ReturnNode(optionalExpression(), MainGen.symbolTable.currentMethod.getReturnType(), ct, MainGen.symbolTable.currentMethod);
     }
 
     private ExpressionNode optionalExpression() throws SyntacticException {
@@ -717,7 +717,7 @@ public class SyntacticAnalyzer {
     private ReferenceNode primary() throws SyntacticException {
         ReferenceNode p;
         if (currentToken.getTokenName().equals("pr_this")) {
-            p = new ThisCallNode(currentToken,MainSemantic.symbolTable.currentClass,MainSemantic.symbolTable.currentBlock);
+            p = new ThisCallNode(currentToken, MainGen.symbolTable.currentClass, MainGen.symbolTable.currentBlock);
             match("pr_this");
         } else if (currentToken.getTokenName().equals("stringLiteral")) {
             p = new StringLiteralNode(currentToken);
@@ -740,7 +740,7 @@ public class SyntacticAnalyzer {
         Token ct = currentToken;
         match("idMetVar");
         List<ExpressionNode> l = possibleArgs();
-        BlockNode blockNode = MainSemantic.symbolTable.currentBlock;
+        BlockNode blockNode = MainGen.symbolTable.currentBlock;
         if (l==null)
             return new AccessVarNode(ct,blockNode);
         else

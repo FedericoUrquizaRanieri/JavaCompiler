@@ -1,7 +1,7 @@
 package Semantic.AST.Chains;
 
 import Lexical.Analyzer.Token;
-import Main.MainSemantic;
+import Main.MainGen;
 import Semantic.AST.Expressions.ExpressionNode;
 import Semantic.ST.*;
 import Semantic.ST.Class;
@@ -12,6 +12,7 @@ import java.util.List;
 
 public class ChainedMethodNode extends ChainedNode{
     private final List<ExpressionNode> parameters;
+    private Class previousClass;
     public ChainedMethodNode(List<ExpressionNode> params, Token mainToken) {
         parameters = params;
         idToken = mainToken;
@@ -28,7 +29,7 @@ public class ChainedMethodNode extends ChainedNode{
             if (!(lastClass instanceof ReferenceType)){
                 throw new SemanticException(idToken.getLexeme(),"La llamada encadenada se hace sobre una variable primitiva: ", idToken.getLine());
             }
-            Class previousClass = MainSemantic.symbolTable.existsClass(lastClass.getTokenType());
+            previousClass = MainGen.symbolTable.existsClass(lastClass.getTokenType());
             if(previousClass==null){
                 throw new SemanticException(idToken.getLexeme(),"La clase encadenada previa no existe: ", idToken.getLine());
             }
@@ -67,5 +68,36 @@ public class ChainedMethodNode extends ChainedNode{
                 throw new SemanticException(ct.getLexeme(),"El parametro es de tipo incorrecto: ",ct.getLine());
             i++;
         }
+    }
+
+    @Override
+    public void generateCode() {
+        Method method = previousClass.getMethods().get(idToken.getLexeme());
+        if (method.getModifier() != null && method.getModifier().getLexeme().equals("static")){
+            MainGen.symbolTable.instructionsList.add("POP ; Borro objeto");
+            if (method.getReturnType()!=null && !method.getReturnType().getTokenType().getLexeme().equals("void")){
+                MainGen.symbolTable.instructionsList.add("RMEM 1 ; Reservo retorno");
+            }
+            for (ExpressionNode p : parameters){
+                p.generateCode();
+            }
+            MainGen.symbolTable.instructionsList.add("PUSH lblMet"+method.getName()+"@"+method.getOriginalClass().getClassName());
+            MainGen.symbolTable.instructionsList.add("CALL");
+        } else {
+            if (method.getReturnType() != null){
+                MainGen.symbolTable.instructionsList.add("RMEM 1 ; Reservo retorno");
+                MainGen.symbolTable.instructionsList.add("SWAP");
+            }
+            for (ExpressionNode p : parameters){
+                p.generateCode();
+                MainGen.symbolTable.instructionsList.add("SWAP ; Muevo this");
+            }
+            MainGen.symbolTable.instructionsList.add("DUP ; Duplico this");
+            MainGen.symbolTable.instructionsList.add("LOADREF 0 ; Cargo VT");
+            MainGen.symbolTable.instructionsList.add("LOADREF "+method.getOffset()+" ; Cargo metodo "+method.getName());
+            MainGen.symbolTable.instructionsList.add("CALL");
+        }
+        if (chainedNode != null)
+            chainedNode.generateCode();
     }
 }

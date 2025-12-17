@@ -1,5 +1,6 @@
 package Semantic.AST.Sentences;
 
+import Main.MainGen;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ public class NullBlockNode extends BlockNode{
     public NullBlockNode(){
         super(null,null,null);
         checked = false;
+        lastOffsetValue = 0;
     }
 
     @Override
@@ -35,5 +37,10 @@ public class NullBlockNode extends BlockNode{
     @Override
     public HashMap<String,LocalVarNode> getLocalVarList() {
         return new HashMap<>();
+    }
+
+    @Override
+    public void generateCode() {
+        MainGen.symbolTable.instructionsList.add("FMEM 0");
     }
 }

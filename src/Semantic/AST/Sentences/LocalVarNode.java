@@ -1,6 +1,7 @@
 package Semantic.AST.Sentences;
 
 import Lexical.Analyzer.Token;
+import Main.MainGen;
 import Semantic.AST.Expressions.AssignExpNode;
 import Semantic.AST.Expressions.ExpressionNode;
 import Semantic.AST.Expressions.References.ParamExpressionNode;
@@ -14,6 +15,7 @@ public class LocalVarNode extends SentenceNode{
     private final ExpressionNode compExpression;
     private Type varType;
     private final BlockNode blockNode;
+    private int offset;
 
     public LocalVarNode(Token name, ExpressionNode e, BlockNode blockNode){
         compExpression=e;
@@ -43,6 +45,15 @@ public class LocalVarNode extends SentenceNode{
         checked = true;
     }
 
+    @Override
+    public void generateCode() {
+        MainGen.symbolTable.instructionsList.add("RMEM 1");
+        if(compExpression != null){
+            compExpression.generateCode();
+            MainGen.symbolTable.instructionsList.add("STORE " + offset);
+        }
+    }
+
     public String getTokenName() {
         return tokenName.getLexeme();
     }
@@ -53,5 +64,13 @@ public class LocalVarNode extends SentenceNode{
 
     public Type getVarType() {
         return varType;
+    }
+
+    public int getOffset() {
+        return offset;
+    }
+
+    public void setOffset(int offset) {
+        this.offset = offset;
     }
 }

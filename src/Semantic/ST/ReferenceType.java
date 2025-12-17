@@ -1,7 +1,7 @@
 package Semantic.ST;
 
 import Lexical.Analyzer.Token;
-import Main.MainSemantic;
+import Main.MainGen;
 import Semantic.SemExceptions.SemanticException;
 
 import java.util.List;
@@ -69,15 +69,15 @@ public class ReferenceType implements Type{
             className="String";
         } else
             className = typeSon.getNameType();
-        if (MainSemantic.symbolTable.classes.get(className)==null){
+        if (MainGen.symbolTable.classes.get(className)==null){
             throw new SemanticException(className,"Operacion fallida por tipo inexistente: ",typeSon.getTokenType().getLine());
         }
-        Token currentFather = MainSemantic.symbolTable.classes.get(className).getInheritance();
+        Token currentFather = MainGen.symbolTable.classes.get(className).getInheritance();
         while (currentFather!=null){
             if (currentFather.getLexeme().equals(nameType)){
                 return;
             }
-            currentFather = MainSemantic.symbolTable.classes.get(currentFather.getLexeme()).getInheritance();
+            currentFather = MainGen.symbolTable.classes.get(currentFather.getLexeme()).getInheritance();
         }
         throw new SemanticException(operator.getLexeme(),"Operacion fallida por tipo incompatible: ",operator.getLine());
     }
@@ -88,9 +88,9 @@ public class ReferenceType implements Type{
             className="String";
         } else
             className = typeSon.getNameType();
-        if (MainSemantic.symbolTable.classes.get(nameType) == null)
+        if (MainGen.symbolTable.classes.get(nameType) == null)
             throw new SemanticException(nameType, "Operación fallida por tipo inexistente: ", typeSon.getTokenType().getLine());
-        if (MainSemantic.symbolTable.classes.get(className) == null)
+        if (MainGen.symbolTable.classes.get(className) == null)
             throw new SemanticException(className, "Operación fallida por tipo inexistente: ", typeSon.getTokenType().getLine());
         if (nameType.equals(className)) {
             return;
@@ -105,12 +105,12 @@ public class ReferenceType implements Type{
     }
 
     private boolean isSubtypeOf(String child, String parent) {
-        Token currentFather = MainSemantic.symbolTable.classes.get(child).getInheritance();
+        Token currentFather = MainGen.symbolTable.classes.get(child).getInheritance();
         while (currentFather != null) {
             if (currentFather.getLexeme().equals(parent)) {
                 return true;
             }
-            currentFather = MainSemantic.symbolTable.classes
+            currentFather = MainGen.symbolTable.classes
                     .get(currentFather.getLexeme())
                     .getInheritance();
         }
